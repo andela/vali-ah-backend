@@ -1,9 +1,9 @@
-const express = require('express'),
-  bodyParser = require('body-parser'),
-  session = require('express-session'),
-  cors = require('cors'),
-  errorhandler = require('errorhandler'),
-  mongoose = require('mongoose');
+import express from 'express';
+import bodyParser from 'body-parser';
+import session from 'express-session';
+import cors from 'cors';
+import errorhandler from 'errorhandler';
+import { log } from 'console';
 
 const isProduction = process.env.NODE_ENV === 'production';
 
@@ -35,30 +35,21 @@ if (!isProduction) {
   app.use(errorhandler());
 }
 
-if (isProduction) {
-  mongoose.connect(process.env.MONGODB_URI);
-} else {
-  mongoose.connect('mongodb://localhost/conduit');
-  mongoose.set('debug', true);
-}
-
 app.use(require('./routes'));
 
-// / catch 404 and forward to error handler
+// catch 404 and forward to error handler
 app.use((req, res, next) => {
   const err = new Error('Not Found');
   err.status = 404;
   next(err);
 });
 
-// / error handlers
+// error handlers
 
 // development error handler
 // will print stacktrace
 if (!isProduction) {
   app.use((err, req, res) => {
-    console.log(err.stack);
-
     res.status(err.status || 500);
 
     res.json({
@@ -84,5 +75,5 @@ app.use((err, req, res) => {
 
 // finally, let's start our server...
 const server = app.listen(process.env.PORT || 3000, () => {
-  console.log(`Listening on port ${server.address().port}`);
+  log(`Listening on port ${server.address().port}`);
 });

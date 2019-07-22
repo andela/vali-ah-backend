@@ -4,14 +4,17 @@
   "description": "A Social platform for the creative at heart",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon --exec babel-node src/index.js",
-    "start": "node dist/index.js",
     "build": "babel src --out-dir dist",
-    "sync-env": "sync-dotenv",
+    "coveralls": "cat ./coverage/lcov.info | coveralls",
+    "db:migrate": "npm run sequelize-cli:es6 db:migrate",
+    "db:undo": "sequelize db:migrate:undo:all",
+    "dev": "nodemon --exec babel-node src/index.js",
+    "sequelize-cli:es6": "babel-node ./node_modules/.bin/sequelize $*",
     "lint": "eslint \"**/*.js\" --fix",
+    "start": "node dist/index.js",
+    "sync-env": "sync-dotenv",
     "test": "mocha --require @babel/register tests/test.js --exit",
-    "test:coverage": "nyc --reporter=text --reporter=lcov npm run test",
-    "coveralls": "cat ./coverage/lcov.info | coveralls"
+    "test:coverage": "nyc --reporter=text --reporter=lcov npm run test"
   },
   "author": "Andela Simulations Programme",
   "license": "MIT",
@@ -27,12 +30,13 @@
     "jsonwebtoken": "^8.3.0",
     "method-override": "^2.3.10",
     "methods": "^1.1.2",
-    "mongoose": "^5.2.2",
-    "mongoose-unique-validator": "^2.0.1",
     "morgan": "^1.9.1",
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",
+    "pg": "^7.11.0",
+    "pg-hstore": "^2.3.3",
     "request": "^2.87.0",
+    "sequelize": "^5.10.2",
     "underscore": "^1.9.1"
   },
   "devDependencies": {
@@ -41,7 +45,6 @@
     "@babel/node": "^7.5.5",
     "@babel/polyfill": "^7.4.4",
     "@babel/preset-env": "^7.5.5",
-    "@babel/register": "^7.5.5",
     "chai": "^4.2.0",
     "coveralls": "^3.0.5",
     "eslint": "^5.3.0",
@@ -52,6 +55,7 @@
     "mocha": "^6.2.0",
     "nodemon": "^1.19.1",
     "nyc": "^14.1.1",
+    "sequelize-cli": "^5.5.0",
     "sync-dotenv": "^2.2.0"
   },
   "husky": {
