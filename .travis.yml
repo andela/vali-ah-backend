@@ -1,0 +1,27 @@
+language: node_js
+services:
+- postgresql
+env:
+  global:
+  - secure: sdH4NyUaY8H2ksh8S/K3oFvPpCJ7bTn5oh7J07QunI3WJhryXCNYuCW9cW9CkXDrgyLG/Jre6NYd0OrSojg1+yegsbI6sgzl+9iX/gNnbL7tjqo8ZUO0M3MDqPxaGFmThQcUyOO6RhMEVIHatmAowx3V5VXIGDsq45cdwbnLOFzEVEmhJ4OiFMUFFgnyeMVUE92Umj98QKqyd8Fo8+HoGAc4aYSgJ3AHsWBM9Xqi4HG92NZIWTUTeumgULzih2PpcqIW0OcfhP2p68xiaBDg8CHLhjtb3+6a3oRnrhCAMDQEt1IwB3LKh0wKJP2PFY/EmsOTbKDPvXxdTlyZI+SUfglqcVRioz6qKIg3pFa0GyOeRmJxw5GytreaQa9zL1oIs9rYOsVnO+QkFWiOJyTDMvgUz85ivnYtPveUA4rfoHa7T4BWeY7Sgqb+TeIB7eFR+h2UV2Dden1uGIihBkbuGdFWwgXtpio26YuIQD6UiqGuv4la1iKG3MsCWX/dt6hA756UezUwdqKRDVFle3p+WR0Y2AX+3oRyU6pJ9uujyI6+TRjV0omjSzAAP7YFRyiVJ2ncL37VnwwQJvTmglfTEyL6X6nAi6RVbV73mpx9RCLUZv1+L3ifRovtRx2TZu3r/qEIqoFaykBVlp3e5d3Snav+yU41qG6/qQ75Enx4pvk=
+  - secure: fTmsOkWnum/XuusIUDQ+9WMfBfplul44E6fCzaJ0DJ+RE/irQfBfovucG/1C5dzXOEnGaUEPoWrDHNCRNktI+5xioNeFP88u6ozA8GnjeDIRBbegphyACasbN2X/0MfkhLKChUi2NgQ5jHYZxjLPvadMPOVp3sVNHF0AslmcrnJKM6GelmZcESbr8hyBG7wGu3etJCSedY7zk37IxIQ5bE/j3a70/dDjWOIeIZazhZnAUyZ4brsOUlwMlXk2Ex5EaRN4xoDK5eCDm6TtpFVFFtbJE/O4vd8UBX3dsCa0ay2qkByT5PVTy6KbqGaeQ3tnnq4R2dvBdcjK2OTRZQ+Dks5dUD2sXtj/Ve51YFHlVUe3A2iy+A14cddNmorq7xZFKmmFQCG+4wgO0AfZ8oXbT6g5t5MvZZ+miBB1Moi8T0EoI2IyPQMDmlUZsokQpIRR9N0AbIQmIwI+XAknZsFs9bZoNVE03zLXAoeAWEam0VtWTR5FzyFbX/+a99mP7OA1CKWQpLzARCbS9XBwN33NEhDr1dl7+Qdgm8OtxVsRKdUda22rxudW9hT9HumBx3Up81AuOrQZ6fK/i2SYUt3CDg8+UYeemKd6xcCIX3ZUoin04Dz6erSF20N/PcUoN0HI7MAxN7tGlhf+h7eIbNW5bb4/3SpSxLqpuEgMykYj0X8=
+node_js:
+- node
+before_script:
+- curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64
+  > ./cc-test-reporter
+- chmod +x ./cc-test-reporter
+- "./cc-test-reporter before-build"
+- psql -c "CREATE DATABASE $DATABASE;" -U postgres
+install:
+- npm install
+script:
+- npm run test
+cache:
+  directories:
+  - node_modules
+after_success:
+- npm run coveralls
+- npm run coverage
+after_script:
+- "./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT"

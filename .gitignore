@@ -4,6 +4,8 @@ logs
 .DS_Store
 
 npm-debug.log*
+.nyc_output/
+package.json.lock
 
 # Runtime data
 pids
