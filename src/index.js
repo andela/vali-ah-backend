@@ -1,66 +1,47 @@
-const express = require('express'),
-  bodyParser = require('body-parser'),
-  session = require('express-session'),
-  cors = require('cors'),
-  errorhandler = require('errorhandler'),
-  mongoose = require('mongoose');
+import '@babel/polyfill';
+import errorhandler from 'errorhandler';
+import express, { json, urlencoded } from 'express';
+import { config } from 'dotenv';
+import cors from 'cors';
+import Debug from 'debug';
+import routes from './routes';
+
+config();
+
+const debug = Debug('dev');
+
+const { PORT } = process.env; // setup port to be used
+const app = express(); // calling an instance of express
+
+app.use(json());
+app.use(urlencoded({ extended: false }));
+app.use(cors());
+app.use('/api/v1', routes);
+
+// catch 404 and forward to error handler
+app.use('*', (request, response) => {
+  response.status(404).send('Not Found');
+});
+
+// index route
+app.get('/', (request, response) => {
+  response.status(200).send('1kbIdeas');
+});
 
 const isProduction = process.env.NODE_ENV === 'production';
-
-// Create global app object
-const app = express();
-
-app.use(cors());
-
-// Normal express config defaults
-app.use(require('morgan')('dev'));
-
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
-
-app.use(require('method-override')());
-
-app.use(express.static(`${__dirname}/public`));
-
-app.use(
-  session({
-    secret: 'authorshaven',
-    cookie: { maxAge: 60000 },
-    resave: false,
-    saveUninitialized: false
-  })
-);
 
 if (!isProduction) {
   app.use(errorhandler());
 }
 
-if (isProduction) {
-  mongoose.connect(process.env.MONGODB_URI);
-} else {
-  mongoose.connect('mongodb://localhost/conduit');
-  mongoose.set('debug', true);
-}
-
-app.use(require('./routes'));
-
-// / catch 404 and forward to error handler
-app.use((req, res, next) => {
-  const err = new Error('Not Found');
-  err.status = 404;
-  next(err);
-});
-
-// / error handlers
+// error handlers
 
 // development error handler
 // will print stacktrace
 if (!isProduction) {
   app.use((err, req, res) => {
-    console.log(err.stack);
-
+    debug(err.stack);
     res.status(err.status || 500);
-
     res.json({
       errors: {
         message: err.message,
@@ -82,7 +63,6 @@ app.use((err, req, res) => {
   });
 });
 
-// finally, let's start our server...
-const server = app.listen(process.env.PORT || 3000, () => {
-  console.log(`Listening on port ${server.address().port}`);
-});
+app.listen(PORT, () => debug(`Server started on port ${PORT}`));
+
+export default app;
