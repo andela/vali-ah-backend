@@ -1,7 +1,7 @@
 Authors Haven - A Social platform for the creative at heart.
 =======
 
-[![Build Status](https://travis-ci.org/andela/vali-ah-backend.svg?branch=develop)](https://travis-ci.org/andela/vali-ah-backend) [![Coverage Status](https://coveralls.io/repos/github/andela/vali-ah-backend/badge.svg?branch=master)](https://coveralls.io/github/andela/vali-ah-backend?branch=develop) [![Maintainability](https://api.codeclimate.com/v1/badges/ecfa2d78a99c71e54dfc/maintainability)](https://codeclimate.com/github/andela/vali-ah-backend/maintainability) [![Test Coverage](https://api.codeclimate.com/v1/badges/ecfa2d78a99c71e54dfc/test_coverage)](https://codeclimate.com/github/andela/vali-ah-backend/test_coverage) [![](https://img.shields.io/badge/Reviewed_by-Hound-blueviolet.svg)](https://houndci.com)
+[![Build Status](https://travis-ci.org/andela/vali-ah-backend.svg?branch=develop)](https://travis-ci.org/andela/vali-ah-backend) [![Coverage Status](https://coveralls.io/repos/github/andela/vali-ah-backend/badge.svg?branch=develop)](https://coveralls.io/github/andela/vali-ah-backend?branch=develop) [![Maintainability](https://api.codeclimate.com/v1/badges/ecfa2d78a99c71e54dfc/maintainability)](https://codeclimate.com/github/andela/vali-ah-backend/maintainability) [![Test Coverage](https://api.codeclimate.com/v1/badges/ecfa2d78a99c71e54dfc/test_coverage)](https://codeclimate.com/github/andela/vali-ah-backend/test_coverage) [![](https://img.shields.io/badge/Reviewed_by-Hound-blueviolet.svg)](https://houndci.com)
 
 ## Vision
 Create a community of like minded authors to foster inspiration and innovation
