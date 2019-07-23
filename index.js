@@ -14,17 +14,16 @@ const app = express(); // calling an instance of express
 app.use(json());
 app.use(urlencoded({ extended: false }));
 app.use(cors());
-
-// index route
-app.get('/', (request, response) => {
-  response.status(200).send('1kbIdeas');
-});
-
 app.use('/api/v1', routes);
 
 // catch 404 and forward to error handler
 app.use('*', (request, response) => {
   response.status(404).send('Not Found');
+});
+
+// index route
+app.get('/', (request, response) => {
+  response.status(200).send('1kbIdeas');
 });
 
 const isProduction = process.env.NODE_ENV === 'production';
