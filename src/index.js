@@ -6,11 +6,12 @@ import swaggerUi from 'swagger-ui-express';
 
 import routes from './routes';
 import swaggerDoc from '../docs/swagger';
+import errorHandler from './middlewares/errorHandler';
 
 config();
 
 const debug = Debug('dev');
-const { PORT, NODE_ENV } = process.env;
+const { PORT } = process.env;
 const app = express();
 
 app.use(json());
@@ -24,38 +25,12 @@ app.get('/', (request, response) => {
   response.status(200).send('1kbIdeas');
 });
 
-const isProduction = NODE_ENV === 'production';
-
-if (!isProduction) {
-  // will print stacktrace
-  app.use((err, request, response) => {
-    debug(err.stack);
-    response.status(err.status || 500);
-    response.json({
-      errors: {
-        message: err.message,
-        error: err
-      }
-    });
-  });
-}
-
-if (isProduction) {
-  // no stack trace leaked to user
-  app.use((err, request, response) => {
-    response.status(err.status || 500);
-    response.json({
-      errors: {
-        message: err.message,
-        error: {}
-      }
-    });
-  });
-}
-
-app.use('*', (request, response) => {
+app.all('*', (request, response) => {
   response.status(404).send('Not Found');
 });
+
+app.use(errorHandler);
+
 app.listen(PORT, () => debug(`Server started on port ${PORT}`));
 
 export default app;

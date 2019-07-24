@@ -1,1 +1,2 @@
-import './fake.test';
+import './app.test';
+import './middleware.test';
