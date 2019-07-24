@@ -1,6 +1,6 @@
-import { config } from 'dotenv';
+import { config as getEnv } from 'dotenv';
 
-config();
+getEnv();
 
 const databaseUrls = {
   development: process.env.DATABASE_URL,
@@ -10,14 +10,13 @@ const databaseUrls = {
 };
 
 const environment = process.env.NODE_ENV || 'development';
-const url = databaseUrls[environment];
+
+export const url = databaseUrls[environment];
+
 const devMode = (environment !== 'production');
 
-const configuration = {
-  url,
+export const config = {
   dialect: 'postgres',
   logging: devMode ? log => log : false,
   operatorsAliases: false,
 };
-
-export default configuration;

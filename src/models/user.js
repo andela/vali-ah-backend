@@ -1,4 +1,3 @@
-
 const user = (sequelize, DataTypes) => {
   const User = sequelize.define('User', {
     firstName: DataTypes.STRING,

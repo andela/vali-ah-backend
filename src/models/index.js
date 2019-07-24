@@ -1,11 +1,11 @@
 import Sequelize from 'sequelize';
 import fs from 'fs';
 import path from 'path';
-import config from '../../../config/sequelize';
+import { config, url } from '../../config/sequelize';
 
 const basename = path.basename(__filename);
+const sequelize = new Sequelize(url, config);
 const database = {};
-const sequelize = new Sequelize(config.url, config);
 
 fs
   .readdirSync(__dirname)
