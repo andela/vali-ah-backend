@@ -1,8 +1,11 @@
+import Debug from 'debug';
+
+const debug = Debug('dev');
 
 export default {
   up: async (queryInterface, Sequelize) => {
     try {
-      queryInterface.createTable('Users', {
+      await queryInterface.createTable('Users', {
         id: {
           allowNull: false,
           autoIncrement: true,
@@ -28,14 +31,14 @@ export default {
         }
       });
     } catch (error) {
-      console.log(error);
+      debug(error);
     }
   },
   down: async (queryInterface) => {
     try {
-      queryInterface.dropTable('Users');
+      await queryInterface.dropTable('Users');
     } catch (error) {
-      console.log(error);
+      debug(error);
     }
   }
 };
