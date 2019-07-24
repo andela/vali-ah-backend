@@ -1,4 +1,3 @@
-import '@babel/polyfill';
 import errorhandler from 'errorhandler';
 import express, { json, urlencoded } from 'express';
 import { config } from 'dotenv';
@@ -10,20 +9,14 @@ config();
 
 const debug = Debug('dev');
 
-const { PORT } = process.env; // setup port to be used
-const app = express(); // calling an instance of express
+const { PORT } = process.env;
+const app = express();
 
 app.use(json());
 app.use(urlencoded({ extended: false }));
 app.use(cors());
 app.use('/api/v1', routes);
 
-// catch 404 and forward to error handler
-app.use('*', (request, response) => {
-  response.status(404).send('Not Found');
-});
-
-// index route
 app.get('/', (request, response) => {
   response.status(200).send('1kbIdeas');
 });
@@ -63,6 +56,9 @@ app.use((err, req, res) => {
   });
 });
 
+app.use('*', (request, response) => {
+  response.status(404).send('Not Found');
+});
 app.listen(PORT, () => debug(`Server started on port ${PORT}`));
 
 export default app;
