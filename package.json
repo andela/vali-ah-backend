@@ -7,7 +7,7 @@
     "build": "babel src --out-dir dist",
     "coveralls": "cat ./coverage/lcov.info | coveralls",
     "db:migrate": "npm run sequelize-cli:es6 db:migrate",
-    "db:undo": "sequelize db:migrate:undo:all",
+    "db:undo": "npm run sequelize-cli:es6 db:migrate:undo:all",
     "dev": "nodemon --exec babel-node src/index.js",
     "lint": "eslint \"**/*.js\" --fix",
     "sequelize-cli:es6": "babel-node ./node_modules/.bin/sequelize $*",
