@@ -1,58 +1,34 @@
-import express from 'express';
-import bodyParser from 'body-parser';
-import session from 'express-session';
+import express, { json, urlencoded } from 'express';
+import { config } from 'dotenv';
 import cors from 'cors';
-import errorhandler from 'errorhandler';
-import { log } from 'console';
+import Debug from 'debug';
 
-const isProduction = process.env.NODE_ENV === 'production';
+import routes from './routes';
 
-// Create global app object
+config();
+
+const debug = Debug('dev');
+const { PORT, NODE_ENV } = process.env;
 const app = express();
 
+app.use(json());
+app.use(urlencoded({ extended: false }));
 app.use(cors());
 
-// Normal express config defaults
-app.use(require('morgan')('dev'));
+app.use('/api/v1', routes);
 
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
-
-app.use(require('method-override')());
-
-app.use(express.static(`${__dirname}/public`));
-
-app.use(
-  session({
-    secret: 'authorshaven',
-    cookie: { maxAge: 60000 },
-    resave: false,
-    saveUninitialized: false
-  })
-);
-
-if (!isProduction) {
-  app.use(errorhandler());
-}
-
-app.use(require('./routes'));
-
-// catch 404 and forward to error handler
-app.use((req, res, next) => {
-  const err = new Error('Not Found');
-  err.status = 404;
-  next(err);
+app.get('/', (request, response) => {
+  response.status(200).send('1kbIdeas');
 });
 
-// error handlers
+const isProduction = NODE_ENV === 'production';
 
-// development error handler
-// will print stacktrace
 if (!isProduction) {
-  app.use((err, req, res) => {
-    res.status(err.status || 500);
-
-    res.json({
+  // will print stacktrace
+  app.use((err, request, response) => {
+    debug(err.stack);
+    response.status(err.status || 500);
+    response.json({
       errors: {
         message: err.message,
         error: err
@@ -61,19 +37,22 @@ if (!isProduction) {
   });
 }
 
-// production error handler
-// no stacktraces leaked to user
-app.use((err, req, res) => {
-  res.status(err.status || 500);
-  res.json({
-    errors: {
-      message: err.message,
-      error: {}
-    }
+if (isProduction) {
+  // no stack trace leaked to user
+  app.use((err, request, response) => {
+    response.status(err.status || 500);
+    response.json({
+      errors: {
+        message: err.message,
+        error: {}
+      }
+    });
   });
-});
+}
 
-// finally, let's start our server...
-const server = app.listen(process.env.PORT || 3000, () => {
-  log(`Listening on port ${server.address().port}`);
+app.use('*', (request, response) => {
+  response.status(404).send('Not Found');
 });
+app.listen(PORT, () => debug(`Server started on port ${PORT}`));
+
+export default app;
