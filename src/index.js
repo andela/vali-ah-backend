@@ -42,8 +42,6 @@ if (isProduction) {
   mongoose.set('debug', true);
 }
 
-require('./models/User');
-
 app.use(require('./routes'));
 
 // / catch 404 and forward to error handler
