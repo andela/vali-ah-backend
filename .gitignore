@@ -39,3 +39,5 @@ node_modules
 # Ignore built files
 dist
 build
+#evn file
+.env
