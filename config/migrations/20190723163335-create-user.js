@@ -1,29 +1,44 @@
+import Debug from 'debug';
+
+const debug = Debug('dev');
 
 export default {
-  up: (queryInterface, Sequelize) => queryInterface.createTable('Users', {
-    id: {
-      allowNull: false,
-      autoIncrement: true,
-      primaryKey: true,
-      type: Sequelize.INTEGER
-    },
-    firstName: {
-      type: Sequelize.STRING
-    },
-    lastName: {
-      type: Sequelize.STRING
-    },
-    email: {
-      type: Sequelize.STRING
-    },
-    createdAt: {
-      allowNull: false,
-      type: Sequelize.DATE
-    },
-    updatedAt: {
-      allowNull: false,
-      type: Sequelize.DATE
+  up: async (queryInterface, Sequelize) => {
+    try {
+      await queryInterface.createTable('Users', {
+        id: {
+          allowNull: false,
+          autoIncrement: true,
+          primaryKey: true,
+          type: Sequelize.INTEGER
+        },
+        firstName: {
+          type: Sequelize.STRING
+        },
+        lastName: {
+          type: Sequelize.STRING
+        },
+        email: {
+          type: Sequelize.STRING
+        },
+        createdAt: {
+          allowNull: false,
+          type: Sequelize.DATE
+        },
+        updatedAt: {
+          allowNull: false,
+          type: Sequelize.DATE
+        }
+      });
+    } catch (error) {
+      debug(error);
     }
-  }),
-  down: queryInterface => queryInterface.dropTable('Users')
+  },
+  down: async (queryInterface) => {
+    try {
+      await queryInterface.dropTable('Users');
+    } catch (error) {
+      debug(error);
+    }
+  }
 };
