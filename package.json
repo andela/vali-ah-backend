@@ -15,8 +15,8 @@
     "start": "node dist/index.js",
     "start:dev": "cross-env DEBUG=dev nodemon --exec babel-node src/index.js",
     "sync-env": "sync-dotenv",
-    "test": "mocha --require @babel/register tests/test.js --exit",
-    "test:coverage": "nyc --reporter=text --reporter=lcov npm run test"
+    "test": "mocha --require @babel/register --require regenerator-runtime tests/test.js --exit",
+    "test:coverage": "nyc npm run test"
   },
   "author": "Andela Simulations Programme",
   "license": "MIT",
@@ -50,6 +50,7 @@
     "@babel/node": "^7.5.5",
     "@babel/preset-env": "^7.5.5",
     "chai": "^4.2.0",
+    "chai-http": "^4.3.0",
     "coveralls": "^3.0.5",
     "cross-env": "^5.2.0",
     "eslint": "^5.3.0",
@@ -61,11 +62,12 @@
     "nyc": "^14.1.1",
     "sequelize-cli": "^5.5.0",
     "swagger-jsdoc": "^3.3.0",
+    "sinon": "^7.3.2",
     "sync-dotenv": "^2.2.0"
   },
   "husky": {
     "hooks": {
-      "pre-commit": "npm run sync-env && npm run lint && npm run test && npm run generate-doc"
+      "pre-commit": "npm run sync-env && npm run lint && npm run test && npm run test:coverage && npm run generate-doc"
     }
   }
 }
