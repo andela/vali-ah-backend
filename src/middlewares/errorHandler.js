@@ -3,11 +3,14 @@ import { config } from 'dotenv';
 
 config();
 const debug = Debug('dev');
-// eslint-disable-next-line no-unused-vars
+
 export default (err, request, response, next) => {
   const isProduction = process.env.NODE_ENV === 'production';
-
   let errorMessage = {};
+
+  if (response.headersSent) {
+    return next(err);
+  }
 
   if (!isProduction) {
     debug(err.stack);
@@ -15,9 +18,10 @@ export default (err, request, response, next) => {
   }
 
   return response.status(err.status || 500).json({
-    errors: {
+    status: 'error',
+    error: {
       message: err.message,
-      error: errorMessage
+      ...(!isProduction && { trace: errorMessage })
     }
   });
 };

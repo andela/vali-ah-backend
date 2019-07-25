@@ -22,11 +22,17 @@ app.use('/api/v1', routes);
 app.use('/api/v1/docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc));
 
 app.get('/', (request, response) => {
-  response.status(200).send('1kbIdeas');
+  response.status(200).json({
+    status: 'success',
+    message: 'Welcome to 1kbIdeas'
+  });
 });
 
 app.all('*', (request, response) => {
-  response.status(404).send('Not Found');
+  response.status(404).json({
+    status: 'error',
+    error: 'Not Found'
+  });
 });
 
 app.use(errorHandler);

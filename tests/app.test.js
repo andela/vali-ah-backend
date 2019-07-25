@@ -6,12 +6,13 @@ import app from '../src';
 chai.use(chaiHttp);
 should();
 
-describe('Root Route', () => {
-  it('should pass on GET/', async () => {
+describe('Home Route', () => {
+  it('should pass on GET /', async () => {
     const response = await chai.request(app).get('/');
 
     response.should.have.status(200);
-    response.body.should.be.a('object');
+    response.body.status.should.eql('success');
+    response.body.message.should.eql('Welcome to 1kbIdeas');
   });
 });
 
@@ -20,6 +21,7 @@ describe('Error Messages', () => {
     const response = await chai.request(app).get('/invalid/route');
 
     response.should.have.status(404);
-    response.body.should.be.a('object');
+    response.body.status.should.eql('error');
+    response.body.error.should.eql('Not Found');
   });
 });

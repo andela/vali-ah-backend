@@ -1,52 +1,64 @@
 import { should } from 'chai';
+
 import errorHandler from '../src/middlewares/errorHandler';
 
 should();
 
-const error = new Error('403 Error');
 
 describe('Error Handler', () => {
-  let req, res, next;
+  let request, response, next, nextCall = 0;
+  const error = new Error('Error');
 
   beforeEach(() => {
-    res = {
+    response = {
       status(code) {
-        res.status = code;
-        return res;
+        response.status = code;
+        return response;
       },
       json(data) {
-        res.body = data;
+        response.body = data;
       }
     };
-    req = {};
-    next = () => {};
+    request = {};
+    next = () => { nextCall += 1; };
   });
 
   it('should return 500 error status', async () => {
-    errorHandler(new Error('Test Error'), req, res, next);
+    errorHandler(error, request, response, next);
 
-    res.status.should.eql(500);
+    response.status.should.eql(500);
   });
 
-  it('should return specified error for production', async () => {
+  it('should not return stack trace with specified error for production', async () => {
     process.env.NODE_ENV = 'production';
-
     error.status = 403;
 
-    errorHandler(error, req, res, next);
+    errorHandler(error, request, response, next);
 
-    res.status.should.eql(403);
-    res.body.errors.error.should.eql({});
+    response.status.should.eql(403);
+    response.body.status.should.eql('error');
+    response.body.error.message.should.eql('Error');
+    response.body.error.should.not.have.property('trace');
   });
 
-  it('should return specified error for development', async () => {
-    process.env.NODE_ENV = 'dev';
-
+  it('should return stack trace with specified error for development', async () => {
+    process.env.NODE_ENV = 'development';
     error.status = 403;
 
-    errorHandler(error, req, res, next);
+    errorHandler(error, request, response, next);
 
-    res.status.should.eql(403);
-    res.body.errors.error.should.not.eql({});
+    response.status.should.eql(403);
+    response.body.status.should.eql('error');
+    response.body.error.message.should.eql('Error');
+    response.body.error.should.have.property('trace');
+  });
+
+  it('should call next when resopnse headers have already been sent', async () => {
+    response.headersSent = true;
+
+    errorHandler(error, request, response, next);
+
+    nextCall.should.equal(1);
+    response.should.not.have.property('body');
   });
 });
