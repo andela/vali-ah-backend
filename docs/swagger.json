@@ -1,0 +1,23 @@
+{
+  "info": {
+    "title": "1kbIdeas",
+    "version": "1.0.0",
+    "description": "The one-stop shop for all the self-help ideas you need",
+    "termsOfService": "",
+    "contact": {
+      "email": ""
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "basePath": "/api/v1",
+  "swagger": "2.0",
+  "paths": {},
+  "definitions": {},
+  "responses": {},
+  "parameters": {},
+  "securityDefinitions": {},
+  "tags": []
+}

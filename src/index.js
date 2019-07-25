@@ -2,8 +2,10 @@ import express, { json, urlencoded } from 'express';
 import { config } from 'dotenv';
 import cors from 'cors';
 import Debug from 'debug';
+import swaggerUi from 'swagger-ui-express';
 
 import routes from './routes';
+import swaggerDoc from '../docs/swagger';
 
 config();
 
@@ -16,6 +18,7 @@ app.use(urlencoded({ extended: false }));
 app.use(cors());
 
 app.use('/api/v1', routes);
+app.use('/api/v1/docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc));
 
 app.get('/', (request, response) => {
   response.status(200).send('1kbIdeas');
