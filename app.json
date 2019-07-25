@@ -1,0 +1,32 @@
+{
+    "name": "vali-ah-backend",
+    "description": "1kbIdeas: The one-stop shop for all the self-help ideas you need",
+    "scripts": {
+        "postdeploy": "npm run db:migrate"
+    },
+    "env": {
+        "NODE_ENV": {
+          "required": true
+        },
+        "DATABASE_URL": {
+          "required": true
+        },
+        "PORT": {
+          "required": true
+        }
+      },
+    "formation": {
+      "web": {
+        "quantity": 1
+      }
+    },
+    "addons": [
+      "heroku-postgresql"
+    ],
+    "buildpacks": [
+      {
+        "url": "heroku/nodejs"
+      }
+    ],
+    "stack": "heroku-18"
+}
