@@ -9,18 +9,18 @@ export default {
         id: {
           allowNull: false,
           primaryKey: true,
-          type: Sequelize.UUIDV4
+          type: Sequelize.UUID,
+          defaultValue: Sequelize.UUIDV4
         },
         authorId: {
           allowNull: false,
           foreignKey: true,
-          type: Sequelize.UUIDV4,
+          type: Sequelize.UUID,
           onDelete: 'CASCADE'
         },
         followUpId: {
-          allowNull: false,
           foreignKey: true,
-          type: Sequelize.UUIDV4,
+          type: Sequelize.UUID,
           onDelete: 'CASCADE'
         },
         title: {
@@ -29,7 +29,7 @@ export default {
         },
         summary: {
           allowNull: false,
-          type: Sequelize.STRING
+          type: Sequelize.TEXT
         },
         body: {
           allowNull: false,

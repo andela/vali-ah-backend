@@ -1,19 +1,17 @@
 export default (sequelize, DataTypes) => {
   const Comments = sequelize.define(
-    'Comments',
-    {
+    'Comments', {
       id: {
-        type: DataTypes.UUIDV4,
+        type: DataTypes.UUID,
         primaryKey: true,
         defaultValue: DataTypes.UUIDV4
       },
       content: DataTypes.STRING,
-      userId: DataTypes.UUIDV4,
-      articleId: DataTypes.UUIDV4,
-      repliedToId: DataTypes.UUIDV4,
+      userId: DataTypes.UUID,
+      articleId: DataTypes.UUID,
+      repliedToId: DataTypes.UUID,
       suspended: DataTypes.BOOLEAN
-    },
-    {}
+    }, {}
   );
 
   Comments.associate = (models) => {

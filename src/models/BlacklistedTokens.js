@@ -1,16 +1,14 @@
 export default (sequelize, DataTypes) => {
   const BlacklistedTokens = sequelize.define(
-    'BlacklistedTokens',
-    {
+    'BlacklistedTokens', {
       id: {
-        type: DataTypes.UUIDV4,
+        type: DataTypes.UUID,
         primaryKey: true,
         defaultValue: DataTypes.UUIDV4
       },
-      userId: DataTypes.UUIDV4,
+      userId: DataTypes.UUID,
       token: DataTypes.STRING
-    },
-    {}
+    }, {}
   );
 
   BlacklistedTokens.associate = (models) => {

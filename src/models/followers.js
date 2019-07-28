@@ -1,16 +1,14 @@
 export default (sequelize, DataTypes) => {
   const Followers = sequelize.define(
-    'Followers',
-    {
+    'Followers', {
       id: {
-        type: DataTypes.UUIDV4,
+        type: DataTypes.UUID,
         primaryKey: true,
         defaultValue: DataTypes.UUIDV4
       },
-      followeeId: DataTypes.UUIDV4,
-      followerId: DataTypes.UUIDV4
-    },
-    {}
+      followeeId: DataTypes.UUID,
+      followerId: DataTypes.UUID
+    }, {}
   );
 
   Followers.associate = (models) => {

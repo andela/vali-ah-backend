@@ -13,6 +13,8 @@
     "dev": "nodemon --exec babel-node src/index.js",
     "generate-doc": "npm run build && swagger-jsdoc -d dist/swagger.js  -o ./docs/swagger.json",
     "lint": "eslint \"**/*.js\" --fix",
+    "pretest": "npm run db:migrate",
+    "posttest": "npm run db:undo",
     "sequelize-cli:es6": "babel-node ./node_modules/.bin/sequelize $*",
     "start": "node dist/index.js",
     "start:dev": "cross-env DEBUG=dev nodemon --exec babel-node src/index.js",
@@ -24,6 +26,8 @@
   "license": "MIT",
   "dependencies": {
     "@sendgrid/mail": "^6.4.0",
+    "bcrypt": "^3.0.6",
+    "body-parser": "^1.18.3",
     "cors": "^2.8.5",
     "debug": "^4.1.1",
     "dotenv": "^8.0.0",
@@ -45,6 +49,7 @@
     "sequelize": "^5.10.2",
     "sinon-test": "^2.4.0",
     "swagger-ui-express": "^4.0.7",
+    "underscore": "^1.9.1",
     "uuid": "^3.3.2"
   },
   "devDependencies": {
@@ -68,6 +73,7 @@
     "nyc": "^14.1.1",
     "sequelize-cli": "^5.5.0",
     "sinon": "^7.3.2",
+    "sinon-chai": "^3.3.0",
     "swagger-jsdoc": "^3.3.0",
     "sync-dotenv": "^2.2.0"
   },
