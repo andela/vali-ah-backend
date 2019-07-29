@@ -18,6 +18,7 @@
     "sequelize-cli:es6": "babel-node ./node_modules/.bin/sequelize $*",
     "start": "node dist/index.js",
     "start:dev": "cross-env DEBUG=dev nodemon --exec babel-node src/index.js",
+    "start:debug": "cross-env DEBUG=dev nodemon --inspect --exec babel-node src/index.js",
     "sync-env": "sync-dotenv",
     "test": "mocha --require @babel/register --require regenerator-runtime/runtime tests/test.js --exit",
     "test:coverage": "nyc npm run test"
@@ -36,6 +37,7 @@
     "express": "^4.17.1",
     "express-jwt": "^5.3.1",
     "express-session": "^1.15.6",
+    "express-validator": "5.3.1",
     "jsonwebtoken": "^8.3.0",
     "method-override": "^2.3.10",
     "methods": "^1.1.2",
