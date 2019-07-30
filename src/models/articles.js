@@ -2,20 +2,25 @@ export default (sequelize, DataTypes) => {
   const Articles = sequelize.define(
     'Articles',
     {
+      id: {
+        type: DataTypes.UUIDV4,
+        primaryKey: true,
+        defaultValue: DataTypes.UUIDV4
+      },
       title: DataTypes.STRING,
       summary: DataTypes.STRING,
       body: DataTypes.TEXT,
       suspended: DataTypes.BOOLEAN,
       status: DataTypes.STRING,
       coverImageUrl: DataTypes.STRING,
-      followUpId: DataTypes.UUID,
-      authorId: DataTypes.UUID
+      followUpId: DataTypes.UUIDV4,
+      authorId: DataTypes.UUIDV4
     },
     {}
   );
 
   Articles.associate = (models) => {
-    Articles.belongsTo(models.Authors, {
+    Articles.belongsTo(models.Users, {
       foreignKey: 'authorId',
       onDelete: 'CASCADE'
     });
@@ -30,12 +35,7 @@ export default (sequelize, DataTypes) => {
       onDelete: 'CASCADE'
     });
 
-    Articles.hasMany(models.Upvotes, {
-      foreignKey: 'articleId',
-      onDelete: 'CASCADE'
-    });
-
-    Articles.hasMany(models.Downvotes, {
+    Articles.hasMany(models.Votes, {
       foreignKey: 'articleId',
       onDelete: 'CASCADE'
     });

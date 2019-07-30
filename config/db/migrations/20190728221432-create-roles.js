@@ -1,25 +1,25 @@
 import Debug from 'debug';
+import UUID from 'uuid/v4';
 
 const debug = Debug('dev');
 
 export default {
   up: async (queryInterface, Sequelize) => {
     try {
-      await queryInterface.createTable('Downvotes', {
+      await queryInterface.createTable('Roles', {
         id: {
           allowNull: false,
           primaryKey: true,
-          type: Sequelize.UUID
+          type: Sequelize.UUIDV4,
+          defaultValue: UUID()
         },
-        userId: {
+        name: {
           allowNull: false,
-          foreignKey: true,
-          type: Sequelize.UUID
+          type: Sequelize.STRING
         },
-        articleId: {
+        description: {
           allowNull: false,
-          foreignKey: true,
-          type: Sequelize.UUID
+          type: Sequelize.STRING
         },
         createdAt: {
           allowNull: false,
@@ -36,7 +36,7 @@ export default {
   },
   down: async (queryInterface) => {
     try {
-      await queryInterface.dropTable('Downvotes');
+      await queryInterface.dropTable('Roles');
     } catch (error) {
       debug(error);
     }

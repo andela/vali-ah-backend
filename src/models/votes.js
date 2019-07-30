@@ -1,6 +1,6 @@
 export default (sequelize, DataTypes) => {
-  const Reports = sequelize.define(
-    'Reports',
+  const Votes = sequelize.define(
+    'Votes',
     {
       id: {
         type: DataTypes.UUIDV4,
@@ -9,21 +9,21 @@ export default (sequelize, DataTypes) => {
       },
       articleId: DataTypes.UUIDV4,
       userId: DataTypes.UUIDV4,
-      reason: DataTypes.STRING
+      upVote: DataTypes.BOOLEAN
     },
     {}
   );
 
-  Reports.associate = (models) => {
-    Reports.belongsTo(models.Users, {
+  Votes.associate = (models) => {
+    Votes.belongsTo(models.Users, {
       foreignKey: 'userId',
       onDelete: 'CASCADE'
     });
-    Reports.belongsTo(models.Articles, {
+    Votes.belongsTo(models.Articles, {
       foreignKey: 'articleId',
       onDelete: 'CASCADE'
     });
   };
 
-  return Reports;
+  return Votes;
 };

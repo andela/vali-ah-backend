@@ -2,8 +2,13 @@ export default (sequelize, DataTypes) => {
   const Notifications = sequelize.define(
     'Notifications',
     {
+      id: {
+        type: DataTypes.UUIDV4,
+        primaryKey: true,
+        defaultValue: DataTypes.UUIDV4
+      },
       event: DataTypes.STRING,
-      userId: DataTypes.UUID,
+      userId: DataTypes.UUIDV4,
       payload: DataTypes.JSON,
       notified: DataTypes.BOOLEAN
     },

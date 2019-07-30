@@ -2,6 +2,11 @@ export default (sequelize, DataTypes) => {
   const Categories = sequelize.define(
     'Categories',
     {
+      id: {
+        type: DataTypes.UUIDV4,
+        primaryKey: true,
+        defaultValue: DataTypes.UUIDV4
+      },
       category: DataTypes.STRING,
       description: DataTypes.STRING
     },
@@ -9,7 +14,7 @@ export default (sequelize, DataTypes) => {
   );
 
   Categories.associate = (models) => {
-    Categories.hasOne(models.ArticleCategories, {
+    Categories.hasMany(models.ArticleCategories, {
       foreignKey: 'categoryId',
       onDelete: 'CASCADE'
     });

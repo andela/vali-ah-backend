@@ -5,27 +5,32 @@ const debug = Debug('dev');
 export default {
   up: async (queryInterface, Sequelize) => {
     try {
-      await queryInterface.createTable('Categories', {
+      await queryInterface.createTable('BlacklistedTokens', {
         id: {
           allowNull: false,
           primaryKey: true,
-          type: Sequelize.UUID
+          type: Sequelize.UUIDV4,
+          defaultValue: Sequelize.UUIDV4
         },
-        category: {
+        userId: {
           allowNull: false,
-          type: Sequelize.STRING
+          foreignKey: true,
+          type: Sequelize.UUIDV4,
+          onDelete: 'CASCADE'
         },
-        description: {
+        token: {
           allowNull: false,
           type: Sequelize.STRING
         },
         createdAt: {
           allowNull: false,
-          type: Sequelize.DATE
+          type: Sequelize.DATE,
+          defaultValue: Sequelize.fn('now')
         },
         updatedAt: {
           allowNull: false,
-          type: Sequelize.DATE
+          type: Sequelize.DATE,
+          defaultValue: Sequelize.fn('now')
         }
       });
     } catch (error) {
@@ -34,7 +39,7 @@ export default {
   },
   down: async (queryInterface) => {
     try {
-      await queryInterface.dropTable('Categories');
+      await queryInterface.dropTable('BlacklistedTokens');
     } catch (error) {
       debug(error);
     }

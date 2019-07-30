@@ -1,9 +1,14 @@
 export default (sequelize, DataTypes) => {
   const ReadStats = sequelize.define(
-    'Book',
+    'ReadStats',
     {
-      articleId: DataTypes.UUID,
-      userId: DataTypes.UUID
+      id: {
+        type: DataTypes.UUIDV4,
+        primaryKey: true,
+        defaultValue: DataTypes.UUIDV4
+      },
+      articleId: DataTypes.UUIDV4,
+      userId: DataTypes.UUIDV4
     },
     {}
   );

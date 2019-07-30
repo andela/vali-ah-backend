@@ -2,38 +2,41 @@ export default (sequelize, DataTypes) => {
   const Users = sequelize.define(
     'Users',
     {
+      id: {
+        type: DataTypes.UUIDV4,
+        primaryKey: true,
+        defaultValue: DataTypes.UUIDV4
+      },
+      roleId: DataTypes.UUIDV4,
       firstName: DataTypes.STRING,
       lastName: DataTypes.STRING,
       userName: DataTypes.STRING,
       email: DataTypes.STRING,
       password: DataTypes.STRING,
-      avatarUrl: DataTypes.STRING,
-      roleId: DataTypes.UUID
+      avatarUrl: DataTypes.STRING
     },
     {}
   );
 
   Users.associate = (models) => {
-    Users.hasMany(models.Permissions, {
-      foreignKey: 'userId',
-      onDelete: 'CASCADE'
-    });
     Users.hasMany(models.Reports, {
       foreignKey: 'userId',
       onDelete: 'CASCADE'
     });
 
     Users.hasMany(models.Followers, {
-      foreignKey: 'userId',
+      as: 'followers',
+      foreignKey: 'followeeId',
+      onDelete: 'CASCADE'
+    });
+
+    Users.hasMany(models.Followers, {
+      as: 'following',
+      foreignKey: 'followerId',
       onDelete: 'CASCADE'
     });
 
     Users.hasMany(models.Bookmarks, {
-      foreignKey: 'userId',
-      onDelete: 'CASCADE'
-    });
-
-    Users.hasMany(models.Authors, {
       foreignKey: 'userId',
       onDelete: 'CASCADE'
     });
@@ -43,12 +46,7 @@ export default (sequelize, DataTypes) => {
       onDelete: 'CASCADE'
     });
 
-    Users.hasMany(models.Upvotes, {
-      foreignKey: 'userId',
-      onDelete: 'CASCADE'
-    });
-
-    Users.hasMany(models.Downvotes, {
+    Users.hasMany(models.Votes, {
       foreignKey: 'userId',
       onDelete: 'CASCADE'
     });

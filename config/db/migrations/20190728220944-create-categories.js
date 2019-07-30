@@ -5,33 +5,30 @@ const debug = Debug('dev');
 export default {
   up: async (queryInterface, Sequelize) => {
     try {
-      await queryInterface.createTable('Permissions', {
+      await queryInterface.createTable('Categories', {
         id: {
           allowNull: false,
           primaryKey: true,
-          type: Sequelize.UUID
+          type: Sequelize.UUIDV4,
+          defaultValue: Sequelize.UUIDV4
         },
-        userId: {
+        category: {
           allowNull: false,
-          foreignKey: true,
-          type: Sequelize.UUID
+          type: Sequelize.STRING
         },
-        roleId: {
+        description: {
           allowNull: false,
-          foreignKey: true,
-          type: Sequelize.UUID
-        },
-        code: {
-          allowNull: false,
-          type: Sequelize.BIGINT
+          type: Sequelize.STRING
         },
         createdAt: {
           allowNull: false,
-          type: Sequelize.DATE
+          type: Sequelize.DATE,
+          defaultValue: Sequelize.fn('now')
         },
         updatedAt: {
           allowNull: false,
-          type: Sequelize.DATE
+          type: Sequelize.DATE,
+          defaultValue: Sequelize.fn('now')
         }
       });
     } catch (error) {
@@ -40,7 +37,7 @@ export default {
   },
   down: async (queryInterface) => {
     try {
-      await queryInterface.dropTable('Permissions');
+      await queryInterface.dropTable('Categories');
     } catch (error) {
       debug(error);
     }

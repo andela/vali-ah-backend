@@ -2,9 +2,13 @@ export default (sequelize, DataTypes) => {
   const Bookmarks = sequelize.define(
     'Bookmarks',
     {
-      articleId: DataTypes.UUID,
-      userId: DataTypes.UUID,
-      isActive: DataTypes.BOOLEAN
+      id: {
+        type: DataTypes.UUIDV4,
+        primaryKey: true,
+        defaultValue: DataTypes.UUIDV4
+      },
+      articleId: DataTypes.UUIDV4,
+      userId: DataTypes.UUIDV4
     },
     {}
   );
