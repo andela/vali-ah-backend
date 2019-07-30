@@ -7,6 +7,8 @@
     "build": "babel src --out-dir dist",
     "coveralls": "cat ./coverage/lcov.info | coveralls",
     "db:migrate": "npm run sequelize-cli:es6 db:migrate",
+    "db:rollback": "npm run db:undo && npm run db:migrate && npm run db:seed",
+    "db:seed": "npm run sequelize-cli:es6 db:seed:all",
     "db:undo": "npm run sequelize-cli:es6 db:migrate:undo:all",
     "dev": "nodemon --exec babel-node src/index.js",
     "generate-doc": "npm run build && swagger-jsdoc -d dist/swagger.js  -o ./docs/swagger.json",
@@ -22,7 +24,6 @@
   "license": "MIT",
   "dependencies": {
     "@sendgrid/mail": "^6.4.0",
-    "body-parser": "^1.18.3",
     "cors": "^2.8.5",
     "debug": "^4.1.1",
     "dotenv": "^8.0.0",
@@ -44,7 +45,7 @@
     "sequelize": "^5.10.2",
     "sinon-test": "^2.4.0",
     "swagger-ui-express": "^4.0.7",
-    "underscore": "^1.9.1"
+    "uuid": "^3.3.2"
   },
   "devDependencies": {
     "@babel/cli": "^7.5.5",
