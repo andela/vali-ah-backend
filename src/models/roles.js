@@ -2,7 +2,7 @@ export default (sequelize, DataTypes) => {
   const Roles = sequelize.define(
     'Roles',
     {
-      RolesName: DataTypes.STRING,
+      name: DataTypes.STRING,
       description: DataTypes.STRING
     },
     {}

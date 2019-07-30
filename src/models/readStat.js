@@ -2,7 +2,7 @@ export default (sequelize, DataTypes) => {
   const ReadStats = sequelize.define(
     'Book',
     {
-      ArticlesId: DataTypes.UUID,
+      articleId: DataTypes.UUID,
       userId: DataTypes.UUID
     },
     {}
@@ -14,7 +14,7 @@ export default (sequelize, DataTypes) => {
       onDelete: 'CASCADE'
     });
     ReadStats.belongsTo(models.Articles, {
-      foreignKey: 'ArticlesId',
+      foreignKey: 'articleId',
       onDelete: 'CASCADE'
     });
   };

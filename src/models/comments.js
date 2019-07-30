@@ -1,12 +1,14 @@
 export default (sequelize, DataTypes) => {
-  const Comments = sequelize.define('Comments', {
-    content: DataTypes.STRING,
-    userId: DataTypes.UUID,
-    ArticlesId: DataTypes.UUID,
-    repliedToId: DataTypes.UUID,
-    suspended: DataTypes.BOOLEAN
-  },
-  {});
+  const Comments = sequelize.define(
+    'Comments', {
+      content: DataTypes.STRING,
+      userId: DataTypes.UUID,
+      articleId: DataTypes.UUID,
+      repliedToId: DataTypes.UUID,
+      suspended: DataTypes.BOOLEAN
+    },
+    {}
+  );
 
   Comments.associate = (models) => {
     Comments.belongsTo(models.Users, {
@@ -14,7 +16,7 @@ export default (sequelize, DataTypes) => {
       onDelete: 'CASCADE'
     });
     Comments.belongsTo(models.Articles, {
-      foreignKey: 'ArticlesId',
+      foreignKey: 'articleId',
       onDelete: 'CASCADE'
     });
     Comments.belongsTo(models.Comments, {

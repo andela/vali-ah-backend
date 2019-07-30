@@ -1,54 +1,60 @@
 export default (sequelize, DataTypes) => {
   const Articles = sequelize.define(
-    'Articless',
+    'Articles',
     {
       title: DataTypes.STRING,
       summary: DataTypes.STRING,
       body: DataTypes.TEXT,
       suspended: DataTypes.BOOLEAN,
-      Status: DataTypes.STRING,
+      status: DataTypes.STRING,
       coverImageUrl: DataTypes.STRING,
       followUpId: DataTypes.UUID,
-      AuthorId: DataTypes.UUID
+      authorId: DataTypes.UUID
     },
     {}
   );
 
   Articles.associate = (models) => {
     Articles.belongsTo(models.Authors, {
-      foreignKey: 'AuthorId',
+      foreignKey: 'authorId',
       onDelete: 'CASCADE'
     });
 
     Articles.hasMany(models.Bookmarks, {
-      foreignKey: 'ArticlesId',
+      foreignKey: 'articleId',
       onDelete: 'CASCADE'
     });
 
     Articles.hasMany(models.Reports, {
-      foreignKey: 'ArticlesId',
+      foreignKey: 'articleId',
       onDelete: 'CASCADE'
     });
-    Articles.hasMany(models.UpVotes, {
-      foreignKey: 'ArticlesId',
+
+    Articles.hasMany(models.Upvotes, {
+      foreignKey: 'articleId',
       onDelete: 'CASCADE'
     });
-    Articles.hasMany(models.downVotes, {
-      foreignKey: 'ArticlesId',
+
+    Articles.hasMany(models.Downvotes, {
+      foreignKey: 'articleId',
       onDelete: 'CASCADE'
     });
+
     Articles.hasMany(models.Comments, {
-      foreignKey: 'ArticlesId',
+      foreignKey: 'articleId',
       onDelete: 'CASCADE'
     });
-    Articles.hasMany(models.Articlescategorys, {
-      foreignKey: 'ArticlesId',
+
+    Articles.hasMany(models.ArticleCategories, {
+      foreignKey: 'articleId',
       onDelete: 'CASCADE'
     });
+
     Articles.hasMany(models.ReadStats, {
-      foreignKey: 'ArticlesId',
+      foreignKey: 'articleId',
       onDelete: 'CASCADE'
     });
+
     Articles.hasMany(models.Articles, {
       foreignKey: 'followUpId',
       onDelete: 'CASCADE'

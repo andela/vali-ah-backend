@@ -5,7 +5,7 @@ const debug = Debug('dev');
 export default {
   up: async (queryInterface, Sequelize) => {
     try {
-      await queryInterface.createTable('DownVotes', {
+      await queryInterface.createTable('Upvotes', {
         id: {
           allowNull: false,
           primaryKey: true,
@@ -13,17 +13,12 @@ export default {
         },
         userId: {
           allowNull: false,
-          primaryKey: true,
+          foreignKey: true,
           type: Sequelize.UUID
         },
-        ArticlesId: {
+        articleId: {
           allowNull: false,
-          primaryKey: true,
-          type: Sequelize.UUID
-        },
-        UpVoteId: {
-          allowNull: false,
-          primaryKey: true,
+          foreignKey: true,
           type: Sequelize.UUID
         },
         createdAt: {
@@ -41,7 +36,7 @@ export default {
   },
   down: async (queryInterface) => {
     try {
-      await queryInterface.dropTable('DownVotes');
+      await queryInterface.dropTable('Upvotes');
     } catch (error) {
       debug(error);
     }

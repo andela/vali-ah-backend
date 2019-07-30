@@ -2,7 +2,7 @@ export default (sequelize, DataTypes) => {
   const Bookmarks = sequelize.define(
     'Bookmarks',
     {
-      ArticlesId: DataTypes.UUID,
+      articleId: DataTypes.UUID,
       userId: DataTypes.UUID,
       isActive: DataTypes.BOOLEAN
     },
@@ -15,7 +15,7 @@ export default (sequelize, DataTypes) => {
       onDelete: 'CASCADE'
     });
     Bookmarks.belongsTo(models.Articles, {
-      foreignKey: 'ArticlesId',
+      foreignKey: 'articleId',
       onDelete: 'CASCADE'
     });
   };

@@ -3,7 +3,7 @@ export default (sequelize, DataTypes) => {
     'Followers',
     {
       userId: DataTypes.UUID,
-      FollowersId: DataTypes.UUID
+      followerId: DataTypes.UUID
     },
     {}
   );
@@ -14,7 +14,7 @@ export default (sequelize, DataTypes) => {
       onDelete: 'CASCADE'
     });
     Followers.belongsTo(models.Users, {
-      foreignKey: 'FollowersId',
+      foreignKey: 'followerId',
       onDelete: 'CASCADE'
     });
   };

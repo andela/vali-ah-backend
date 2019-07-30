@@ -5,13 +5,13 @@ const debug = Debug('dev');
 export default {
   up: async (queryInterface, Sequelize) => {
     try {
-      await queryInterface.createTable('Categorys', {
+      await queryInterface.createTable('Categories', {
         id: {
           allowNull: false,
           primaryKey: true,
           type: Sequelize.UUID
         },
-        categorys: {
+        category: {
           allowNull: false,
           type: Sequelize.STRING
         },
@@ -34,7 +34,7 @@ export default {
   },
   down: async (queryInterface) => {
     try {
-      await queryInterface.dropTable('Categorys');
+      await queryInterface.dropTable('Categories');
     } catch (error) {
       debug(error);
     }

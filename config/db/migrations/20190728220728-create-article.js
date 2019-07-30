@@ -5,20 +5,42 @@ const debug = Debug('dev');
 export default {
   up: async (queryInterface, Sequelize) => {
     try {
-      await queryInterface.createTable('Followers', {
+      await queryInterface.createTable('Articles', {
         id: {
           allowNull: false,
           primaryKey: true,
           type: Sequelize.UUID
         },
-        userId: {
+        authorId: {
           allowNull: false,
-          primaryKey: true,
+          foreignKey: true,
           type: Sequelize.UUID
         },
-        FollowersId: {
+        title: {
           allowNull: false,
-          primaryKey: true,
+          type: Sequelize.STRING
+        },
+        summary: {
+          allowNull: false,
+          type: Sequelize.STRING
+        },
+        body: {
+          allowNull: false,
+          type: Sequelize.STRING
+        },
+        suspended: {
+          allowNull: false,
+          type: Sequelize.STRING
+        },
+        status: {
+          allowNull: false,
+          type: Sequelize.STRING,
+          defaultValue: 'active'
+        },
+        coverImageUrl: {
+          type: Sequelize.STRING
+        },
+        followerUpId: {
           type: Sequelize.UUID
         },
         createdAt: {
@@ -36,7 +58,7 @@ export default {
   },
   down: async (queryInterface) => {
     try {
-      await queryInterface.dropTable('Followers');
+      await queryInterface.dropTable('Articles');
     } catch (error) {
       debug(error);
     }

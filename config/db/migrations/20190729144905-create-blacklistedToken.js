@@ -5,7 +5,7 @@ const debug = Debug('dev');
 export default {
   up: async (queryInterface, Sequelize) => {
     try {
-      await queryInterface.createTable('Comments', {
+      await queryInterface.createTable('BlacklistedTokens', {
         id: {
           allowNull: false,
           primaryKey: true,
@@ -13,22 +13,12 @@ export default {
         },
         userId: {
           allowNull: false,
-          primaryKey: true,
+          foreignKey: true,
           type: Sequelize.UUID
         },
-        ArticlesId: {
+        token: {
           allowNull: false,
-          primaryKey: true,
-          type: Sequelize.UUID
-        },
-        content: {
           type: Sequelize.STRING
-        },
-        repliedToId: {
-          type: Sequelize.UUID
-        },
-        suspended: {
-          type: Sequelize.BOOLEAN
         },
         createdAt: {
           allowNull: false,
@@ -45,7 +35,7 @@ export default {
   },
   down: async (queryInterface) => {
     try {
-      await queryInterface.dropTable('Comments');
+      await queryInterface.dropTable('BlacklistedTokens');
     } catch (error) {
       debug(error);
     }

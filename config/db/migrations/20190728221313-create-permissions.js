@@ -5,27 +5,27 @@ const debug = Debug('dev');
 export default {
   up: async (queryInterface, Sequelize) => {
     try {
-      await queryInterface.createTable('Bookmarks', {
+      await queryInterface.createTable('Permissions', {
         id: {
-          allowNull: false,
-          primaryKey: true,
-          type: Sequelize.UUID
-        },
-        ArticlesId: {
           allowNull: false,
           primaryKey: true,
           type: Sequelize.UUID
         },
         userId: {
           allowNull: false,
-          primaryKey: true,
+          foreignKey: true,
           type: Sequelize.UUID
         },
-        isActive: {
+        roleId: {
           allowNull: false,
-          type: Sequelize.BOOLEAN
+          foreignKey: true,
+          type: Sequelize.UUID
         },
-        timeBookmarksed: {
+        code: {
+          allowNull: false,
+          type: Sequelize.BIGINT
+        },
+        createdAt: {
           allowNull: false,
           type: Sequelize.DATE
         },
@@ -40,7 +40,7 @@ export default {
   },
   down: async (queryInterface) => {
     try {
-      await queryInterface.dropTable('Bookmarks');
+      await queryInterface.dropTable('Permissions');
     } catch (error) {
       debug(error);
     }

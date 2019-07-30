@@ -1,5 +1,5 @@
 {
-  "name": "express-Authorsshaven",
+  "name": "express-authorshaven",
   "version": "1.0.0",
   "description": "A Social platform for the creative at heart",
   "main": "index.js",
@@ -20,7 +20,7 @@
     "test": "mocha --require @babel/register --require regenerator-runtime/runtime tests/test.js --exit",
     "test:coverage": "nyc npm run test"
   },
-  "Authors": "Andela Simulations Programme",
+  "author": "Andela Simulations Programme",
   "license": "MIT",
   "dependencies": {
     "@sendgrid/mail": "^6.4.0",

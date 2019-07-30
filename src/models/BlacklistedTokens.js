@@ -2,7 +2,7 @@ export default (sequelize, DataTypes) => {
   const BlacklistedTokens = sequelize.define(
     'BlacklistedTokens',
     {
-      ArticlesId: DataTypes.UUID,
+      articleId: DataTypes.UUID,
       token: DataTypes.STRING
     },
     {}

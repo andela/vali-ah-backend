@@ -5,7 +5,7 @@ const debug = Debug('dev');
 export default {
   up: async (queryInterface, Sequelize) => {
     try {
-      await queryInterface.createTable('Reports', {
+      await queryInterface.createTable('Notifications', {
         id: {
           allowNull: false,
           primaryKey: true,
@@ -13,17 +13,20 @@ export default {
         },
         userId: {
           allowNull: false,
-          primaryKey: true,
+          foreignKey: true,
           type: Sequelize.UUID
         },
-        ArticlesId: {
-          allowNull: false,
-          primaryKey: true,
-          type: Sequelize.UUID
-        },
-        reason: {
+        event: {
           allowNull: false,
           type: Sequelize.STRING
+        },
+        payload: {
+          allowNull: false,
+          type: Sequelize.JSON
+        },
+        notified: {
+          allowNull: false,
+          type: Sequelize.BOOLEAN
         },
         createdAt: {
           allowNull: false,
@@ -40,7 +43,7 @@ export default {
   },
   down: async (queryInterface) => {
     try {
-      await queryInterface.dropTable('Reports');
+      await queryInterface.dropTable('Notifications');
     } catch (error) {
       debug(error);
     }

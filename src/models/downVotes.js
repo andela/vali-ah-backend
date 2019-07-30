@@ -1,28 +1,23 @@
 export default (sequelize, DataTypes) => {
-  const downVotes = sequelize.define(
-    'downVotes',
+  const Downvotes = sequelize.define(
+    'Downvotes',
     {
-      ArticlesId: DataTypes.UUID,
-      userId: DataTypes.UUID,
-      UpVoteId: DataTypes.UUID
+      articleId: DataTypes.UUID,
+      userId: DataTypes.UUID
     },
     {}
   );
 
-  downVotes.associate = (models) => {
-    downVotes.belongsTo(models.Users, {
+  Downvotes.associate = (models) => {
+    Downvotes.belongsTo(models.Users, {
       foreignKey: 'userId',
       onDelete: 'CASCADE'
     });
-    downVotes.belongsTo(models.Articles, {
-      foreignKey: 'ArticlesId',
-      onDelete: 'CASCADE'
-    });
-    downVotes.belongsTo(models.UpVotes, {
-      foreignKey: 'UpVoteId',
+    Downvotes.belongsTo(models.Articles, {
+      foreignKey: 'articleId',
       onDelete: 'CASCADE'
     });
   };
 
-  return downVotes;
+  return Downvotes;
 };

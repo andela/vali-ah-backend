@@ -5,20 +5,25 @@ const debug = Debug('dev');
 export default {
   up: async (queryInterface, Sequelize) => {
     try {
-      await queryInterface.createTable('BlacklistedTokens', {
+      await queryInterface.createTable('Bookmarks', {
         id: {
           allowNull: false,
           primaryKey: true,
           type: Sequelize.UUID
         },
-        userId: {
+        articleId: {
           allowNull: false,
-          primaryKey: true,
+          foreignKey: true,
           type: Sequelize.UUID
         },
-        token: {
+        userId: {
           allowNull: false,
-          type: Sequelize.STRING
+          foreignKey: true,
+          type: Sequelize.UUID
+        },
+        isActive: {
+          allowNull: false,
+          type: Sequelize.BOOLEAN
         },
         createdAt: {
           allowNull: false,
@@ -35,7 +40,7 @@ export default {
   },
   down: async (queryInterface) => {
     try {
-      await queryInterface.dropTable('BlacklistedTokens');
+      await queryInterface.dropTable('Bookmarks');
     } catch (error) {
       debug(error);
     }

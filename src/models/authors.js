@@ -15,7 +15,7 @@ export default (sequelize, DataTypes) => {
     });
 
     Authors.hasMany(models.Articles, {
-      foreignKey: 'AuthorId',
+      foreignKey: 'authorId',
       onDelete: 'CASCADE'
     });
   };

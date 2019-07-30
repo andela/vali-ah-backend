@@ -1,6 +1,6 @@
 module.exports = {
-  'config': './src/db/sequelize.js',
+  'config': './src/sequelize.js',
   'models-path': './src/models',
-  'seeders-path': './src/db/seeders',
-  'migrations-path': './src/db/migrations'
+  'seeders-path': './config/db/seeders',
+  'migrations-path': './config/db/migrations'
 }

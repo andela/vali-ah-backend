@@ -2,7 +2,7 @@ export default (sequelize, DataTypes) => {
   const Reports = sequelize.define(
     'Reports',
     {
-      ArticlesId: DataTypes.UUID,
+      articleId: DataTypes.UUID,
       userId: DataTypes.UUID,
       reason: DataTypes.STRING
     },
@@ -15,7 +15,7 @@ export default (sequelize, DataTypes) => {
       onDelete: 'CASCADE'
     });
     Reports.belongsTo(models.Articles, {
-      foreignKey: 'ArticlesId'
+      foreignKey: 'articleId'
     });
   };
 

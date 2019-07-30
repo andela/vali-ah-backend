@@ -37,18 +37,22 @@ export default (sequelize, DataTypes) => {
       foreignKey: 'userId',
       onDelete: 'CASCADE'
     });
+
     Users.hasMany(models.ReadStats, {
       foreignKey: 'userId',
       onDelete: 'CASCADE'
     });
-    Users.hasMany(models.UpVotes, {
+
+    Users.hasMany(models.Upvotes, {
       foreignKey: 'userId',
       onDelete: 'CASCADE'
     });
-    Users.hasMany(models.downVotes, {
+
+    Users.hasMany(models.Downvotes, {
       foreignKey: 'userId',
       onDelete: 'CASCADE'
     });
+
     Users.hasMany(models.Notifications, {
       foreignKey: 'userId',
       onDelete: 'CASCADE'
