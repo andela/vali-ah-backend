@@ -1,10 +1,10 @@
-Authors Haven - A Social platform for the creative at heart.
+Authorss Haven - A Social platform for the creative at heart.
 =======
 
 [![Build Status](https://travis-ci.org/andela/vali-ah-backend.svg?branch=develop)](https://travis-ci.org/andela/vali-ah-backend) [![Coverage Status](https://coveralls.io/repos/github/andela/vali-ah-backend/badge.svg?branch=develop)](https://coveralls.io/github/andela/vali-ah-backend?branch=develop) [![Maintainability](https://api.codeclimate.com/v1/badges/08b713ce3211374e1d39/maintainability)](https://codeclimate.com/github/andela/vali-ah-backend/maintainability) [![Test Coverage](https://api.codeclimate.com/v1/badges/08b713ce3211374e1d39/test_coverage)](https://codeclimate.com/github/andela/vali-ah-backend/test_coverage) [![](https://img.shields.io/badge/Reviewed_by-Hound-blueviolet.svg)](https://houndci.com)
 
 ## Vision
-Create a community of like minded authors to foster inspiration and innovation
+Create a community of like minded Authorss to foster inspiration and innovation
 by leveraging the modern web.
 
 ---
@@ -12,14 +12,14 @@ by leveraging the modern web.
 ## API Spec
 The preferred JSON object to be returned by the API should be structured as follows:
 
-### Users (for authentication)
+### Userss (for authentication)
 
 ```source-json
 {
-  "user": {
+  "Users": {
     "email": "jake@jake.jake",
     "token": "jwt.token.here",
-    "username": "jake",
+    "Usersname": "jake",
     "bio": "I work at statefarm",
     "image": null
   }
@@ -29,17 +29,17 @@ The preferred JSON object to be returned by the API should be structured as foll
 ```source-json
 {
   "profile": {
-    "username": "jake",
+    "Usersname": "jake",
     "bio": "I work at statefarm",
     "image": "image-link",
     "following": false
   }
 }
 ```
-### Single Article
+### Single Articles
 ```source-json
 {
-  "article": {
+  "Articles": {
     "slug": "how-to-train-your-dragon",
     "title": "How to train your dragon",
     "description": "Ever wonder how?",
@@ -49,8 +49,8 @@ The preferred JSON object to be returned by the API should be structured as foll
     "updatedAt": "2016-02-18T03:48:35.824Z",
     "favorited": false,
     "favoritesCount": 0,
-    "author": {
-      "username": "jake",
+    "Authors": {
+      "Usersname": "jake",
       "bio": "I work at statefarm",
       "image": "https://i.stack.imgur.com/xHWG8.jpg",
       "following": false
@@ -58,10 +58,10 @@ The preferred JSON object to be returned by the API should be structured as foll
   }
 }
 ```
-### Multiple Articles
+### Multiple Articless
 ```source-json
 {
-  "articles":[{
+  "Articless":[{
     "slug": "how-to-train-your-dragon",
     "title": "How to train your dragon",
     "description": "Ever wonder how?",
@@ -71,8 +71,8 @@ The preferred JSON object to be returned by the API should be structured as foll
     "updatedAt": "2016-02-18T03:48:35.824Z",
     "favorited": false,
     "favoritesCount": 0,
-    "author": {
-      "username": "jake",
+    "Authors": {
+      "Usersname": "jake",
       "bio": "I work at statefarm",
       "image": "https://i.stack.imgur.com/xHWG8.jpg",
       "following": false
@@ -88,14 +88,14 @@ The preferred JSON object to be returned by the API should be structured as foll
     "updatedAt": "2016-02-18T03:48:35.824Z",
     "favorited": false,
     "favoritesCount": 0,
-    "author": {
-      "username": "jake",
+    "Authors": {
+      "Usersname": "jake",
       "bio": "I work at statefarm",
       "image": "https://i.stack.imgur.com/xHWG8.jpg",
       "following": false
     }
   }],
-  "articlesCount": 2
+  "ArticlessCount": 2
 }
 ```
 ### Single Comment
@@ -106,8 +106,8 @@ The preferred JSON object to be returned by the API should be structured as foll
     "createdAt": "2016-02-18T03:22:56.637Z",
     "updatedAt": "2016-02-18T03:22:56.637Z",
     "body": "It takes a Jacobian",
-    "author": {
-      "username": "jake",
+    "Authors": {
+      "Usersname": "jake",
       "bio": "I work at statefarm",
       "image": "https://i.stack.imgur.com/xHWG8.jpg",
       "following": false
@@ -123,8 +123,8 @@ The preferred JSON object to be returned by the API should be structured as foll
     "createdAt": "2016-02-18T03:22:56.637Z",
     "updatedAt": "2016-02-18T03:22:56.637Z",
     "body": "It takes a Jacobian",
-    "author": {
-      "username": "jake",
+    "Authors": {
+      "Usersname": "jake",
       "bio": "I work at statefarm",
       "image": "https://i.stack.imgur.com/xHWG8.jpg",
       "following": false
@@ -155,9 +155,9 @@ If a request fails any validations, expect errors in the following format:
 }
 ```
 ### Other status codes:
-401 for Unauthorized requests, when a request requires authentication but it isn't provided
+401 for UnAuthorsized requests, when a request requires authentication but it isn't provided
 
-403 for Forbidden requests, when a request may be valid but the user doesn't have permissions to perform the action
+403 for Forbidden requests, when a request may be valid but the Users doesn't have permissions to perform the action
 
 404 for Not found requests, when a resource can't be found to fulfill the request
 
@@ -167,58 +167,58 @@ Endpoints:
 
 ### Authentication:
 
-`POST /api/users/login`
+`POST /api/Userss/login`
 
 Example request body:
 
 ```source-json
 {
-  "user":{
+  "Users":{
     "email": "jake@jake.jake",
     "password": "jakejake"
   }
 }
 ```
 
-No authentication required, returns a User
+No authentication required, returns a Users
 
 Required fields: `email`, `password`
 
 ### Registration:
 
-`POST /api/users`
+`POST /api/Userss`
 
 Example request body:
 
 ```source-json
 {
-  "user":{
-    "username": "Jacob",
+  "Users":{
+    "Usersname": "Jacob",
     "email": "jake@jake.jake",
     "password": "jakejake"
   }
 }
 ```
 
-No authentication required, returns a User
+No authentication required, returns a Users
 
-Required fields: `email`, `username`, `password`
+Required fields: `email`, `Usersname`, `password`
 
-### Get Current User
+### Get Current Users
 
-`GET /api/user`
+`GET /api/Users`
 
-Authentication required, returns a User that's the current user
+Authentication required, returns a Users that's the current Users
 
-### Update User
+### Update Users
 
-`PUT /api/user`
+`PUT /api/Users`
 
 Example request body:
 
 ```source-json
 {
-  "user":{
+  "Users":{
     "email": "jake@jake.jake",
     "bio": "I like to skateboard",
     "image": "https://i.stack.imgur.com/xHWG8.jpg"
@@ -226,37 +226,37 @@ Example request body:
 }
 ```
 
-Authentication required, returns the User
+Authentication required, returns the Users
 
-Accepted fields: `email`, `username`, `password`, `image`, `bio`
+Accepted fields: `email`, `Usersname`, `password`, `image`, `bio`
 
 ### Get Profile
 
-`GET /api/profiles/:username`
+`GET /api/profiles/:Usersname`
 
 Authentication optional, returns a Profile
 
-### Follow user
+### Follow Users
 
-`POST /api/profiles/:username/follow`
-
-Authentication required, returns a Profile
-
-No additional parameters required
-
-### Unfollow user
-
-`DELETE /api/profiles/:username/follow`
+`POST /api/profiles/:Usersname/follow`
 
 Authentication required, returns a Profile
 
 No additional parameters required
 
-### List Articles
+### Unfollow Users
 
-`GET /api/articles`
+`DELETE /api/profiles/:Usersname/follow`
 
-Returns most recent articles globally by default, provide `tag`, `author` or `favorited` query parameter to filter results
+Authentication required, returns a Profile
+
+No additional parameters required
+
+### List Articless
+
+`GET /api/Articless`
+
+Returns most recent Articless globally by default, provide `tag`, `Authors` or `favorited` query parameter to filter results
 
 Query Parameters:
 
@@ -264,47 +264,47 @@ Filter by tag:
 
 `?tag=AngularJS`
 
-Filter by author:
+Filter by Authors:
 
-`?author=jake`
+`?Authors=jake`
 
-Favorited by user:
+Favorited by Users:
 
 `?favorited=jake`
 
-Limit number of articles (default is 20):
+Limit number of Articless (default is 20):
 
 `?limit=20`
 
-Offset/skip number of articles (default is 0):
+Offset/skip number of Articless (default is 0):
 
 `?offset=0`
 
-Authentication optional, will return multiple articles, ordered by most recent first
+Authentication optional, will return multiple Articless, ordered by most recent first
 
-### Feed Articles
+### Feed Articless
 
-`GET /api/articles/feed`
+`GET /api/Articless/feed`
 
-Can also take `limit` and `offset` query parameters like List Articles
+Can also take `limit` and `offset` query parameters like List Articless
 
-Authentication required, will return multiple articles created by followed users, ordered by most recent first.
+Authentication required, will return multiple Articless created by followed Userss, ordered by most recent first.
 
-### Get Article
+### Get Articles
 
-`GET /api/articles/:slug`
+`GET /api/Articless/:slug`
 
-No authentication required, will return single article
+No authentication required, will return single Articles
 
-### Create Article
+### Create Articles
 
-`POST /api/articles`
+`POST /api/Articless`
 
 Example request body:
 
 ```source-json
 {
-  "article": {
+  "Articles": {
     "title": "How to train your dragon",
     "description": "Ever wonder how?",
     "body": "You have to believe",
@@ -313,41 +313,41 @@ Example request body:
 }
 ```
 
-Authentication required, will return an Article
+Authentication required, will return an Articles
 
 Required fields: `title`, `description`, `body`
 
 Optional fields: `tagList` as an array of Strings
 
-### Update Article
+### Update Articles
 
-`PUT /api/articles/:slug`
+`PUT /api/Articless/:slug`
 
 Example request body:
 
 ```source-json
 {
-  "article": {
+  "Articles": {
     "title": "Did you train your dragon?"
   }
 }
 ```
 
-Authentication required, returns the updated Article
+Authentication required, returns the updated Articles
 
 Optional fields: `title`, `description`, `body`
 
 The `slug` also gets updated when the `title` is changed
 
-### Delete Article
+### Delete Articles
 
-`DELETE /api/articles/:slug`
+`DELETE /api/Articless/:slug`
 
 Authentication required
 
-### Add Comments to an Article
+### Add Comments to an Articles
 
-`POST /api/articles/:slug/comments`
+`POST /api/Articless/:slug/comments`
 
 Example request body:
 
@@ -362,30 +362,30 @@ Example request body:
 Authentication required, returns the created Comment
 Required field: `body`
 
-### Get Comments from an Article
+### Get Comments from an Articles
 
-`GET /api/articles/:slug/comments`
+`GET /api/Articless/:slug/comments`
 
 Authentication optional, returns multiple comments
 
 ### Delete Comment
 
-`DELETE /api/articles/:slug/comments/:id`
+`DELETE /api/Articless/:slug/comments/:id`
 
 Authentication required
 
-### Favorite Article
+### Favorite Articles
 
-`POST /api/articles/:slug/favorite`
+`POST /api/Articless/:slug/favorite`
 
-Authentication required, returns the Article
+Authentication required, returns the Articles
 No additional parameters required
 
-### Unfavorite Article
+### Unfavorite Articles
 
-`DELETE /api/articles/:slug/favorite`
+`DELETE /api/Articless/:slug/favorite`
 
-Authentication required, returns the Article
+Authentication required, returns the Articles
 
 No additional parameters required
 

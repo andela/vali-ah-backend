@@ -3,7 +3,7 @@
     "@babel/register",
     "regenerator-runtime/runtime"
     ],
-  "reporter": [
+  "Reportser": [
       "html",
       "lcov",
       "text"
