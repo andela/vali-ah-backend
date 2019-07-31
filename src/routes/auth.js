@@ -1,14 +1,17 @@
-import express from 'express';
+import { Router } from 'express';
+import passport from 'passport';
 
 import authController from '../controllers/auth';
 import validator from '../middlewares/validator';
 import Schemas from '../validations/auth';
 import asyncWrapper from '../middlewares/asyncWrapper';
 
-const { signup, signin } = authController;
-const { signupSchema, signinSchema } = Schemas;
+const {
+  signup, signin, socialLogin, twitterLogin
+} = authController;
+const { signupSchema, signinSchema, socialLoginSchema } = Schemas;
 
-const router = express.Router();
+const router = Router();
 
 /**
  * @swagger
@@ -74,5 +77,66 @@ router.post('/signup', validator(signupSchema), asyncWrapper(signup));
  *         description: users
  */
 router.post('/signin', validator(signinSchema), asyncWrapper(signin));
+
+/**
+ * @swagger
+ *
+ * /auth/twitter:
+ *   get:
+ *     description: Authenticate user using twitter
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: success
+ */
+router.get('/twitter', passport.authenticate('twitter'));
+
+/**
+ * @swagger
+ *
+ * /auth/twitter/redirect:
+ *   get:
+ *     description: Create a new user
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: success
+ */
+router.get(
+  '/twitter/redirect',
+  passport.authenticate('twitter', { session: false }),
+  asyncWrapper(twitterLogin)
+);
+
+/**
+ * @swagger
+ *
+ * /auth/{provider}:
+ *   post:
+ *     description: Authenticate user using third party social account
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: Content-Type
+ *         in: header
+ *         required: true
+ *         type: string
+ *         default: application/json
+ *       - name: provider
+ *         in: path
+ *         required: true
+ *         type: string
+ *       - name: accessToken
+ *         description: User access token gotten from either facebook or google.
+ *         in: formData
+ *         required: true
+ *         type: string
+ *     responses:
+ *       200:
+ *         description: success
+ */
+router.post('/:provider', validator(socialLoginSchema), asyncWrapper(socialLogin));
 
 export default router;

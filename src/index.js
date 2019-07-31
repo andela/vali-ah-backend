@@ -4,6 +4,8 @@ import cors from 'cors';
 import Debug from 'debug';
 import swaggerUi from 'swagger-ui-express';
 import validator from 'express-validator';
+import passport from 'passport';
+import session from 'express-session';
 
 import routes from './routes';
 import swaggerDoc from '../docs/swagger';
@@ -19,6 +21,14 @@ app.use(json());
 app.use(urlencoded({ extended: false }));
 app.use(validator());
 app.use(cors());
+app.use(passport.initialize());
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: true,
+    saveUninitialized: true
+  })
+);
 
 app.use('/api/v1', routes);
 app.use('/api/v1/docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc));
