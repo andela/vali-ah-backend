@@ -1,5 +1,8 @@
 /* eslint-disable import/prefer-default-export */
-import Articles from '../services/articles';
+// import Articles from '../services/articles';
+import Models from '../models';
+
+const { Articles } = Models;
 
 /**
   * controller for creating comments

@@ -18,11 +18,16 @@ should();
 const { Articles, Users } = models;
 const baseRoute = '/api/v1';
 
+const commentData = {
+  content: faker.lorem.sentences(),
+  userId: faker.random.uuid(),
+};
+
 describe('Articles API', () => {
   describe('POST /articles/:article/comment', () => {
     let articles;
     before(async () => {
-      const users = await Users.bulkCreate(Array(5).fill(0).map(() => ({
+      const users = await Users.bulkCreate(Array(2).fill(0).map(() => ({
         id: uuid(),
         firstName: faker.name.firstName(),
         lastName: faker.name.lastName(),
@@ -39,11 +44,6 @@ describe('Articles API', () => {
         body: faker.lorem.text()
       })), { returning: true });
     });
-
-    const commentData = {
-      content: faker.lorem.sentences(),
-      userId: faker.random.uuid(),
-    };
 
     it('should return 201', async () => {
       const { status } = await chai.request(app).post(`${baseRoute}/articles/${articles[0].id}/comments`).send(commentData);

@@ -1,17 +1,51 @@
-export default (sequelize, DataTypes) => {
-  const ArticleCategories = sequelize.define(
-    'ArticleCategories', {
-      id: {
-        type: DataTypes.UUID,
-        primaryKey: true,
-        defaultValue: DataTypes.UUIDV4
-      },
-      articleId: DataTypes.UUID,
-      categoryId: DataTypes.UUID
-    }, {}
-  );
+import { Sequelize, Model } from 'sequelize';
 
-  ArticleCategories.associate = (models) => {
+/**
+ * Model class for Article's category
+ *
+ * @class
+ *
+ * @extends Model
+ *
+ */
+export default class ArticleCategories extends Model {
+  static modelFields = {
+    id: {
+      type: Sequelize.UUID,
+      primaryKey: true,
+      defaultValue: Sequelize.UUIDV4
+    },
+    articleId: Sequelize.UUID,
+    categoryId: Sequelize.UUID
+  }
+
+  /**
+   * initializes the model
+   *
+   * @static
+   * @memberof ArticleCategories
+   *
+   * @param {any} sequelize the sequelize obbject
+   *
+   * @returns {object} the model
+   */
+  static init(sequelize) {
+    const model = super.init(ArticleCategories.modelFields, { sequelize });
+
+    return model;
+  }
+
+  /**
+   * model association
+   *
+   * @static
+   * @memberof ArticleCategories
+   *
+   * @param {Object} models the models object
+   *
+   * @returns {object} the model
+   */
+  static associate(models) {
     ArticleCategories.belongsTo(models.Articles, {
       foreignKey: 'articleId',
       onDelete: 'CASCADE'
@@ -20,7 +54,5 @@ export default (sequelize, DataTypes) => {
       foreignKey: 'categoryId',
       onDelete: 'CASCADE'
     });
-  };
-
-  return ArticleCategories;
-};
+  }
+}

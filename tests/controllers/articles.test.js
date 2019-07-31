@@ -6,13 +6,14 @@ import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
 import sinonTest from 'sinon-test';
 
-import Articles from '../../src/services/articles';
+import Models from '../../src/models';
 import { createComment } from '../../src/controllers/article';
 
 chai.use(chaiAsPromised);
 chai.use(sinonChai);
 
 const test = sinonTest(sinon);
+const { Articles } = Models;
 
 should();
 

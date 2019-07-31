@@ -1,4 +1,4 @@
-import database from '../models/index';
+import database from '../models';
 
 const { Users } = database;
 

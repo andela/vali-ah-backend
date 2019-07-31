@@ -1,17 +1,51 @@
-export default (sequelize, DataTypes) => {
-  const Followers = sequelize.define(
-    'Followers', {
-      id: {
-        type: DataTypes.UUID,
-        primaryKey: true,
-        defaultValue: DataTypes.UUIDV4
-      },
-      followeeId: DataTypes.UUID,
-      followerId: DataTypes.UUID
-    }, {}
-  );
+import { Sequelize, Model } from 'sequelize';
 
-  Followers.associate = (models) => {
+/**
+ * Model class for Followers category
+ *
+ * @class
+ *
+ * @extends Model
+ *
+ */
+export default class Followers extends Model {
+  static modelFields = {
+    id: {
+      type: Sequelize.UUID,
+      primaryKey: true,
+      defaultValue: Sequelize.UUIDV4
+    },
+    followeeId: Sequelize.UUID,
+    followerId: Sequelize.UUID
+  }
+
+  /**
+   * initializes the Followers model
+   *
+   * @static
+   * @memberof Followers
+   *
+   * @param {any} sequelize the sequelize obbject
+   *
+   * @returns {object} the Followers model
+   */
+  static init(sequelize) {
+    const model = super.init(Followers.modelFields, { sequelize });
+
+    return model;
+  }
+
+  /**
+   * model association
+   *
+   * @static
+   * @memberof Followers
+   *
+   * @param {Object} models the models object
+   *
+   * @returns {object} the model
+   */
+  static associate(models) {
     Followers.belongsTo(models.Users, {
       as: 'following',
       foreignKey: 'followeeId',
@@ -22,7 +56,5 @@ export default (sequelize, DataTypes) => {
       foreignKey: 'followerId',
       onDelete: 'CASCADE'
     });
-  };
-
-  return Followers;
-};
+  }
+}

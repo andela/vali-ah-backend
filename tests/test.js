@@ -4,7 +4,7 @@ import './services/notification.test';
 import './services/email.test';
 import './routes/auth.test';
 import './auth.test';
-import './services/articles.test';
+import './models/articles.test';
 import './controllers/articles.test';
 import './routes/articles.test';
 import './helpers/errors.test';

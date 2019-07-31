@@ -1,20 +1,54 @@
-export default (sequelize, DataTypes) => {
-  const Comments = sequelize.define(
-    'Comments', {
-      id: {
-        type: DataTypes.UUID,
-        primaryKey: true,
-        defaultValue: DataTypes.UUIDV4
-      },
-      content: DataTypes.STRING,
-      userId: DataTypes.UUID,
-      articleId: DataTypes.UUID,
-      repliedToId: DataTypes.UUID,
-      suspended: DataTypes.BOOLEAN
-    }, {}
-  );
+import { Sequelize, Model } from 'sequelize';
 
-  Comments.associate = (models) => {
+/**
+ * Model class for Comments
+ *
+ * @class
+ *
+ * @extends Model
+ *
+ */
+export default class Comments extends Model {
+  static modelFields = {
+    id: {
+      type: Sequelize.UUID,
+      primaryKey: true,
+      defaultValue: Sequelize.UUIDV4
+    },
+    content: Sequelize.STRING,
+    userId: Sequelize.UUID,
+    articleId: Sequelize.UUID,
+    repliedToId: Sequelize.UUID,
+    suspended: Sequelize.BOOLEAN
+  }
+
+  /**
+   * initializes the User model
+   *
+   * @static
+   * @memberof Comments
+   *
+   * @param {any} sequelize the sequelize obbject
+   *
+   * @returns {object} the User model
+   */
+  static init(sequelize) {
+    const model = super.init(Comments.modelFields, { sequelize });
+
+    return model;
+  }
+
+  /**
+   * model association
+   *
+   * @static
+   * @memberof Comments
+   *
+   * @param {Object} models the models object
+   *
+   * @returns {object} the model
+   */
+  static associate(models) {
     Comments.belongsTo(models.Users, {
       foreignKey: 'userId',
       onDelete: 'CASCADE'
@@ -27,7 +61,5 @@ export default (sequelize, DataTypes) => {
       foreignKey: 'repliedToId',
       onDelete: 'CASCADE'
     });
-  };
-
-  return Comments;
-};
+  }
+}

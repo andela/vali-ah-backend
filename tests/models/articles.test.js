@@ -5,15 +5,16 @@ import faker from 'faker';
 import sinon from 'sinon';
 import sinonTest from 'sinon-test';
 
-import Articles from '../../src/services/articles';
+import Models from '../../src/models';
 
 chai.use(chaiAsPromised);
 
 const test = sinonTest(sinon);
+const { Articles } = Models;
 
 should();
 
-describe('Articles Service', () => {
+describe('Articles model', () => {
   const id = faker.random.uuid();
   const commentData = {
     content: faker.lorem.sentences(),
@@ -21,11 +22,11 @@ describe('Articles Service', () => {
   };
 
   afterEach(() => {
-    Articles.model.findByPk.restore();
+    Articles.findByPk.restore();
   });
 
   it('should return created comment if article exist', test(async () => {
-    sinon.stub(Articles.model, 'findByPk').callsFake(() => ({
+    sinon.stub(Articles, 'findByPk').callsFake(() => ({
       createComment() {
         return { id, ...commentData };
       }
@@ -37,7 +38,7 @@ describe('Articles Service', () => {
   }));
 
   it('should return error if article doenst exist', test(async () => {
-    sinon.stub(Articles.model, 'findByPk').returns(null);
+    sinon.stub(Articles, 'findByPk').returns(null);
 
     const comment = { article: id, comment: commentData };
 

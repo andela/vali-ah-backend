@@ -13,8 +13,6 @@ import { ApplicationError } from '../helpers/errors';
  */
 
 export default (schemas, status = 400) => {
-  const schemaToValidate = schemas || [];
-
   const validationCheck = async (request, response, next) => {
     const errors = validationResult(request);
     request = { ...request, ...matchedData(request) };
@@ -33,5 +31,5 @@ export default (schemas, status = 400) => {
     return next();
   };
 
-  return [schemaToValidate, validationCheck];
+  return [...(schemas.length && [schemas]), validationCheck];
 };

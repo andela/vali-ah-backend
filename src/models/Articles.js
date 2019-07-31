@@ -1,23 +1,59 @@
-export default (sequelize, DataTypes) => {
-  const Articles = sequelize.define(
-    'Articles', {
-      id: {
-        type: DataTypes.UUID,
-        primaryKey: true,
-        defaultValue: DataTypes.UUIDV4
-      },
-      title: DataTypes.STRING,
-      summary: DataTypes.STRING,
-      body: DataTypes.TEXT,
-      suspended: DataTypes.BOOLEAN,
-      status: DataTypes.STRING,
-      coverImageUrl: DataTypes.STRING,
-      followUpId: DataTypes.UUID,
-      authorId: DataTypes.UUID
-    }, {}
-  );
+import { Sequelize, Model } from 'sequelize';
 
-  Articles.associate = (models) => {
+import { NotFoundError } from '../helpers/errors';
+
+/**
+ * Model class for Articles
+ *
+ * @class
+ *
+ * @extends Model
+ *
+ */
+export default class Articles extends Model {
+  static modelFields = {
+    id: {
+      type: Sequelize.UUID,
+      primaryKey: true,
+      defaultValue: Sequelize.UUIDV4
+    },
+    title: Sequelize.STRING,
+    summary: Sequelize.STRING,
+    body: Sequelize.TEXT,
+    suspended: Sequelize.BOOLEAN,
+    status: Sequelize.STRING,
+    coverImageUrl: Sequelize.STRING,
+    followUpId: Sequelize.UUID,
+    authorId: Sequelize.UUID
+  }
+
+  /**
+   * initializes the model
+   *
+   * @static
+   * @memberof Articles
+   *
+   * @param {any} sequelize the sequelize obbject
+   *
+   * @returns {object} the model
+   */
+  static init(sequelize) {
+    const model = super.init(Articles.modelFields, { sequelize });
+
+    return model;
+  }
+
+  /**
+   * model association
+   *
+   * @static
+   * @memberof ArticleCategories
+   *
+   * @param {Object} models the models object
+   *
+   * @returns {object} the model
+   */
+  static associate(models) {
     Articles.belongsTo(models.Users, {
       foreignKey: 'authorId',
       onDelete: 'CASCADE'
@@ -57,7 +93,25 @@ export default (sequelize, DataTypes) => {
       foreignKey: 'followUpId',
       onDelete: 'CASCADE'
     });
-  };
+  }
 
-  return Articles;
-};
+  /**
+   * model association
+   *
+   * @static
+   * @memberof Articles
+   *
+   * @param {Object} data - The event payload. Contains notification type and payload.
+   * @param {String} data.article - article to comment on
+   * @param {String} data.comment - comment data
+   *
+   * @return {Object | void} - details of comment data
+   */
+  static async createComment({ article, comment }) {
+    const articleObject = await this.findByPk(article);
+
+    if (articleObject) return articleObject.createComment(comment);
+
+    throw new NotFoundError();
+  }
+}

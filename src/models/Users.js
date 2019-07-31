@@ -1,59 +1,58 @@
-export default (sequelize, DataTypes) => {
-  const Users = sequelize.define(
-    'Users', {
-      id: {
-        type: DataTypes.UUID,
-        primaryKey: true,
-        defaultValue: DataTypes.UUIDV4
-      },
-      roleId: DataTypes.UUID,
-      firstName: DataTypes.STRING,
-      lastName: DataTypes.STRING,
-      userName: DataTypes.STRING,
-      email: DataTypes.STRING,
-      password: DataTypes.STRING,
-      avatarUrl: DataTypes.STRING
-    }, {}
-  );
+import { Sequelize, Model } from 'sequelize';
 
-  Users.associate = (models) => {
-    Users.hasMany(models.Reports, {
-      foreignKey: 'userId',
-      onDelete: 'CASCADE'
+/**
+ * Model class for Users
+ *
+ * @class
+ *
+ * @extends Model
+ *
+ */
+export default class Users extends Model {
+  static modelFields = {
+    id: {
+      type: Sequelize.UUID,
+      primaryKey: true,
+      defaultValue: Sequelize.UUIDV4
+    },
+    roleId: Sequelize.UUID,
+    firstName: Sequelize.STRING,
+    lastName: Sequelize.STRING,
+    userName: Sequelize.STRING,
+    email: Sequelize.STRING,
+    password: Sequelize.STRING,
+    avatarUrl: Sequelize.STRING
+  }
+
+  /**
+   * initializes the User model
+   *
+   * @static
+   * @memberof User
+   *
+   * @param {any} sequelize the sequelize obbject
+   *
+   * @returns {object} the User model
+   */
+  static init(sequelize) {
+    const model = super.init(Users.modelFields, {
+      sequelize
     });
 
-    Users.hasMany(models.Followers, {
-      as: 'followers',
-      foreignKey: 'followeeId',
-      onDelete: 'CASCADE'
-    });
+    return model;
+  }
 
-    Users.hasMany(models.Followers, {
-      as: 'following',
-      foreignKey: 'followerId',
-      onDelete: 'CASCADE'
-    });
+  /**
+   * model association
+   *
+   * @static
+   * @memberof User
+   *
+   * @param {Object} models the models object
+   *
+   * @returns {object} the model
+   */
+  static associate() {
 
-    Users.hasMany(models.Bookmarks, {
-      foreignKey: 'userId',
-      onDelete: 'CASCADE'
-    });
-
-    Users.hasMany(models.ReadStats, {
-      foreignKey: 'userId',
-      onDelete: 'CASCADE'
-    });
-
-    Users.hasMany(models.Votes, {
-      foreignKey: 'userId',
-      onDelete: 'CASCADE'
-    });
-
-    Users.hasMany(models.Notifications, {
-      foreignKey: 'userId',
-      onDelete: 'CASCADE'
-    });
-  };
-
-  return Users;
-};
+  }
+}

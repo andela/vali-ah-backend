@@ -1,7 +1,14 @@
 {
-  "presets": ["@babel/preset-env"],
-  "ignore": ["node_modules"],
-  "plugins": ["istanbul", "@babel/transform-runtime"],
+  "presets": [ [
+    "@babel/preset-env",
+    {
+      "targets": {
+        "node": "current"
+      }
+    }
+  ]],
+  // "ignore": ["node_modules"],
+  "plugins": ["istanbul", "@babel/transform-runtime", "@babel/plugin-proposal-class-properties"],
   "env": {
     "debug": {
       "sourceMaps": "inline",
