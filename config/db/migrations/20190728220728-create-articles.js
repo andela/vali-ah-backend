@@ -9,12 +9,19 @@ export default {
         id: {
           allowNull: false,
           primaryKey: true,
-          type: Sequelize.UUID
+          type: Sequelize.UUIDV4
         },
         authorId: {
           allowNull: false,
           foreignKey: true,
-          type: Sequelize.UUID
+          type: Sequelize.UUIDV4,
+          onDelete: 'CASCADE'
+        },
+        followUpId: {
+          allowNull: false,
+          foreignKey: true,
+          type: Sequelize.UUIDV4,
+          onDelete: 'CASCADE'
         },
         title: {
           allowNull: false,
@@ -26,30 +33,30 @@ export default {
         },
         body: {
           allowNull: false,
-          type: Sequelize.STRING
+          type: Sequelize.TEXT
         },
         suspended: {
           allowNull: false,
-          type: Sequelize.STRING
+          type: Sequelize.BOOLEAN,
+          defaultValue: false
         },
         status: {
           allowNull: false,
           type: Sequelize.STRING,
-          defaultValue: 'active'
+          defaultValue: 'draft'
         },
         coverImageUrl: {
           type: Sequelize.STRING
         },
-        followerUpId: {
-          type: Sequelize.UUID
-        },
         createdAt: {
           allowNull: false,
-          type: Sequelize.DATE
+          type: Sequelize.DATE,
+          defaultValue: Sequelize.fn('now')
         },
         updatedAt: {
           allowNull: false,
-          type: Sequelize.DATE
+          type: Sequelize.DATE,
+          defaultValue: Sequelize.fn('now')
         }
       });
     } catch (error) {

@@ -9,29 +9,30 @@ export default {
         id: {
           allowNull: false,
           primaryKey: true,
-          type: Sequelize.UUID
+          type: Sequelize.UUIDV4,
+          defaultValue: Sequelize.UUIDV4
         },
         articleId: {
           allowNull: false,
           foreignKey: true,
-          type: Sequelize.UUID
+          type: Sequelize.UUIDV4,
+          onDelete: 'CASCADE'
         },
         userId: {
           allowNull: false,
           foreignKey: true,
-          type: Sequelize.UUID
-        },
-        isActive: {
-          allowNull: false,
-          type: Sequelize.BOOLEAN
+          type: Sequelize.UUIDV4,
+          onDelete: 'CASCADE'
         },
         createdAt: {
           allowNull: false,
-          type: Sequelize.DATE
+          type: Sequelize.DATE,
+          defaultValue: Sequelize.fn('now')
         },
         updatedAt: {
           allowNull: false,
-          type: Sequelize.DATE
+          type: Sequelize.DATE,
+          defaultValue: Sequelize.fn('now')
         }
       });
     } catch (error) {

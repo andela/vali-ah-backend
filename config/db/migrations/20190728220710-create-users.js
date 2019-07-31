@@ -9,12 +9,12 @@ export default {
         id: {
           allowNull: false,
           primaryKey: true,
-          type: Sequelize.UUID
+          type: Sequelize.UUIDV4
         },
         roleId: {
-          allowNull: false,
-          primaryKey: true,
-          type: Sequelize.UUID
+          allowNull: true,
+          foreignKey: true,
+          type: Sequelize.UUIDV4
         },
         firstName: {
           allowNull: false,
@@ -26,7 +26,8 @@ export default {
         },
         userName: {
           allowNull: false,
-          type: Sequelize.STRING
+          type: Sequelize.STRING,
+          unique: true
         },
         email: {
           allowNull: false,
@@ -42,11 +43,13 @@ export default {
         },
         createdAt: {
           allowNull: false,
-          type: Sequelize.DATE
+          type: Sequelize.DATE,
+          defaultValue: Sequelize.fn('now')
         },
         updatedAt: {
           allowNull: false,
-          type: Sequelize.DATE
+          type: Sequelize.DATE,
+          defaultValue: Sequelize.fn('now')
         }
       });
     } catch (error) {

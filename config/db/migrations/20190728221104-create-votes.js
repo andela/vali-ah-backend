@@ -5,29 +5,38 @@ const debug = Debug('dev');
 export default {
   up: async (queryInterface, Sequelize) => {
     try {
-      await queryInterface.createTable('ArticleCategories', {
+      await queryInterface.createTable('Votes', {
         id: {
           allowNull: false,
           primaryKey: true,
-          type: Sequelize.UUID
+          type: Sequelize.UUIDV4,
+          defaultValue: Sequelize.UUIDV4
+        },
+        userId: {
+          allowNull: false,
+          foreignKey: true,
+          type: Sequelize.UUIDV4,
+          onDelete: 'CASCADE'
         },
         articleId: {
           allowNull: false,
           foreignKey: true,
-          type: Sequelize.UUID
+          type: Sequelize.UUIDV4,
+          onDelete: 'CASCADE'
         },
-        categoryId: {
+        upVote: {
           allowNull: false,
-          foreignKey: true,
-          type: Sequelize.UUID
+          type: Sequelize.BOOLEAN
         },
         createdAt: {
           allowNull: false,
-          type: Sequelize.DATE
+          type: Sequelize.DATE,
+          defaultValue: Sequelize.fn('now')
         },
         updatedAt: {
           allowNull: false,
-          type: Sequelize.DATE
+          type: Sequelize.DATE,
+          defaultValue: Sequelize.fn('now')
         }
       });
     } catch (error) {
@@ -36,7 +45,7 @@ export default {
   },
   down: async (queryInterface) => {
     try {
-      await queryInterface.dropTable('ArticleCategories');
+      await queryInterface.dropTable('Upvotes');
     } catch (error) {
       debug(error);
     }
