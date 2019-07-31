@@ -1,18 +1,16 @@
 export default (sequelize, DataTypes) => {
   const Notifications = sequelize.define(
-    'Notifications',
-    {
+    'Notifications', {
       id: {
-        type: DataTypes.UUIDV4,
+        type: DataTypes.UUID,
         primaryKey: true,
         defaultValue: DataTypes.UUIDV4
       },
       event: DataTypes.STRING,
-      userId: DataTypes.UUIDV4,
+      userId: DataTypes.UUID,
       payload: DataTypes.JSON,
       notified: DataTypes.BOOLEAN
-    },
-    {}
+    }, {}
   );
 
   Notifications.associate = (models) => {

@@ -1,17 +1,15 @@
 export default (sequelize, DataTypes) => {
   const Reports = sequelize.define(
-    'Reports',
-    {
+    'Reports', {
       id: {
-        type: DataTypes.UUIDV4,
+        type: DataTypes.UUID,
         primaryKey: true,
         defaultValue: DataTypes.UUIDV4
       },
-      articleId: DataTypes.UUIDV4,
-      userId: DataTypes.UUIDV4,
+      articleId: DataTypes.UUID,
+      userId: DataTypes.UUID,
       reason: DataTypes.STRING
-    },
-    {}
+    }, {}
   );
 
   Reports.associate = (models) => {

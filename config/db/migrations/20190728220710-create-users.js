@@ -9,12 +9,13 @@ export default {
         id: {
           allowNull: false,
           primaryKey: true,
-          type: Sequelize.UUIDV4
+          type: Sequelize.UUID,
+          defaultValue: Sequelize.UUIDV4
         },
         roleId: {
           allowNull: true,
           foreignKey: true,
-          type: Sequelize.UUIDV4
+          type: Sequelize.UUID,
         },
         firstName: {
           allowNull: false,

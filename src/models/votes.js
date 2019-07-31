@@ -1,17 +1,15 @@
 export default (sequelize, DataTypes) => {
   const Votes = sequelize.define(
-    'Votes',
-    {
+    'Votes', {
       id: {
-        type: DataTypes.UUIDV4,
+        type: DataTypes.UUID,
         primaryKey: true,
         defaultValue: DataTypes.UUIDV4
       },
-      articleId: DataTypes.UUIDV4,
-      userId: DataTypes.UUIDV4,
+      articleId: DataTypes.UUID,
+      userId: DataTypes.UUID,
       upVote: DataTypes.BOOLEAN
-    },
-    {}
+    }, {}
   );
 
   Votes.associate = (models) => {

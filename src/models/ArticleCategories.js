@@ -1,16 +1,14 @@
 export default (sequelize, DataTypes) => {
   const ArticleCategories = sequelize.define(
-    'ArticleCategories',
-    {
+    'ArticleCategories', {
       id: {
-        type: DataTypes.UUIDV4,
+        type: DataTypes.UUID,
         primaryKey: true,
         defaultValue: DataTypes.UUIDV4
       },
-      articleId: DataTypes.UUIDV4,
-      categoryId: DataTypes.UUIDV4
-    },
-    {}
+      articleId: DataTypes.UUID,
+      categoryId: DataTypes.UUID
+    }, {}
   );
 
   ArticleCategories.associate = (models) => {

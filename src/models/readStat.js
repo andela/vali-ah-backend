@@ -1,16 +1,14 @@
 export default (sequelize, DataTypes) => {
   const ReadStats = sequelize.define(
-    'ReadStats',
-    {
+    'ReadStats', {
       id: {
-        type: DataTypes.UUIDV4,
+        type: DataTypes.UUID,
         primaryKey: true,
         defaultValue: DataTypes.UUIDV4
       },
-      articleId: DataTypes.UUIDV4,
-      userId: DataTypes.UUIDV4
-    },
-    {}
+      articleId: DataTypes.UUID,
+      userId: DataTypes.UUID
+    }, {}
   );
 
   ReadStats.associate = (models) => {
