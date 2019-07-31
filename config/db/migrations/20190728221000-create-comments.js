@@ -9,28 +9,27 @@ export default {
         id: {
           allowNull: false,
           primaryKey: true,
-          type: Sequelize.UUIDV4,
+          type: Sequelize.UUID,
           defaultValue: Sequelize.UUIDV4
         },
         userId: {
           allowNull: false,
           foreignKey: true,
-          type: Sequelize.UUIDV4,
+          type: Sequelize.UUID,
           onDelete: 'CASCADE'
         },
         articleId: {
           allowNull: false,
           foreignKey: true,
-          type: Sequelize.UUIDV4,
+          type: Sequelize.UUID,
           onDelete: 'CASCADE'
         },
         content: {
           type: Sequelize.STRING
         },
         repliedToId: {
-          allowNull: false,
           foreignKey: true,
-          type: Sequelize.UUIDV4
+          type: Sequelize.UUID,
         },
         suspended: {
           type: Sequelize.BOOLEAN,

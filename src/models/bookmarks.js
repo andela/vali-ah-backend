@@ -1,16 +1,14 @@
 export default (sequelize, DataTypes) => {
   const Bookmarks = sequelize.define(
-    'Bookmarks',
-    {
+    'Bookmarks', {
       id: {
-        type: DataTypes.UUIDV4,
+        type: DataTypes.UUID,
         primaryKey: true,
         defaultValue: DataTypes.UUIDV4
       },
-      articleId: DataTypes.UUIDV4,
-      userId: DataTypes.UUIDV4
-    },
-    {}
+      articleId: DataTypes.UUID,
+      userId: DataTypes.UUID
+    }, {}
   );
 
   Bookmarks.associate = (models) => {

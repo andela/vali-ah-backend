@@ -12,7 +12,7 @@
           "required": true
         },
         "PORT": {
-          "required": true
+          "required": false
         }
       },
     "formation": {

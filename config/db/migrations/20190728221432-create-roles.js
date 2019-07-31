@@ -1,5 +1,4 @@
 import Debug from 'debug';
-import UUID from 'uuid/v4';
 
 const debug = Debug('dev');
 
@@ -10,8 +9,8 @@ export default {
         id: {
           allowNull: false,
           primaryKey: true,
-          type: Sequelize.UUIDV4,
-          defaultValue: UUID()
+          type: Sequelize.UUID,
+          defaultValue: Sequelize.UUIDV4
         },
         name: {
           allowNull: false,

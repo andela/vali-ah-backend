@@ -1,9 +1,8 @@
 export default (sequelize, DataTypes) => {
   const Articles = sequelize.define(
-    'Articles',
-    {
+    'Articles', {
       id: {
-        type: DataTypes.UUIDV4,
+        type: DataTypes.UUID,
         primaryKey: true,
         defaultValue: DataTypes.UUIDV4
       },
@@ -13,10 +12,9 @@ export default (sequelize, DataTypes) => {
       suspended: DataTypes.BOOLEAN,
       status: DataTypes.STRING,
       coverImageUrl: DataTypes.STRING,
-      followUpId: DataTypes.UUIDV4,
-      authorId: DataTypes.UUIDV4
-    },
-    {}
+      followUpId: DataTypes.UUID,
+      authorId: DataTypes.UUID
+    }, {}
   );
 
   Articles.associate = (models) => {

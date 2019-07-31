@@ -3,6 +3,10 @@
     "@babel/register",
     "regenerator-runtime/runtime"
     ],
+    "exclude": [
+    "config/db/**/*.js",
+    "src/sequelize.js"
+  ],
   "reporter": [
       "html",
       "lcov",
