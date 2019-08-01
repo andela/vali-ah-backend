@@ -1,4 +1,4 @@
-const user = {
+export const user = {
   firstName: 'gilbert',
   lastName: 'erick',
   userName: 'erickBlaze',
@@ -6,4 +6,4 @@ const user = {
   password: 'hotgirls2real'
 };
 
-export default user;
+export default { user };

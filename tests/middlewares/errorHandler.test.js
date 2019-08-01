@@ -1,6 +1,6 @@
 import { should } from 'chai';
 
-import errorHandler from '../src/middlewares/errorHandler';
+import errorHandler from '../../src/middlewares/errorHandler';
 
 should();
 
