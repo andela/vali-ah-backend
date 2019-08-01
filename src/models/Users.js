@@ -19,6 +19,7 @@ export default class Users extends Model {
       defaultValue: Sequelize.UUIDV4
     },
     roleId: Sequelize.UUID,
+    isAdmin: Sequelize.BOOLEAN,
     firstName: Sequelize.STRING,
     lastName: Sequelize.STRING,
     userName: Sequelize.STRING,

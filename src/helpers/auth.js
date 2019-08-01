@@ -12,8 +12,8 @@ dotenv.config();
  *
  * @returns {string} - token
  */
-export const generateAuthToken = ({ id }) => jwt.sign(
-  { id },
+export const generateAuthToken = ({ id, isAdmin }) => jwt.sign(
+  { id, isAdmin },
   process.env.SECRET_KEY,
   { expiresIn: '24h' }
 );

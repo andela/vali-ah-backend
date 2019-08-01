@@ -9,6 +9,14 @@ const user = {
   password: 'gillberto5'
 };
 
+const anotherUser = {
+  firstName: 'Foo',
+  lastName: 'Baz',
+  userName: 'foofoo',
+  email: 'foobar@fakemail.com',
+  password: 'foobarjdb34',
+};
+
 const invalidFirstName = {
   firstName: 'vali@',
   lastName: 'v',
@@ -100,5 +108,6 @@ export {
   shortPassword,
   invalidPassword,
   user,
+  anotherUser,
   users
 };

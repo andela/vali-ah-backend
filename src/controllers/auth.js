@@ -7,7 +7,8 @@ import notification from '../services/notification';
 import { facebookAuth, googleAuth, createOrFindUser } from '../services/auth';
 
 dotenv.config();
-const { Users } = database;
+
+const { Users, BlacklistedTokens } = database;
 
 export default {
   /**
@@ -67,6 +68,23 @@ export default {
   },
 
   /**
+   * Handles user signout
+   *
+   * @param {Object} request - The request object to the server
+   *
+   * @return {Object} - response object
+   */
+  signout: async (request) => {
+    const authHeader = request.headers.authorization;
+    const token = authHeader.split(' ')[1];
+    const { id } = request.user;
+
+    await BlacklistedTokens.create({ token, userId: id });
+
+    return { status: 200, message: 'User successfully logged out' };
+  },
+
+  /**
    * Handles user sign up and sign in using their social media accounts
    *
    * - Facebook login
@@ -101,5 +119,5 @@ export default {
   twitterLogin: async (request) => {
     const user = await createOrFindUser(request.user);
     return { ...user };
-  }
+  },
 };

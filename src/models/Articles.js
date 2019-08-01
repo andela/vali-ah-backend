@@ -33,7 +33,7 @@ export default class Articles extends Model {
    * @static
    * @memberof Articles
    *
-   * @param {any} sequelize the sequelize obbject
+   * @param {any} sequelize the sequelize object
    *
    * @returns {Object} the Articles model
    */

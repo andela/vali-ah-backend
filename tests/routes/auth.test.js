@@ -11,7 +11,8 @@ import {
   shortUsername,
   invalidEmail,
   shortPassword,
-  user
+  user,
+  anotherUser
 } from '../fixtures/users';
 
 chai.use(chaiHttp);
@@ -19,6 +20,12 @@ should();
 
 const { Users } = database;
 const signupRoute = '/api/v1/auth/signup';
+const signoutRoute = '/api/v1/auth/signout';
+
+let validToken;
+let blacklistedToken;
+
+const server = () => chai.request(app);
 
 describe('Auth Routes', () => {
   describe('Signup Route', () => {
@@ -155,5 +162,88 @@ describe('Auth Routes', () => {
       response.should.have.status(400);
       response.body.error.errors.password.should.eql('password should be between 8 to 15 characters');
     });
+  });
+});
+
+describe('Signout Route', () => {
+  before((done) => {
+    server()
+      .post(signupRoute)
+      .send(anotherUser)
+      .end((err, response) => {
+        const { token } = response.body.data;
+        validToken = token;
+        done();
+      });
+  });
+
+  it('should log out a user', async () => {
+    const response = await server()
+      .post(`${signoutRoute}`)
+      .set('Authorization', `Bearer ${validToken}`);
+
+    response.should.have.status(200);
+    response.body.status.should.eql('success');
+    response.body.should.be.a('object');
+  });
+
+  it('should not let a user with an invalid token make a request', async () => {
+    const response = await server()
+      .post(`${signoutRoute}`)
+      .set('Authorization', 'bad token');
+
+    response.should.have.status(401);
+    response.body.should.be.a('object');
+    response.body.status.should.eql('error');
+    response.body.should.have.property('error');
+    response.body.error.should.be.a('object');
+    response.body.error.should.have.property('message');
+    response.body.error.should.have.property('trace');
+    response.body.error.message.should.eql('jwt malformed');
+  });
+
+  it('should not let a user make a request if the header is not set', async () => {
+    const response = await server()
+      .post(`${signoutRoute}`);
+
+    response.should.have.status(412);
+    response.body.should.be.a('object');
+    response.body.status.should.eql('error');
+    response.body.should.have.property('error');
+    response.body.error.should.be.a('object');
+    response.body.error.should.have.property('message');
+    response.body.error.should.have.property('trace');
+    response.body.error.message.should.eql('Authorization header not set');
+  });
+
+  it('should not let a logged out user make a request', async () => {
+    blacklistedToken = validToken;
+    const response = await server()
+      .post(`${signoutRoute}`)
+      .set('Authorization', `Bearer ${blacklistedToken}`);
+
+    response.should.have.status(403);
+    response.body.should.be.a('object');
+    response.body.status.should.eql('error');
+    response.body.should.have.property('error');
+    response.body.error.should.be.a('object');
+    response.body.error.should.have.property('message');
+    response.body.error.should.have.property('trace');
+    response.body.error.message.should.eql('Please login or signup to access this resource');
+  });
+
+  it('should throw 400 status code accessing the signout route without a token', async () => {
+    const response = await server()
+      .post(`${signoutRoute}`)
+      .set('Authorization', '');
+
+    response.should.have.status(400);
+    response.body.should.be.a('object');
+    response.body.status.should.eql('error');
+    response.body.should.have.property('error');
+    response.body.error.should.be.a('object');
+    response.body.error.should.have.property('message');
+    response.body.error.should.have.property('trace');
+    response.body.error.message.should.eql('No token provided. Please signup or login');
   });
 });

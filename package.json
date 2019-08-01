@@ -11,7 +11,7 @@
     "db:seed": "npm run sequelize-cli:es6 db:seed:all",
     "db:undo": "npm run sequelize-cli:es6 db:migrate:undo:all",
     "dev": "nodemon --exec babel-node src/index.js",
-    "generate-doc": "npm run build && swagger-jsdoc -d dist/swagger.js  -o ./docs/swagger.json",
+    "generate:doc": "npm run build && swagger-jsdoc -d dist/swagger.js  -o ./docs/swagger.json",
     "lint": "eslint \"**/*.js\" --fix",
     "pretest": "npm run db:migrate",
     "posttest": "npm run db:undo",
@@ -82,7 +82,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "npm run sync-env && npm run lint && npm run test:coverage && npm run generate-doc"
+      "pre-commit": "npm run sync-env && npm run lint && npm run test && npm run test:coverage && npm run generate:doc"
     }
   }
 }
