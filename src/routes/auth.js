@@ -8,9 +8,11 @@ import Schemas from '../validations/auth';
 import asyncWrapper from '../middlewares/asyncWrapper';
 
 const {
-  signup, signin, signout, socialLogin, twitterLogin
+  signup, signin, signout, socialLogin, twitterLogin, resetPassword, updatePassword
 } = authController;
-const { signupSchema, signinSchema, socialLoginSchema } = Schemas;
+const {
+  signupSchema, signinSchema, socialLoginSchema, emailSchema, passwordSchema
+} = Schemas;
 
 const router = Router();
 const { verifyToken } = authentication;
@@ -128,6 +130,56 @@ router.get(
   passport.authenticate('twitter', { session: false }),
   asyncWrapper(twitterLogin)
 );
+
+/**
+ * @swagger
+ *
+ * /auth/reset_password:
+ *   post:
+ *     description: Send password reset to user
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: email
+ *         description: user email
+ *         in:  body
+ *         required: true
+ *         type: string
+ *     responses:
+ *       200:
+ *         description: success
+ */
+router.post('/reset_password', validator(emailSchema), asyncWrapper(resetPassword));
+
+/**
+ * @swagger
+ *
+ * /auth/update_password/:id/:token:
+ *   patch:
+ *     description: Update user password
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: id
+ *         description: user id
+ *         in:  params
+ *         required: true
+ *         type: string
+ *       - name: token
+ *         description: user token
+ *         in:  params
+ *         required: true
+ *         type: string
+ *       - name: password
+ *         description: user password
+ *         in:  body
+ *         required: true
+ *         type: string
+ *     responses:
+ *       200:
+ *         description: success
+ */
+router.patch('/update_password/:id/:token', validator(passwordSchema), asyncWrapper(updatePassword));
 
 /**
  * @swagger

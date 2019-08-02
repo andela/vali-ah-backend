@@ -125,4 +125,67 @@ export default {
 
     return response.status(status).json({ status: 'success', data });
   },
+
+  /**
+   * Handles user reset password link
+   *
+   * @function
+   * @param {Object} request - request object to the server
+   * @param {Object} response - response object from the server
+   *
+   * @return {void} - empty object
+   */
+  resetPassword: async (request, response) => {
+    const host = request.get('host');
+    const { email } = request.body;
+
+    const user = await Users.getExistingUser(email);
+
+    if (!user) throw new NotFoundError();
+
+    const token = await user.generateVerificationToken();
+
+    const resetLink = `${request.protocol}://${host}/password/reset/${user.id}/${token}`;
+
+    notification.emit('notification', {
+      type: 'passwordRecovery',
+      payload: [{
+        email,
+        resetLink,
+      }]
+    });
+
+    return response.status(200).json({ status: 'success', data: {}, message: 'Email sent successfully' });
+  },
+
+  /**
+   * Handles user update password
+   *
+   * @function
+   * @param {Object} request - The request object to the server
+   * @param {Object} response - The response object from the server
+   *
+   * @return {void} - empty object
+   */
+  updatePassword: async (request, response) => {
+    const { id, token } = request.params;
+    const { password } = request.body;
+
+    const user = await Users.findByPk(id);
+
+    if (!user) throw new NotFoundError();
+
+    await user.decodeVerificationToken(token);
+
+    await user.update({ password });
+
+    notification.emit('notification', {
+      type: 'updateSuccessful',
+      payload: [{
+        email: user.email,
+      }]
+    });
+
+    return response.status(200).json({ status: 'success', message: 'Your password was successfully updated' });
+  }
 };

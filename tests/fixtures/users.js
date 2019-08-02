@@ -137,6 +137,8 @@ const profiledataForLowerCase = {
   userName: 'lovIngYOU',
 };
 
+const invalidUserId = 'a7b039e8-bae4-11e9-a2a3-2a2ae2dbcce4';
+
 export {
   invalidFirstName,
   shortLastName,
@@ -157,4 +159,5 @@ export {
   userToken,
   usersWithFollowing,
   profiledataForLowerCase,
+  invalidUserId
 };

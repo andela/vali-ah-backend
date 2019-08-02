@@ -1,5 +1,6 @@
 import { Sequelize, Model } from 'sequelize';
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 import { NotFoundError } from '../helpers/errors';
 
 const saltRounds = 10;
@@ -78,6 +79,7 @@ export default class Users extends Model {
 
     model.beforeCreate(Users.beforeHook);
     model.afterCreate(this.afterCreateHook);
+    model.beforeUpdate(Users.beforeUpdateHook);
 
     return model;
   }
@@ -112,7 +114,31 @@ export default class Users extends Model {
    *
    * @returns {Object} user to create or update
    */
-  static beforeHook = async (user) => {
+  static beforeHook = async user => this.encryptPassword(user)
+
+  /**
+   * BeforeUpdateHook for the User model
+   *
+   * @static
+   * @memberof User
+   *
+   * @param {Object} user
+   *
+   * @returns {Object} user to update
+   */
+  static beforeUpdateHook = async user => this.encryptPassword(user)
+
+  /**
+   * Encrypts user password
+   *
+   * @static
+   * @memberof User
+   *
+   * @param {Object} user
+   *
+   * @returns {Object} user with encryted password
+   */
+  static encryptPassword = async (user) => {
     const hash = await bcrypt.hash(user.password, saltRounds);
     user.password = hash;
 
@@ -196,7 +222,6 @@ export default class Users extends Model {
     return `${firstName} ${lastName}`;
   }
 
-
   /**
    * Get single user
    *
@@ -213,5 +238,36 @@ export default class Users extends Model {
     if (!userObject) throw new NotFoundError();
 
     return userObject.toJSON();
+  }
+
+  /**
+   * Generate verification token for a user
+   *
+   * @memberof User
+   *
+   *
+   * @returns {string} user token
+   */
+  async generateVerificationToken() {
+    const secret = `${this.password}!${this.createdAt.toISOString()}`;
+    return jwt.sign(
+      { id: this.id },
+      secret,
+      { expiresIn: '10m' }
+    );
+  }
+
+  /**
+   * Decode verification token for a user
+   *
+   * @memberof User
+   *
+   * @param {string} token
+   *
+   * @returns {string} decoded token
+   */
+  async decodeVerificationToken(token) {
+    const secret = `${this.password}!${this.createdAt.toISOString()}`;
+    return jwt.verify(token, secret);
   }
 }

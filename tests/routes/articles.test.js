@@ -370,6 +370,10 @@ describe('POST /articles/:articleId/vote', () => {
   let token;
 
   before(async () => {
+    await Users.destroy({ where: {}, });
+    await Articles.destroy({ where: {}, });
+    await Votes.destroy({ where: {}, });
+
     await Users.bulkCreate(bulkUsers, { returning: true });
 
     userResponseObject = await chai
