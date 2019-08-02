@@ -1,8 +1,12 @@
 import express from 'express';
+
 import { signup, signin } from '../controllers/auth';
+import validator from '../middlewares/validator';
+import Schemas from '../validations/auth';
+
+const { signupSchema } = Schemas;
 
 const router = express.Router();
-
 
 /**
  * @swagger
@@ -42,7 +46,7 @@ const router = express.Router();
  *       200:
  *         description: token is supplied
  */
-router.post('/signup', signup);
+router.post('/signup', validator(signupSchema), signup);
 
 /**
  * @swagger
