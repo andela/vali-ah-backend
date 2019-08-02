@@ -15,6 +15,46 @@
   "basePath": "/api/v1",
   "swagger": "2.0",
   "paths": {
+    "/articles": {
+      "post": {
+        "description": "Create comment for an article",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "article",
+            "required": true
+          },
+          {
+            "name": "content",
+            "description": "content of the comment.",
+            "in": "body",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "userId",
+            "description": "The id of user posting the comment.",
+            "in": "body",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "repliedToId",
+            "description": "id of comment it is replying to if any.",
+            "in": "body",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "comment posted"
+          }
+        }
+      }
+    },
     "/auth/signup": {
       "post": {
         "description": "Signup to the application",

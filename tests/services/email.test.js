@@ -29,6 +29,7 @@ describe('Email Service', () => {
 
   it('should throw an error if template is not available', async () => {
     const data = await Email({ type: 'unAvailable', payload: emailData });
+
     data.should.be.instanceof(Error);
   });
 
@@ -42,6 +43,7 @@ describe('Email Service', () => {
 
   it('should throw an error if mail data is undefined', test(async () => {
     const data = await Email({ type: 'accountActivation' });
+
     data.should.be.instanceof(Error);
   }));
 

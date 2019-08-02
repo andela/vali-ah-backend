@@ -3,6 +3,7 @@ import { config } from 'dotenv';
 import cors from 'cors';
 import Debug from 'debug';
 import swaggerUi from 'swagger-ui-express';
+import validator from 'express-validator';
 
 import routes from './routes';
 import swaggerDoc from '../docs/swagger';
@@ -16,6 +17,7 @@ const app = express();
 
 app.use(json());
 app.use(urlencoded({ extended: false }));
+app.use(validator());
 app.use(cors());
 
 app.use('/api/v1', routes);
