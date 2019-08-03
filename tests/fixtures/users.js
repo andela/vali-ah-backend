@@ -1,9 +1,12 @@
+import faker from 'faker';
+import uuid from 'uuid';
+
 const user = {
   firstName: 'gilbert',
   lastName: 'erick',
   userName: 'erickBlaze',
   email: 'gillberto5@gmail.com',
-  password: 'hotgirls2real'
+  password: 'gillberto5'
 };
 
 const invalidFirstName = {
@@ -24,7 +27,7 @@ const undefinedFirstName = {
 
 const undefinedLastName = {
   firstName: 'vali',
-  username: 'teamVali',
+  userName: 'teamVali',
   email: 'vali@gandela.com',
   password: 'password123'
 };
@@ -77,6 +80,15 @@ const invalidPassword = {
   password: 'passwordui'
 };
 
+const users = Array(2).fill(0).map(() => ({
+  id: uuid(),
+  firstName: faker.name.firstName(),
+  lastName: faker.name.lastName(),
+  userName: faker.internet.userName(),
+  email: faker.internet.email(),
+  password: faker.internet.password()
+}));
+
 export {
   invalidFirstName,
   shortLastName,
@@ -87,5 +99,6 @@ export {
   invalidEmail,
   shortPassword,
   invalidPassword,
-  user
+  user,
+  users
 };

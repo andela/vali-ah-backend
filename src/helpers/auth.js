@@ -1,23 +1,21 @@
-import database from '../models';
+import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
 
-const { Users } = database;
+dotenv.config();
 
 /**
- * Returns user object or undefined
+ * Generates user token
  *
  * @function
  *
- * @param {string} email - email of the user to be sort
+ * @param {string} user - token payload
  *
- * @returns {Object} - user or undefined
+ * @returns {string} - token
  */
-export const getExistingUser = async (email) => {
-  const user = await Users.findOne({
-    where: {
-      email
-    }
-  });
-  return user;
-};
+export const generateAuthToken = ({ id }) => jwt.sign(
+  { id },
+  process.env.SECRET_KEY,
+  { expiresIn: '24h' }
+);
 
-export default { getExistingUser };
+export default { generateAuthToken };

@@ -6,7 +6,7 @@ import { Sequelize, Model } from 'sequelize';
  * @class
  *
  * @extends Model
- *
+ * @exports Categories
  */
 export default class Categories extends Model {
   static modelFields = {
@@ -20,14 +20,14 @@ export default class Categories extends Model {
   }
 
   /**
-   * initializes the User model
+   * Initializes the Categories model
    *
    * @static
    * @memberof Categories
    *
    * @param {any} sequelize the sequelize obbject
    *
-   * @returns {object} the Categories model
+   * @returns {Object} the Categories model
    */
   static init(sequelize) {
     const model = super.init(Categories.modelFields, { sequelize });
@@ -36,14 +36,14 @@ export default class Categories extends Model {
   }
 
   /**
-   * model association
+   * Model associations
    *
    * @static
    * @memberof Categories
    *
-   * @param {Object} models the models object
+   * @param {any} models all models
    *
-   * @returns {object} the model
+   * @returns {void} no return
    */
   static associate(models) {
     Categories.hasMany(models.ArticleCategories, {

@@ -1,12 +1,12 @@
 import { Sequelize, Model } from 'sequelize';
 
 /**
- * Model class for BlacklistTokens
+ * Model class for BlacklistedTokens
  *
  * @class
  *
  * @extends Model
- *
+ * @exports BlacklistedTokens
  */
 export default class BlacklistedTokens extends Model {
   static modelFields = {
@@ -20,14 +20,14 @@ export default class BlacklistedTokens extends Model {
   }
 
   /**
-   * initializes the User model
+   * Initializes the BlacklistedTokens model
    *
    * @static
-   * @memberof BlacklistTokens
+   * @memberof BlacklistedTokens
    *
    * @param {any} sequelize the sequelize obbject
    *
-   * @returns {object} the BlacklistTokens model
+   * @returns {Object} the BlacklistedTokens model
    */
   static init(sequelize) {
     const model = super.init(BlacklistedTokens.modelFields, { sequelize });
@@ -36,14 +36,14 @@ export default class BlacklistedTokens extends Model {
   }
 
   /**
-   * model association
+   * Model associations
    *
    * @static
-   * @memberof ArticleCategories
+   * @memberof BlacklistedTokens
    *
-   * @param {Object} models the models object
+   * @param {any} models all models
    *
-   * @returns {object} the model
+   * @returns {void} no return
    */
   static associate(models) {
     BlacklistedTokens.belongsTo(models.Users, {

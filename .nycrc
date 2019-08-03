@@ -15,7 +15,7 @@
   "exclude": [
     "src/models/index.js",
     "src/sequelize.js",
-    "tests/**/*.test.js",
+    "tests/**/*",
     "config/db/*"
   ],
   "check-coverage": true,

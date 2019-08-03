@@ -30,7 +30,7 @@ class Notification extends EventEmitter {
   /**
    * Initialises the event
    *
-   * @param {object} eventPayload - The event payload. Contains notification type and payload.
+   * @param {Object} eventPayload - The event payload. Contains notification type and payload.
    *
    * @return {void}
    */
@@ -41,9 +41,9 @@ class Notification extends EventEmitter {
   /**
    * Handles notification for account activation
    *
-   * @param {object} payload - An Object that contains necessary info to send the notification
+   * @param {Object} payload - An Object that contains necessary info to send the notification
    *
-   * @return {object} - status of event executed
+   * @return {Object} - status of event executed
    */
   accountActivation(payload) {
     return this.sendMail('accountActivation', payload);
@@ -55,7 +55,7 @@ class Notification extends EventEmitter {
    * @param {String} type - type of mail being sent.
    * @param {Array} payload - message data.
    *
-   * @return {object} - status of event executed
+   * @return {Object} - status of event executed
    */
   async sendMail(type, payload) {
     await emailService({ type, payload });

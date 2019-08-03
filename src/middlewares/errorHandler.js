@@ -32,7 +32,7 @@ export default (err, request, response, next) => {
   return response.status(err.status || 500).json({
     status: 'error',
     error: {
-      ...(err.errors && (Object.keys(err).length || err.errors.length) && { errors: err.errors }),
+      ...(err.errors && { errors: err.errors }),
       message: err.message,
       ...(!isProduction && { trace: errorMessage })
     }

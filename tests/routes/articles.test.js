@@ -1,13 +1,12 @@
-/* eslint-disable no-unused-expressions */
 import chai, { should } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import faker from 'faker';
-import uuid from 'uuid';
 import sinonChai from 'sinon-chai';
 import chaiHttp from 'chai-http';
 
 import app from '../../src';
 import models from '../../src/models';
+import { users as bulkUsers } from '../fixtures/users';
+import { articles as bulkArticles, comment as commentData } from '../fixtures/articles';
 
 chai.use(chaiAsPromised);
 chai.use(sinonChai);
@@ -18,41 +17,27 @@ should();
 const { Articles, Users } = models;
 const baseRoute = '/api/v1';
 
-const commentData = {
-  content: faker.lorem.sentences(),
-  userId: faker.random.uuid(),
-};
-
 describe('Articles API', () => {
-  describe('POST /articles/:article/comment', () => {
+  describe('POST /articles/:articleId/comment', () => {
     let articles;
     before(async () => {
-      const users = await Users.bulkCreate(Array(2).fill(0).map(() => ({
-        id: uuid(),
-        firstName: faker.name.firstName(),
-        lastName: faker.name.lastName(),
-        userName: faker.internet.userName(),
-        email: faker.internet.email(),
-        password: faker.internet.password()
-      })), { returning: true });
+      await Users.bulkCreate(bulkUsers, { returning: true });
 
-      articles = await Articles.bulkCreate(users.map(({ id }) => ({
-        id: uuid(),
-        authorId: id,
-        title: faker.lorem.sentence(),
-        summary: faker.lorem.sentences(),
-        body: faker.lorem.text()
-      })), { returning: true });
+      articles = await Articles.bulkCreate(bulkArticles, { returning: true });
     });
 
     it('should return 201', async () => {
-      const { status } = await chai.request(app).post(`${baseRoute}/articles/${articles[0].id}/comments`).send(commentData);
+      const { status } = await chai.request(app)
+        .post(`${baseRoute}/articles/${articles[0].id}/comments`)
+        .send(commentData);
 
       status.should.eql(201);
     });
 
     it('should return 400', async () => {
-      const { status } = await chai.request(app).post(`${baseRoute}/articles/${articles[0].id}/comments`).send({});
+      const { status } = await chai.request(app)
+        .post(`${baseRoute}/articles/${articles[0].id}/comments`)
+        .send({});
 
       status.should.eql(400);
     });

@@ -1,5 +1,5 @@
 /**
- * base error class for application
+ * Base error class for application
  *
  * @class
  *
@@ -7,14 +7,13 @@
  */
 export class ApplicationError extends Error {
   /**
-   * Create a Notification.
-   * @description initialises the service
+   * @description initialises the error
    *
    * @param {number} status - status code;
    * @param {string} message - Error message
    * @param {Array} errors - an array of errors
    */
-  constructor(status, message = 'An Error Occured', errors = []) {
+  constructor(status, message = 'an error occured', errors) {
     super(message);
     this.status = status || 500;
     this.message = message;
@@ -37,6 +36,6 @@ export class NotFoundError extends ApplicationError {
    * @param {string} message - Error message
    */
   constructor(message) {
-    super(404, message || 'Resource Not Found');
+    super(404, message || 'resource not found');
   }
 }

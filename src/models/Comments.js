@@ -6,7 +6,7 @@ import { Sequelize, Model } from 'sequelize';
  * @class
  *
  * @extends Model
- *
+ * @exports Comments
  */
 export default class Comments extends Model {
   static modelFields = {
@@ -23,14 +23,14 @@ export default class Comments extends Model {
   }
 
   /**
-   * initializes the User model
+   * Initializes the Comments model
    *
    * @static
    * @memberof Comments
    *
    * @param {any} sequelize the sequelize obbject
    *
-   * @returns {object} the User model
+   * @returns {Object} the Comments model
    */
   static init(sequelize) {
     const model = super.init(Comments.modelFields, { sequelize });
@@ -39,14 +39,14 @@ export default class Comments extends Model {
   }
 
   /**
-   * model association
+   * Model associations
    *
    * @static
    * @memberof Comments
    *
-   * @param {Object} models the models object
+   * @param {any} models all models
    *
-   * @returns {object} the model
+   * @returns {void} no return
    */
   static associate(models) {
     Comments.belongsTo(models.Users, {

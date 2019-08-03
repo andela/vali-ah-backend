@@ -8,7 +8,7 @@ import { NotFoundError } from '../helpers/errors';
  * @class
  *
  * @extends Model
- *
+ * @exports Articles
  */
 export default class Articles extends Model {
   static modelFields = {
@@ -28,14 +28,14 @@ export default class Articles extends Model {
   }
 
   /**
-   * initializes the model
+   * Initializes the Articles model
    *
    * @static
    * @memberof Articles
    *
    * @param {any} sequelize the sequelize obbject
    *
-   * @returns {object} the model
+   * @returns {Object} the Articles model
    */
   static init(sequelize) {
     const model = super.init(Articles.modelFields, { sequelize });
@@ -44,14 +44,14 @@ export default class Articles extends Model {
   }
 
   /**
-   * model association
+   *  Model associations
    *
    * @static
-   * @memberof ArticleCategories
+   * @memberof Articles
    *
-   * @param {Object} models the models object
+   * @param {any} models all models
    *
-   * @returns {object} the model
+   * @returns {void} no return
    */
   static associate(models) {
     Articles.belongsTo(models.Users, {
@@ -96,22 +96,22 @@ export default class Articles extends Model {
   }
 
   /**
-   * model association
+   * Create article comment
    *
    * @static
    * @memberof Articles
    *
-   * @param {Object} data - The event payload. Contains notification type and payload.
-   * @param {String} data.article - article to comment on
-   * @param {String} data.comment - comment data
+   * @param {Object} data
+   * @param {String} data.articleId - id of the article to comment on
+   * @param {String} data.comment - comment contents
    *
    * @return {Object | void} - details of comment data
    */
-  static async createComment({ article, comment }) {
-    const articleObject = await this.findByPk(article);
+  static async createComment({ articleId, comment }) {
+    const articleObject = await this.findByPk(articleId);
 
-    if (articleObject) return articleObject.createComment(comment);
+    if (!articleObject) throw new NotFoundError();
 
-    throw new NotFoundError();
+    return articleObject.createComment(comment);
   }
 }

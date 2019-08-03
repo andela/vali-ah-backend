@@ -4,32 +4,48 @@ export default {
   signupSchema: [
     check('firstName')
       .trim()
+      .exists().withMessage('First name is required')
       .isLength({ min: 2, max: 15 })
-      .withMessage('First name should be between 2 to 15 characters')
+      .withMessage('first name should be between 2 to 15 characters')
       .isAlpha()
-      .withMessage('First name should only contain alphabets')
+      .withMessage('first name should only contain alphabets')
       .customSanitizer(firstName => firstName.toLowerCase()),
     check('lastName')
       .trim()
+      .exists().withMessage('last name is required')
       .isLength({ min: 2, max: 15 })
-      .withMessage('Last name should be between 2 to 15 characters')
+      .withMessage('last name should be between 2 to 15 characters')
       .isAlpha()
-      .withMessage('Last name should only contain alphabets')
+      .withMessage('last name should only contain alphabets')
       .customSanitizer(lastName => lastName.toLowerCase()),
     check('userName')
       .trim()
+      .exists().withMessage('username is required')
       .isLength({ min: 2, max: 20 })
-      .withMessage('Username should be between 2 to 20 characters'),
+      .withMessage('username should be between 2 to 20 characters'),
     check('email')
       .trim()
+      .exists().withMessage('email address is required')
       .isEmail()
-      .withMessage('Enter a valid email address')
+      .withMessage('enter a valid email address')
       .customSanitizer(email => email.toLowerCase()),
     check('password')
       .trim()
+      .exists().withMessage('password is required')
       .isLength({ min: 8, max: 15 })
-      .withMessage('Password should be between 8 to 15 characters')
-      .matches(/[aA-zZ]+[0-9]+/)
-      .withMessage('Password must be alphanumeric characters')
+      .withMessage('password should be between 8 to 15 characters')
+  ],
+  signinSchema: [
+    check('email')
+      .trim()
+      .exists().withMessage('email address is required')
+      .isEmail()
+      .withMessage('enter a valid email address')
+      .customSanitizer(email => email.toLowerCase()),
+    check('password')
+      .trim()
+      .exists().withMessage('password is required')
+      .isLength({ min: 8, max: 15 })
+      .withMessage('password should be between 8 to 15 characters')
   ]
 };

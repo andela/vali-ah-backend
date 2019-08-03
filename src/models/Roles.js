@@ -1,12 +1,12 @@
 import { Sequelize, Model } from 'sequelize';
 
 /**
- * Model class for Roles category
+ * Model class for Roles
  *
  * @class
  *
  * @extends Model
- *
+ * @exports Roles
  */
 export default class Roles extends Model {
   static modelFields = {
@@ -20,32 +20,18 @@ export default class Roles extends Model {
   }
 
   /**
-   * initializes the Roles model
+   * Initializes the Roles model
    *
    * @static
    * @memberof Roles
    *
    * @param {any} sequelize the sequelize obbject
    *
-   * @returns {object} the Roles model
+   * @returns {Object} the Roles model
    */
   static init(sequelize) {
     const model = super.init(Roles.modelFields, { sequelize });
 
     return model;
-  }
-
-  /**
-   * model association
-   *
-   * @static
-   * @memberof Roles
-   *
-   * @param {Object} models the models object
-   *
-   * @returns {object} the model
-   */
-  static associate() {
-
   }
 }

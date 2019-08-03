@@ -1,12 +1,12 @@
 import { Sequelize, Model } from 'sequelize';
 
 /**
- * Model class for Article's category
+ * Model class for ArticleCategories
  *
  * @class
  *
  * @extends Model
- *
+ * @exports ArticleCategories
  */
 export default class ArticleCategories extends Model {
   static modelFields = {
@@ -20,14 +20,14 @@ export default class ArticleCategories extends Model {
   }
 
   /**
-   * initializes the model
+   * Initializes the ArticleCategories model
    *
    * @static
    * @memberof ArticleCategories
    *
    * @param {any} sequelize the sequelize obbject
    *
-   * @returns {object} the model
+   * @returns {Object} the ArticleCategories model
    */
   static init(sequelize) {
     const model = super.init(ArticleCategories.modelFields, { sequelize });
@@ -36,14 +36,14 @@ export default class ArticleCategories extends Model {
   }
 
   /**
-   * model association
+   * Model associations
    *
    * @static
    * @memberof ArticleCategories
    *
-   * @param {Object} models the models object
+   * @param {any} models all models
    *
-   * @returns {object} the model
+   * @returns {void} no return
    */
   static associate(models) {
     ArticleCategories.belongsTo(models.Articles, {

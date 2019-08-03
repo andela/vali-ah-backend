@@ -1,12 +1,12 @@
 import { Sequelize, Model } from 'sequelize';
 
 /**
- * Model class for Followers category
+ * Model class for Followers
  *
  * @class
  *
  * @extends Model
- *
+ * @exports Followers
  */
 export default class Followers extends Model {
   static modelFields = {
@@ -20,14 +20,14 @@ export default class Followers extends Model {
   }
 
   /**
-   * initializes the Followers model
+   * Initializes the Followers model
    *
    * @static
    * @memberof Followers
    *
    * @param {any} sequelize the sequelize obbject
    *
-   * @returns {object} the Followers model
+   * @returns {Object} the Followers model
    */
   static init(sequelize) {
     const model = super.init(Followers.modelFields, { sequelize });
@@ -36,14 +36,14 @@ export default class Followers extends Model {
   }
 
   /**
-   * model association
+   * Model associations
    *
    * @static
    * @memberof Followers
    *
-   * @param {Object} models the models object
+   * @param {any} models all models
    *
-   * @returns {object} the model
+   * @returns {void} no return
    */
   static associate(models) {
     Followers.belongsTo(models.Users, {

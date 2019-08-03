@@ -6,7 +6,7 @@ import { Sequelize, Model } from 'sequelize';
  * @class
  *
  * @extends Model
- *
+ * @exports Bookmarks
  */
 export default class Bookmarks extends Model {
   static modelFields = {
@@ -20,14 +20,14 @@ export default class Bookmarks extends Model {
   }
 
   /**
-   * initializes the Bookmarks model
+   * Initializes the Bookmarks model
    *
    * @static
    * @memberof Bookmarks
    *
    * @param {any} sequelize the sequelize obbject
    *
-   * @returns {object} the Bookmarks model
+   * @returns {Object} the Bookmarks model
    */
   static init(sequelize) {
     const model = super.init(Bookmarks.modelFields, { sequelize });
@@ -36,14 +36,14 @@ export default class Bookmarks extends Model {
   }
 
   /**
-   * model association
+   * Model associations
    *
    * @static
    * @memberof Bookmarks
    *
-   * @param {Object} models the models object
+   * @param {any} models all models
    *
-   * @returns {object} the model
+   * @returns {void} no return
    */
   static associate(models) {
     Bookmarks.belongsTo(models.Users, {

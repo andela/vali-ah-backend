@@ -6,7 +6,7 @@ import { Sequelize, Model } from 'sequelize';
  * @class
  *
  * @extends Model
- *
+ * @exports Notifications
  */
 export default class Notifications extends Model {
   static modelFields = {
@@ -22,14 +22,14 @@ export default class Notifications extends Model {
   }
 
   /**
-   * initializes the User model
+   * Initializes the Notifications model
    *
    * @static
    * @memberof Notifications
    *
    * @param {any} sequelize the sequelize obbject
    *
-   * @returns {object} the Notifications model
+   * @returns {Object} the Notifications model
    */
   static init(sequelize) {
     const model = super.init(Notifications.modelFields, { sequelize });
@@ -38,14 +38,14 @@ export default class Notifications extends Model {
   }
 
   /**
-   * model association
+   * Model associations
    *
    * @static
    * @memberof Notifications
    *
-   * @param {Object} models the models object
+   * @param {any} models all models
    *
-   * @returns {object} the model
+   * @returns {void} no return
    */
   static associate(models) {
     Notifications.belongsTo(models.Users, {

@@ -1,12 +1,12 @@
 import { Sequelize, Model } from 'sequelize';
 
 /**
- * Model class for Votes category
+ * Model class for Votes
  *
  * @class
  *
  * @extends Model
- *
+ * @exports Votes
  */
 export default class Votes extends Model {
   static modelFields = {
@@ -21,14 +21,14 @@ export default class Votes extends Model {
   }
 
   /**
-   * initializes the Votes model
+   * Initializes the Votes model
    *
    * @static
    * @memberof Votes
    *
    * @param {any} sequelize the sequelize obbject
    *
-   * @returns {object} the Votes model
+   * @returns {Object} the Votes model
    */
   static init(sequelize) {
     const model = super.init(Votes.modelFields, { sequelize });
@@ -37,14 +37,14 @@ export default class Votes extends Model {
   }
 
   /**
-   * model association
+   * Model associations
    *
    * @static
    * @memberof Votes
    *
-   * @param {Object} models the models object
+   * @param {any} models all models
    *
-   * @returns {object} the model
+   * @returns {void} no return
    */
   static associate(models) {
     Votes.belongsTo(models.Users, {
