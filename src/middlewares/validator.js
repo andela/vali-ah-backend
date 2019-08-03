@@ -1,6 +1,8 @@
 import { validationResult } from 'express-validator/check';
 import { matchedData } from 'express-validator/filter';
 
+import { ApplicationError } from '../helpers/errors';
+
 /**
  * Generic schema validator
  *
@@ -11,23 +13,23 @@ import { matchedData } from 'express-validator/filter';
  */
 
 export default (schemas, status = 400) => {
-  const schemaToValidate = schemas || [];
-
   const validationCheck = async (request, response, next) => {
     const errors = validationResult(request);
     request = { ...request, ...matchedData(request) };
 
     if (!errors.isEmpty()) {
-      const mappedErrors = errors.mapped();
+      const mappedErrors = Object.entries(errors.mapped()).reduce((acc, [key, value]) => {
+        acc[key] = value.msg;
+        return acc;
+      }, {});
 
-      return response.status(status).json({
-        status: 'error',
-        error: mappedErrors
-      });
+      const appError = new ApplicationError(status, 'validation error', mappedErrors);
+
+      return next(appError);
     }
 
     return next();
   };
 
-  return [schemaToValidate, validationCheck];
+  return [...(schemas.length && [schemas]), validationCheck];
 };

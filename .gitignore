@@ -5,6 +5,7 @@ logs
 
 npm-debug.log*
 .nyc_output/
+.vscode
 
 # Runtime data
 pids

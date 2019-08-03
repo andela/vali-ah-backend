@@ -1,18 +1,52 @@
-export default (sequelize, DataTypes) => {
-  const Votes = sequelize.define(
-    'Votes', {
-      id: {
-        type: DataTypes.UUID,
-        primaryKey: true,
-        defaultValue: DataTypes.UUIDV4
-      },
-      articleId: DataTypes.UUID,
-      userId: DataTypes.UUID,
-      upVote: DataTypes.BOOLEAN
-    }, {}
-  );
+import { Sequelize, Model } from 'sequelize';
 
-  Votes.associate = (models) => {
+/**
+ * Model class for Votes
+ *
+ * @class
+ *
+ * @extends Model
+ * @exports Votes
+ */
+export default class Votes extends Model {
+  static modelFields = {
+    id: {
+      type: Sequelize.UUID,
+      primaryKey: true,
+      defaultValue: Sequelize.UUIDV4
+    },
+    articleId: Sequelize.UUID,
+    userId: Sequelize.UUID,
+    upVote: Sequelize.BOOLEAN
+  }
+
+  /**
+   * Initializes the Votes model
+   *
+   * @static
+   * @memberof Votes
+   *
+   * @param {any} sequelize the sequelize obbject
+   *
+   * @returns {Object} the Votes model
+   */
+  static init(sequelize) {
+    const model = super.init(Votes.modelFields, { sequelize });
+
+    return model;
+  }
+
+  /**
+   * Model associations
+   *
+   * @static
+   * @memberof Votes
+   *
+   * @param {any} models all models
+   *
+   * @returns {void} no return
+   */
+  static associate(models) {
     Votes.belongsTo(models.Users, {
       foreignKey: 'userId',
       onDelete: 'CASCADE'
@@ -21,7 +55,5 @@ export default (sequelize, DataTypes) => {
       foreignKey: 'articleId',
       onDelete: 'CASCADE'
     });
-  };
-
-  return Votes;
-};
+  }
+}

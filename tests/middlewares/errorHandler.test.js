@@ -1,6 +1,8 @@
+/* eslint-disable no-unused-expressions */
 import { should } from 'chai';
 
 import errorHandler from '../../src/middlewares/errorHandler';
+import { ApplicationError } from '../../src/helpers/errors';
 
 should();
 
@@ -13,6 +15,7 @@ describe('Error Handler', () => {
     response = {
       status(code) {
         response.status = code;
+
         return response;
       },
       json(data) {
@@ -60,5 +63,15 @@ describe('Error Handler', () => {
 
     nextCall.should.equal(1);
     response.should.not.have.property('body');
+  });
+
+  it('should have an errors field', async () => {
+    const applicationError = new ApplicationError(400, 'Invalid input', ['invalid input']);
+
+    errorHandler(applicationError, request, response, next);
+
+    response.status.should.eql(400);
+    response.body.status.should.eql('error');
+    response.body.error.errors.should.not.be.empty;
   });
 });

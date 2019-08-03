@@ -1,59 +1,115 @@
-export default (sequelize, DataTypes) => {
-  const Users = sequelize.define(
-    'Users', {
-      id: {
-        type: DataTypes.UUID,
-        primaryKey: true,
-        defaultValue: DataTypes.UUIDV4
-      },
-      roleId: DataTypes.UUID,
-      firstName: DataTypes.STRING,
-      lastName: DataTypes.STRING,
-      userName: DataTypes.STRING,
-      email: DataTypes.STRING,
-      password: DataTypes.STRING,
-      avatarUrl: DataTypes.STRING
-    }, {}
-  );
+import { Sequelize, Model } from 'sequelize';
+import bcrypt from 'bcrypt';
 
-  Users.associate = (models) => {
-    Users.hasMany(models.Reports, {
-      foreignKey: 'userId',
-      onDelete: 'CASCADE'
+const saltRounds = 10;
+
+/**
+ * Model class for Users
+ *
+ * @class
+ *
+ * @extends Model
+ * @exports Users
+ */
+export default class Users extends Model {
+  static modelFields = {
+    id: {
+      type: Sequelize.UUID,
+      primaryKey: true,
+      defaultValue: Sequelize.UUIDV4
+    },
+    roleId: Sequelize.UUID,
+    firstName: Sequelize.STRING,
+    lastName: Sequelize.STRING,
+    userName: Sequelize.STRING,
+    email: Sequelize.STRING,
+    password: Sequelize.STRING,
+    avatarUrl: Sequelize.STRING
+  }
+
+  /**
+   * Initializes the Users model
+   *
+   * @static
+   * @memberof Users
+   *
+   * @param {any} sequelize the sequelize obbject
+   *
+   * @returns {Object} the Users model
+   */
+  static init(sequelize) {
+    const model = super.init(Users.modelFields, { sequelize });
+
+    model.beforeCreate(Users.beforeHook);
+    model.afterCreate(this.afterCreateHook);
+
+    return model;
+  }
+
+  /**
+   * Get existing user
+   *
+   * @static
+   * @memberof Users
+   *
+   * @param {string} email
+   *
+   * @return {Object | void} - details of existing user
+   */
+  static async getExistingUser(email) {
+    const user = await Users.findOne({
+      where: {
+        email
+      }
     });
 
-    Users.hasMany(models.Followers, {
-      as: 'followers',
-      foreignKey: 'followeeId',
-      onDelete: 'CASCADE'
-    });
+    return user;
+  }
 
-    Users.hasMany(models.Followers, {
-      as: 'following',
-      foreignKey: 'followerId',
-      onDelete: 'CASCADE'
-    });
+  /**
+   * Hook for the User model
+   *
+   * @static
+   * @memberof User
+   *
+   * @param {Object} user
+   *
+   * @returns {Object} user to create or update
+   */
+  static beforeHook = async (user) => {
+    const hash = await bcrypt.hash(user.password, saltRounds);
+    user.password = hash;
 
-    Users.hasMany(models.Bookmarks, {
-      foreignKey: 'userId',
-      onDelete: 'CASCADE'
-    });
+    return user;
+  }
 
-    Users.hasMany(models.ReadStats, {
-      foreignKey: 'userId',
-      onDelete: 'CASCADE'
-    });
+  /**
+   * Hook (after creation) for the User model
+   *
+   * @static
+   * @memberof User
+   *
+   * @param {Object} user
+   *
+   * @returns {Object} user to return
+   */
+  static afterCreateHook(user) {
+    delete user.password;
+    return user;
+  }
 
-    Users.hasMany(models.Votes, {
-      foreignKey: 'userId',
-      onDelete: 'CASCADE'
-    });
-
-    Users.hasMany(models.Notifications, {
-      foreignKey: 'userId',
-      onDelete: 'CASCADE'
-    });
-  };
-
-  return Users;
-};
+  /**
+   * Compares user password to hashed password
+   *
+   * @static
+   * @memberof User
+   *
+   * @param {string} password
+   * @param {string} hashedPassword
+   *
+   * @returns {boolean} true or false
+   */
+  static comparePassword(password, hashedPassword) {
+    return bcrypt.compare(password, hashedPassword);
+  }
+}

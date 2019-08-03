@@ -1,18 +1,52 @@
-export default (sequelize, DataTypes) => {
-  const Reports = sequelize.define(
-    'Reports', {
-      id: {
-        type: DataTypes.UUID,
-        primaryKey: true,
-        defaultValue: DataTypes.UUIDV4
-      },
-      articleId: DataTypes.UUID,
-      userId: DataTypes.UUID,
-      reason: DataTypes.STRING
-    }, {}
-  );
+import { Sequelize, Model } from 'sequelize';
 
-  Reports.associate = (models) => {
+/**
+ * Model class for Reports
+ *
+ * @class
+ *
+ * @extends Model
+ * @exports Reports
+ */
+export default class Reports extends Model {
+  static modelFields = {
+    id: {
+      type: Sequelize.UUID,
+      primaryKey: true,
+      defaultValue: Sequelize.UUIDV4
+    },
+    articleId: Sequelize.UUID,
+    userId: Sequelize.UUID,
+    reason: Sequelize.STRING
+  }
+
+  /**
+   * Initializes the Reports model
+   *
+   * @static
+   * @memberof Reports
+   *
+   * @param {any} sequelize the sequelize obbject
+   *
+   * @returns {Object} the Reports model
+   */
+  static init(sequelize) {
+    const model = super.init(Reports.modelFields, { sequelize });
+
+    return model;
+  }
+
+  /**
+   * Model associations
+   *
+   * @static
+   * @memberof Reports
+   *
+   * @param {any} models all models
+   *
+   * @returns {void} no return
+   */
+  static associate(models) {
     Reports.belongsTo(models.Users, {
       foreignKey: 'userId',
       onDelete: 'CASCADE'
@@ -21,7 +55,5 @@ export default (sequelize, DataTypes) => {
       foreignKey: 'articleId',
       onDelete: 'CASCADE'
     });
-  };
-
-  return Reports;
-};
+  }
+}

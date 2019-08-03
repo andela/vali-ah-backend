@@ -1,18 +1,24 @@
 import chai, { should } from 'chai';
 import chaiHttp from 'chai-http';
-import sinon from 'sinon';
-import sinonChai from 'sinon-chai';
 
 import app from '../../src';
-import auth, { signin, signup } from '../../src/controllers/auth';
 import database from '../../src/models';
-import { user } from '../fixtures/users';
+import {
+  undefinedFirstName,
+  invalidFirstName,
+  shortLastName,
+  invalidLastName,
+  shortUsername,
+  invalidEmail,
+  shortPassword,
+  user
+} from '../fixtures/users';
 
 chai.use(chaiHttp);
-chai.use(sinonChai);
 should();
 
 const { Users } = database;
+const signupRoute = '/api/v1/auth/signup';
 
 describe('Auth Routes', () => {
   describe('Signup Route', () => {
@@ -22,7 +28,7 @@ describe('Auth Routes', () => {
         .post('/api/v1/auth/signup')
         .send(user);
 
-      response.should.have.status(200);
+      response.should.have.status(201);
       response.body.status.should.eql('success');
       response.body.data.should.have.property('token');
       response.body.data.token.should.be.a('string');
@@ -52,6 +58,25 @@ describe('Auth Routes', () => {
       });
     });
 
+    it('should post to /api/v1/auth/signin', async () => {
+      const response = await chai
+        .request(app)
+        .post('/api/v1/auth/signin')
+        .send({
+          email: user.email,
+          password: user.password
+        });
+
+      response.should.have.status(200);
+      response.body.status.should.eql('success');
+      response.body.data.should.have.property('token');
+      response.body.data.token.should.be.a('string');
+      response.body.should.have.property('data');
+      response.body.data.user.should.have.property('firstName');
+      response.body.data.user.should.have.property('lastName');
+      response.body.data.user.should.have.property('email');
+    });
+
     it('should throw an error for wrong password', async () => {
       const response = await chai
         .request(app)
@@ -79,66 +104,56 @@ describe('Auth Routes', () => {
       response.body.status.should.eql('error');
       response.body.error.message.should.equal('you are not yet registered');
     });
+  });
 
-    it('should post to /api/v1/auth/signin', async () => {
-      const response = await chai
-        .request(app)
-        .post('/api/v1/auth/signin')
-        .send({
-          email: user.email,
-          password: user.password
-        });
+  describe(`Signup ${signupRoute} - Validation`, () => {
+    it('should return error when first name is undefined', async () => {
+      const response = await chai.request(app).post(signupRoute).send(undefinedFirstName);
 
-      response.should.have.status(200);
-      response.body.status.should.eql('success');
-      response.body.data.should.have.property('token');
-      response.body.data.token.should.be.a('string');
-      response.body.should.have.property('data');
-      response.body.data.user.should.have.property('firstName');
-      response.body.data.user.should.have.property('lastName');
-      response.body.data.user.should.have.property('email');
+      response.should.have.status(400);
+      response.body.error.errors.firstName.should.eql('first name should be between 2 to 15 characters');
     });
 
-    it('should return server error when there is a server issue during signup', async () => {
-      const req = {};
-      const res = {
-        status() {},
-        json() {}
-      };
+    it('should return error when first name contains invlaid character', async () => {
+      const response = await chai.request(app).post(signupRoute).send(invalidFirstName);
 
-      const next = (err) => {
-        res.status(500).json({ err });
-      };
-
-      const stub = sinon.stub(auth, 'signup').throws();
-      sinon.stub(res, 'status').returnsThis();
-
-      await signup(req, res, next);
-
-      (res.status).should.be.calledWith(500);
-
-      stub.restore();
+      response.should.have.status(400);
+      response.body.error.errors.firstName.should.eql('first name should only contain alphabets');
     });
 
-    it('should return server error when there is a server issue during sign in', async () => {
-      const req = {};
-      const res = {
-        status() {},
-        json() {}
-      };
+    it('should return error when last name is not between 2 to 15 characters', async () => {
+      const response = await chai.request(app).post(signupRoute).send(shortLastName);
 
-      const next = (err) => {
-        res.status(500).json({ err });
-      };
+      response.should.have.status(400);
+      response.body.error.errors.lastName.should.eql('last name should be between 2 to 15 characters');
+    });
 
-      const stub = sinon.stub(auth, 'signin').throws();
-      sinon.stub(res, 'status').returnsThis();
+    it('should return error when last name contains invlaid character', async () => {
+      const response = await chai.request(app).post(signupRoute).send(invalidLastName);
 
-      await signin(req, res, next);
+      response.should.have.status(400);
+      response.body.error.errors.lastName.should.eql('last name should only contain alphabets');
+    });
 
-      (res.status).should.be.calledWith(500);
+    it('should return error when userName is invalid', async () => {
+      const response = await chai.request(app).post(signupRoute).send(shortUsername);
 
-      stub.restore();
+      response.should.have.status(400);
+      response.body.error.errors.userName.should.eql('username should be between 2 to 20 characters');
+    });
+
+    it('should return error when email is invalid', async () => {
+      const response = await chai.request(app).post(signupRoute).send(invalidEmail);
+
+      response.should.have.status(400);
+      response.body.error.errors.email.should.eql('enter a valid email address');
+    });
+
+    it('should return error when password is short', async () => {
+      const response = await chai.request(app).post(signupRoute).send(shortPassword);
+
+      response.should.have.status(400);
+      response.body.error.errors.password.should.eql('password should be between 8 to 15 characters');
     });
   });
 });

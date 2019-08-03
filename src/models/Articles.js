@@ -1,23 +1,59 @@
-export default (sequelize, DataTypes) => {
-  const Articles = sequelize.define(
-    'Articles', {
-      id: {
-        type: DataTypes.UUID,
-        primaryKey: true,
-        defaultValue: DataTypes.UUIDV4
-      },
-      title: DataTypes.STRING,
-      summary: DataTypes.STRING,
-      body: DataTypes.TEXT,
-      suspended: DataTypes.BOOLEAN,
-      status: DataTypes.STRING,
-      coverImageUrl: DataTypes.STRING,
-      followUpId: DataTypes.UUID,
-      authorId: DataTypes.UUID
-    }, {}
-  );
+import { Sequelize, Model } from 'sequelize';
 
-  Articles.associate = (models) => {
+import { NotFoundError } from '../helpers/errors';
+
+/**
+ * Model class for Articles
+ *
+ * @class
+ *
+ * @extends Model
+ * @exports Articles
+ */
+export default class Articles extends Model {
+  static modelFields = {
+    id: {
+      type: Sequelize.UUID,
+      primaryKey: true,
+      defaultValue: Sequelize.UUIDV4
+    },
+    title: Sequelize.STRING,
+    summary: Sequelize.STRING,
+    body: Sequelize.TEXT,
+    suspended: Sequelize.BOOLEAN,
+    status: Sequelize.STRING,
+    coverImageUrl: Sequelize.STRING,
+    followUpId: Sequelize.UUID,
+    authorId: Sequelize.UUID
+  }
+
+  /**
+   * Initializes the Articles model
+   *
+   * @static
+   * @memberof Articles
+   *
+   * @param {any} sequelize the sequelize obbject
+   *
+   * @returns {Object} the Articles model
+   */
+  static init(sequelize) {
+    const model = super.init(Articles.modelFields, { sequelize });
+
+    return model;
+  }
+
+  /**
+   *  Model associations
+   *
+   * @static
+   * @memberof Articles
+   *
+   * @param {any} models all models
+   *
+   * @returns {void} no return
+   */
+  static associate(models) {
     Articles.belongsTo(models.Users, {
       foreignKey: 'authorId',
       onDelete: 'CASCADE'
@@ -57,7 +93,25 @@ export default (sequelize, DataTypes) => {
       foreignKey: 'followUpId',
       onDelete: 'CASCADE'
     });
-  };
+  }
 
-  return Articles;
-};
+  /**
+   * Create article comment
+   *
+   * @static
+   * @memberof Articles
+   *
+   * @param {Object} data
+   * @param {String} data.articleId - id of the article to comment on
+   * @param {String} data.comment - comment contents
+   *
+   * @return {Object | void} - details of comment data
+   */
+  static async createComment({ articleId, comment }) {
+    const articleObject = await this.findByPk(articleId);
+
+    if (!articleObject) throw new NotFoundError();
+
+    return articleObject.createComment(comment);
+  }
+}

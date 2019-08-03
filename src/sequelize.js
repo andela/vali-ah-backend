@@ -16,5 +16,4 @@ export const url = databaseUrls[environment];
 export const config = {
   dialect: 'postgres',
   logging: devMode ? log => log : false,
-  operatorsAliases: false,
 };

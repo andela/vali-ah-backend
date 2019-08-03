@@ -1,10 +1,12 @@
 import express from 'express';
 
-import { signup, signin } from '../controllers/auth';
+import authController from '../controllers/auth';
 import validator from '../middlewares/validator';
 import Schemas from '../validations/auth';
+import asyncWrapper from '../middlewares/asyncWrapper';
 
-const { signupSchema } = Schemas;
+const { signup, signin } = authController;
+const { signupSchema, signinSchema } = Schemas;
 
 const router = express.Router();
 
@@ -46,7 +48,7 @@ const router = express.Router();
  *       200:
  *         description: token is supplied
  */
-router.post('/signup', validator(signupSchema), signup);
+router.post('/signup', validator(signupSchema), asyncWrapper(signup));
 
 /**
  * @swagger
@@ -71,6 +73,6 @@ router.post('/signup', validator(signupSchema), signup);
  *       200:
  *         description: users
  */
-router.post('/signin', signin);
+router.post('/signin', validator(signinSchema), asyncWrapper(signin));
 
 export default router;
