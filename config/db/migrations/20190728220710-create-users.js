@@ -26,7 +26,7 @@ export default {
           type: Sequelize.STRING
         },
         userName: {
-          allowNull: false,
+          allowNull: true,
           type: Sequelize.STRING,
           unique: true
         },
