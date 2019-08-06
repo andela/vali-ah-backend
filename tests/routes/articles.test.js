@@ -38,6 +38,7 @@ describe('Articles API', () => {
     it('should return 400', async () => {
       const { status } = await chai.request(app)
         .post(`${baseRoute}/articles/${articles[0].id}/comments`)
+        .set('Authorization', `Bearer ${userToken}`)
         .send({});
 
       status.should.eql(400);

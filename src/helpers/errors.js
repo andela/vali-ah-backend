@@ -36,6 +36,6 @@ export class NotFoundError extends ApplicationError {
    * @param {string} message - Error message
    */
   constructor(message) {
-    super(404, message || 'resource not found');
+    super(404, message || 'Resource not found');
   }
 }

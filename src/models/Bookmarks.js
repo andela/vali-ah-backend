@@ -1,5 +1,7 @@
 import { Sequelize, Model } from 'sequelize';
 
+// import { NotFoundError } from '../helpers/errors';
+
 /**
  * Model class for Bookmarks
  *
@@ -54,5 +56,22 @@ export default class Bookmarks extends Model {
       foreignKey: 'articleId',
       onDelete: 'CASCADE'
     });
+  }
+
+  /**
+   * Get existing bookmarked article
+   *
+   * @static
+   * @memberof Bookmarks
+   *
+   * @param {string} articleId - id of the article to bookmark
+   * @param {string} userId - id of user
+   *
+   * @return {Object | void} - details of existing bookmark
+   */
+  static async getExistingBookmark(articleId, userId) {
+    const bookmark = await Bookmarks.findOne({ where: { articleId, userId } });
+
+    return bookmark;
   }
 }

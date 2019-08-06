@@ -55,6 +55,58 @@
         }
       }
     },
+    "/bookmarks": {
+      "post": {
+        "description": "Bookmark an article",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "articleId",
+            "required": true
+          },
+          {
+            "name": "userId",
+            "description": "The id of user posting the comment.",
+            "in": "body",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "article added to bookmark"
+          }
+        }
+      },
+      "delete": {
+        "description": "Remove an article from bookmark",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "articleId",
+            "required": true
+          },
+          {
+            "name": "userId",
+            "description": "The id of user posting the comment.",
+            "in": "body",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "20": {
+            "description": "article removed from bookmark"
+          }
+        }
+      }
+    },
     "/auth/signup": {
       "post": {
         "description": "Signup to the application",
