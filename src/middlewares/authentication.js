@@ -5,7 +5,7 @@ import database from '../models';
 import { ApplicationError } from '../helpers/errors';
 
 const { SECRET_KEY } = process.env;
-const { BlacklistedTokens } = database;
+const { BlacklistedTokens, Articles } = database;
 
 config();
 
@@ -54,6 +54,32 @@ export default {
     const { isAdmin } = request.user;
     if (!isAdmin) throw new ApplicationError(403, 'Unauthorized Access. For admins accounts only');
 
+    next();
+  },
+
+  /**
+   * Checks if user is the author of the article
+   *
+   * @param {Object} request - the request object to the server
+   * @param {Object} response - express response object
+   * @param {Function} next
+   *
+   * @return {void} - passes control to the next middleware
+   */
+  isAuthor: async (request, response, next) => {
+    const { id } = request.user;
+    const { slug } = request.params;
+
+    const articleResponse = await Articles.findOne({
+      where: { slug }
+    });
+
+    if (!articleResponse) throw new ApplicationError(404, 'Article not found');
+    const article = await Articles.findOne({
+      where: { authorId: id, slug }
+    });
+
+    if (!article) throw new ApplicationError(403, 'Unauthorized Access. For author only');
     next();
   }
 };

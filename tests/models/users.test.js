@@ -14,12 +14,12 @@ should();
 
 describe('Users Model', () => {
   beforeEach(async () => {
-    await Users.destroy({ where: {}, truncate: true });
+    await Users.destroy({ where: {} });
     await Users.bulkCreate(users);
   });
 
   after(async () => {
-    await Users.destroy({ where: {}, truncate: true });
+    await Users.destroy({ where: {} });
   });
 
   it('getSingleUser() if exist', async () => {

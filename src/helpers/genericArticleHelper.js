@@ -20,7 +20,7 @@ const filter = (title, tag, author, keyword) => {
   const queryParams = {
     query: {
       '$article.title$': { [Op.iLike]: `%${title}%` },
-      '$tag.category$': { [Op.iLike]: `${tag}` },
+      '$tag.category$': { [Op.iLike]: `%${tag}%` },
     },
     author: {
       [Op.or]: {

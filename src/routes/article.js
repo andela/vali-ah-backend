@@ -1,5 +1,8 @@
 import express from 'express';
 
+import articleSchema from '../validations/article';
+import articleValidator from '../middlewares/articles';
+import upload from '../services/imageUpload';
 import articleController from '../controllers/article';
 import authentication from '../middlewares/authentication';
 import validator from '../middlewares/validator';
@@ -7,16 +10,20 @@ import commentSchema from '../validations/comment';
 import searchSchema from '../validations/auth';
 import asyncWrapper from '../middlewares/asyncWrapper';
 import bookmarkSchema from '../validations/bookmark';
-import articleSchema from '../validations/articles';
+import articlesSchema from '../validations/articles';
 
 const {
-  createComment, createBookmark, removeBookmark, searchArticle, vote, getComments
+  createComment, createBookmark, removeBookmark, searchArticle, vote, getComments,
+  createArticle, getBySlug, updateArticle, deleteArticle
 } = articleController;
 const { createCommentSchema, getCommentSchema } = commentSchema;
 const { createSearchSchema } = searchSchema;
-const { verifyToken } = authentication;
+const { verifyToken, isAuthor } = authentication;
 const { createBookmarkSchema } = bookmarkSchema;
-const { voteSchema } = articleSchema;
+const { voteSchema } = articlesSchema;
+const { checkArticle, checkArticleUpdate } = articleValidator;
+const { articleCreateSchema } = articleSchema;
+
 
 const router = express.Router();
 
@@ -209,5 +216,134 @@ router.post(
  *         description: Comments retrieved successfully
  */
 router.get('/:articleId/comments', validator(getCommentSchema), asyncWrapper(getComments));
+
+/**
+ * @swagger
+ *
+ * /articles/:
+ *   post:
+ *     description: Create article
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: summary
+ *         description: summary of article.
+ *         in: body
+ *         required: false
+ *         type: string
+ *       - name: body
+ *         description: body of the article.
+ *         in: body
+ *         required: true
+ *         type: string
+ *       - name: suspended
+ *         description: Boolean to show if article is suspended or not.
+ *         in: body
+ *         type: boolean
+ *         required: false
+ *       - name: title
+ *         description: title of the article.
+ *         in: body
+ *         type: string
+ *         required: false
+ *       - name: tag
+ *         description: Array of uuid's representing article categories.
+ *         in: body
+ *         type: array
+ *         required: false
+ *       - name: status
+ *         description: tells if the article is published or drafted
+ *         in: body
+ *         type: string
+ *         required: false
+ *     responses:
+ *       201:
+ *         description: article created
+ */
+router.post('/', upload.single('image'), validator(articleCreateSchema), asyncWrapper(verifyToken), asyncWrapper(checkArticle), asyncWrapper(createArticle));
+
+/**
+ * @swagger
+ *
+ * /articles/{slug}:
+ *   get:
+ *     description: Create a new user
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *        - in: path
+ *          name: slug
+ *          required: true
+ *     responses:
+ *       200:
+ *         description: success
+ */
+router.get('/:slug', asyncWrapper(verifyToken), asyncWrapper(getBySlug));
+
+/**
+ * @swagger
+ *
+ * /articles/{slug}:
+ *   put:
+ *     description: Updates an existing article
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: summary
+ *         description: summary of article.
+ *         in: body
+ *         required: false
+ *         type: string
+ *       - name: body
+ *         description: body of the article.
+ *         in: body
+ *         required: true
+ *         type: string
+ *       - name: suspended
+ *         description: Boolean to show if article is suspended or not.
+ *         in: body
+ *         type: boolean
+ *         required: false
+ *       - name: title
+ *         description: title of the article.
+ *         in: body
+ *         type: string
+ *         required: false
+ *       - name: tag
+ *         description: Array of uuid's representing article categories.
+ *         in: body
+ *         type: array
+ *         required: false
+ *       - name: status
+ *         description: tells if the article is published or drafted
+ *         in: body
+ *         type: string
+ *         required: false
+ *       - in: path
+ *         name: slug
+ *         required: true
+ *     responses:
+ *       200:
+ *         description: success
+ */
+router.put('/:slug', upload.single('image'), validator(articleCreateSchema), asyncWrapper(verifyToken), asyncWrapper(isAuthor), asyncWrapper(checkArticleUpdate), asyncWrapper(updateArticle));
+
+/**
+ * @swagger
+ *
+ * /articles/{slug}:
+ *   delete:
+ *     description: deletes an article by slug
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *        - in: path
+ *          name: slug
+ *          required: true
+ *     responses:
+ *       200:
+ *         description: successful delete
+ */
+router.delete('/:slug', asyncWrapper(verifyToken), asyncWrapper(isAuthor), asyncWrapper(deleteArticle));
 
 export default router;

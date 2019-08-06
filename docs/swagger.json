@@ -218,6 +218,161 @@
         }
       }
     },
+    "/articles/": {
+      "post": {
+        "description": "Create article",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "summary",
+            "description": "summary of article.",
+            "in": "body",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "description": "body of the article.",
+            "in": "body",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "suspended",
+            "description": "Boolean to show if article is suspended or not.",
+            "in": "body",
+            "type": "boolean",
+            "required": false
+          },
+          {
+            "name": "title",
+            "description": "title of the article.",
+            "in": "body",
+            "type": "string",
+            "required": false
+          },
+          {
+            "name": "tag",
+            "description": "Array of uuid's representing article categories.",
+            "in": "body",
+            "type": "array",
+            "required": false
+          },
+          {
+            "name": "status",
+            "description": "tells if the article is published or drafted",
+            "in": "body",
+            "type": "string",
+            "required": false
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "article created"
+          }
+        }
+      }
+    },
+    "/articles/{slug}": {
+      "get": {
+        "description": "Create a new user",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "success"
+          }
+        }
+      },
+      "put": {
+        "description": "Updates an existing article",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "summary",
+            "description": "summary of article.",
+            "in": "body",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "description": "body of the article.",
+            "in": "body",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "suspended",
+            "description": "Boolean to show if article is suspended or not.",
+            "in": "body",
+            "type": "boolean",
+            "required": false
+          },
+          {
+            "name": "title",
+            "description": "title of the article.",
+            "in": "body",
+            "type": "string",
+            "required": false
+          },
+          {
+            "name": "tag",
+            "description": "Array of uuid's representing article categories.",
+            "in": "body",
+            "type": "array",
+            "required": false
+          },
+          {
+            "name": "status",
+            "description": "tells if the article is published or drafted",
+            "in": "body",
+            "type": "string",
+            "required": false
+          },
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "success"
+          }
+        }
+      },
+      "delete": {
+        "description": "deletes an article by slug",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful delete"
+          }
+        }
+      }
+    },
     "/auth/signup": {
       "post": {
         "description": "Signup to the application",

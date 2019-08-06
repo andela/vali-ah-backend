@@ -13,12 +13,12 @@ should();
 
 describe('Notifications Model', () => {
   before(async () => {
-    await Notifications.destroy({ where: {}, truncate: true });
+    await Notifications.destroy({ where: {} });
     await Notifications.bulkCreate(sessions);
   });
 
   after(async () => {
-    await Notifications.destroy({ where: {}, truncate: true });
+    await Notifications.destroy({ where: {} });
   });
 
   it('should get batched notifications', async () => {

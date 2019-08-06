@@ -2,6 +2,7 @@ import path from 'path';
 
 const routesPath = path.resolve(process.cwd(), __dirname, 'routes/*.js');
 
+
 const config = {
   info: {
     title: '1kbIdeas',
