@@ -21,6 +21,7 @@ fs
 
 Object.keys(database).forEach((model) => {
   if (database[model].associate) {
+    database[model].models = database;
     database[model].associate(database);
   }
 });

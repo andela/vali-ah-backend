@@ -6,6 +6,7 @@ import sinon from 'sinon';
 import sinonTest from 'sinon-test';
 
 import Models from '../../src/models';
+import { articles } from '../fixtures/articles';
 
 chai.use(chaiAsPromised);
 
@@ -21,8 +22,16 @@ describe('Articles model', () => {
     userId: faker.random.uuid(),
   };
 
+  before(async () => {
+    await Articles.destroy({ where: {}, truncate: true });
+    await Articles.bulkCreate(articles);
+  });
+
+  after(async () => {
+    await Articles.destroy({ where: {}, truncate: true });
+  });
   afterEach(() => {
-    Articles.findByPk.restore();
+    if (Articles.findByPk.restore) Articles.findByPk.restore();
   });
 
   it('should return created comment if article exist', test(async () => {
@@ -43,5 +52,15 @@ describe('Articles model', () => {
     const comment = { article: id, comment: commentData };
 
     (Articles.createComment(comment)).should.eventually.rejected;
+  }));
+
+  it('should single article if existing', test(async () => {
+    const article = await Articles.getSingleArticle(articles[0].id);
+
+    article.id.should.eql(articles[0].id);
+  }));
+
+  it('should be rejected if article doesnt exist', test(async () => {
+    (Articles.getSingleArticle(faker.random.uuid())).should.be.rejected;
   }));
 });

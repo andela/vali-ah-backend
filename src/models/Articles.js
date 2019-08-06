@@ -114,4 +114,28 @@ export default class Articles extends Model {
 
     return articleObject.createComment(comment);
   }
+
+
+  /**
+   * Get details for a single article
+   *
+   * @static
+   * @memberof Articles
+   *
+   * @param {string} articleId
+   *
+   * @returns {Object} article's data
+   */
+  static async getSingleArticle(articleId) {
+    const articleData = await this.findByPk(articleId, {
+      include: [{
+        model: this.models.Users,
+        include: [{ model: this.models.Sessions, as: 'session' }]
+      }]
+    });
+
+    if (!articleData) throw new NotFoundError();
+
+    return articleData.toJSON();
+  }
 }

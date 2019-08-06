@@ -5,24 +5,28 @@ import Debug from 'debug';
 config();
 
 const debug = Debug('dev');
-const { SENDGRID_API_KEY, SENDGRID_EMAIL, SENDGRID_ACTIVATION_TEMPLATE } = process.env;
-const templates = { accountActivation: SENDGRID_ACTIVATION_TEMPLATE };
+const { SENDGRID_API_KEY, SENDGRID_EMAIL } = process.env;
+const templates = {
+  accountActivation: process.env.SENDGRID_ACTIVATION_TEMPLATE,
+  activityNotification: process.env.SENDGRID_ACTIVITY_TEMPLATE
+};
 
 /**
  * Initialises the event
  *
  * @function
  *
- * @param {String} type - the type of message which corresponds to the mail template
- * @param {Array} data - can be a list for bulk sending. must contain email parameter
+ * @param {string} type - the type of message which corresponds to the mail template
+ * @param {Array} payload - can be a list for bulk sending. must contain email parameter
+ * @param {string} template - sendgrid template to use
  *
- * @return {promise} - Returns a promise that get resolcved to a success object
+ * @return {Promise} - Returns a promise that get resolved to a success object
  */
-export default async ({ type, payload }) => {
+export default async ({ type, payload, template }) => {
   try {
     sendgrid.setApiKey(SENDGRID_API_KEY);
 
-    const template = templates[type];
+    template = template || templates[type];
 
     if (!template) throw new Error('Email Template not available');
 
