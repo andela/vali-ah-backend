@@ -14,10 +14,12 @@ export default {
    * Verify Token
    *
    * @param {Object} request - the request object
+   * @param {Object} response - express response object
+   * @param {Function} next
    *
    * @return {void} - undefined
    */
-  verifyToken: async (request) => {
+  verifyToken: async (request, response, next) => {
     const authHeader = request.headers.authorization;
 
     if (authHeader === '') throw new ApplicationError(400, 'No token provided. Please signup or login');
@@ -34,7 +36,8 @@ export default {
     jwt.verify(token, SECRET_KEY, (error, decodedToken) => {
       if (error) throw new ApplicationError(401, `${error.message}`);
       request.user = decodedToken;
-      return {};
+
+      next();
     });
   },
 
@@ -42,11 +45,15 @@ export default {
    * Checks if a user is an admin
    *
    * @param {Object} request - the request object to the server
+   * @param {Object} response - express response object
+   * @param {Function} next
    *
    * @return {Object} - response object
    */
-  isAdmin: (request) => {
+  isAdmin: (request, response, next) => {
     const { isAdmin } = request.user;
     if (!isAdmin) throw new ApplicationError(403, 'Unauthorized Access. For admins accounts only');
+
+    next();
   }
 };

@@ -44,7 +44,7 @@ describe('Social Login Route', () => {
   });
 
   it('should throw error if access token is invalid', async () => {
-    const invalidToken = { accessToken: 'invalid access token' };
+    const invalidToken = { accessToken: 'Invalid access token' };
     const response = await chai
       .request(app)
       .post('/api/v1/auth/google')
@@ -61,7 +61,7 @@ describe('Social Login Route', () => {
     beforeEach(() => {
       facebook = sinon.stub(axios, 'get');
       facebook.onFirstCall().returns({ data: facebookFirstCallResponse });
-      sampleToken = { accessToken: 'invalid access token' };
+      sampleToken = { accessToken: 'Invalid access token' };
     });
 
     afterEach(() => {
@@ -134,7 +134,7 @@ describe('Social Login Route', () => {
       const response = await chai
         .request(app)
         .post('/api/v1/auth/google')
-        .send({ accessToken: 'invalid access token' });
+        .send({ accessToken: 'Invalid access token' });
 
       googleStub.should.calledOnce;
       response.should.have.status(200);
@@ -143,7 +143,7 @@ describe('Social Login Route', () => {
     });
   });
 
-  describe('Twitter Call Back function', () => {
+  describe('Twitter callback function', () => {
     const profile = userProfileDetails;
     const done = (err, next) => next;
 
@@ -154,25 +154,37 @@ describe('Social Login Route', () => {
     });
   });
 
-  describe('Twitter Social login', () => {
+  describe('Twitter social login', () => {
     let request;
+    let response;
+    const mockedResponse = {};
 
     beforeEach(() => {
       request = { user: extractedUserDetails };
+      response = {
+        status(code) {
+          mockedResponse.status = code;
+          return this;
+        },
+        json(body) {
+          mockedResponse.body = body;
+          return {};
+        }
+      };
     });
 
     it('should signup successfully', async () => {
-      const response = await twitterLogin(request);
+      await twitterLogin(request, response);
 
-      response.status.should.eql(201);
-      response.data.user.should.be.a('object');
+      mockedResponse.status.should.eql(201);
+      mockedResponse.body.data.user.should.be.a('object');
     });
 
     it('should login successfully', async () => {
-      const response = await twitterLogin(request);
+      await twitterLogin(request, response);
 
-      response.status.should.eql(200);
-      response.data.user.should.be.a('object');
+      mockedResponse.status.should.eql(200);
+      mockedResponse.body.data.user.should.be.a('object');
     });
 
     it('should return error', async () => {

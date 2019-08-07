@@ -95,7 +95,7 @@ describe('Auth Routes', () => {
 
       response.should.have.status(400);
       response.body.status.should.eql('error');
-      response.body.error.message.should.equal('invalid user name or password');
+      response.body.error.message.should.equal('Invalid user name or password');
     });
 
     it('should throw an error for wrong email', async () => {
@@ -109,7 +109,7 @@ describe('Auth Routes', () => {
 
       response.should.have.status(404);
       response.body.status.should.eql('error');
-      response.body.error.message.should.equal('you are not yet registered');
+      response.body.error.message.should.equal('You are not yet registered');
     });
   });
 
@@ -118,49 +118,49 @@ describe('Auth Routes', () => {
       const response = await chai.request(app).post(signupRoute).send(undefinedFirstName);
 
       response.should.have.status(400);
-      response.body.error.errors.firstName.should.eql('first name should be between 2 to 15 characters');
+      response.body.error.errors.firstName.should.eql('First name should be between 2 to 15 characters');
     });
 
     it('should return error when first name contains invlaid character', async () => {
       const response = await chai.request(app).post(signupRoute).send(invalidFirstName);
 
       response.should.have.status(400);
-      response.body.error.errors.firstName.should.eql('first name should only contain alphabets');
+      response.body.error.errors.firstName.should.eql('First name should only contain alphabets');
     });
 
     it('should return error when last name is not between 2 to 15 characters', async () => {
       const response = await chai.request(app).post(signupRoute).send(shortLastName);
 
       response.should.have.status(400);
-      response.body.error.errors.lastName.should.eql('last name should be between 2 to 15 characters');
+      response.body.error.errors.lastName.should.eql('Last name should be between 2 to 15 characters');
     });
 
     it('should return error when last name contains invlaid character', async () => {
       const response = await chai.request(app).post(signupRoute).send(invalidLastName);
 
       response.should.have.status(400);
-      response.body.error.errors.lastName.should.eql('last name should only contain alphabets');
+      response.body.error.errors.lastName.should.eql('Last name should only contain alphabets');
     });
 
     it('should return error when userName is invalid', async () => {
       const response = await chai.request(app).post(signupRoute).send(shortUsername);
 
       response.should.have.status(400);
-      response.body.error.errors.userName.should.eql('username should be between 2 to 20 characters');
+      response.body.error.errors.userName.should.eql('Username should be between 2 to 20 characters');
     });
 
     it('should return error when email is invalid', async () => {
       const response = await chai.request(app).post(signupRoute).send(invalidEmail);
 
       response.should.have.status(400);
-      response.body.error.errors.email.should.eql('enter a valid email address');
+      response.body.error.errors.email.should.eql('Enter a valid email address');
     });
 
     it('should return error when password is short', async () => {
       const response = await chai.request(app).post(signupRoute).send(shortPassword);
 
       response.should.have.status(400);
-      response.body.error.errors.password.should.eql('password should be between 8 to 15 characters');
+      response.body.error.errors.password.should.eql('Password should be between 8 to 15 characters');
     });
   });
 });

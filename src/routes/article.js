@@ -1,13 +1,14 @@
 import express from 'express';
 
 import articleController from '../controllers/article';
+import authentication from '../middlewares/authentication';
 import validator from '../middlewares/validator';
 import commentSchema from '../validations/comment';
 import asyncWrapper from '../middlewares/asyncWrapper';
 
 const { createComment } = articleController;
 const { createCommentSchema } = commentSchema;
-
+const { verifyToken } = authentication;
 const router = express.Router();
 
 /**
@@ -40,6 +41,6 @@ const router = express.Router();
  *       201:
  *         description: comment posted
  */
-router.post('/:articleId/comments', validator(createCommentSchema), asyncWrapper(createComment));
+router.post('/:articleId/comments', validator(createCommentSchema), asyncWrapper(verifyToken), asyncWrapper(createComment));
 
 export default router;

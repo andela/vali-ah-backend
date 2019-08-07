@@ -95,7 +95,7 @@ router.post('/signin', validator(signinSchema), asyncWrapper(signin));
  *       200:
  *         description: User successfully signed out
  */
-router.post('/signout', asyncWrapper(verifyToken, true), asyncWrapper(signout));
+router.post('/signout', asyncWrapper(verifyToken), asyncWrapper(signout));
 
 /**
  * @swagger

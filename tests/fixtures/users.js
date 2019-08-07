@@ -1,5 +1,6 @@
 import faker from 'faker';
 import uuid from 'uuid';
+import { generateAuthToken } from '../../src/helpers/auth';
 
 const user = {
   firstName: 'gilbert',
@@ -97,6 +98,8 @@ const users = Array(2).fill(0).map(() => ({
   password: faker.internet.password()
 }));
 
+const userToken = generateAuthToken({ id: 'bd4c4dfa-b2dd-47f9-9599-1b588b35363e' });
+
 export {
   invalidFirstName,
   shortLastName,
@@ -109,5 +112,6 @@ export {
   invalidPassword,
   user,
   anotherUser,
-  users
+  users,
+  userToken
 };

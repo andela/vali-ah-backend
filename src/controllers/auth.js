@@ -15,13 +15,14 @@ export default {
    * Handles user signup.
    *
    * @param {Object} request - the request object to the server
+   * @param {Object} response - express response object
    *
    * @return {Object} - response object
    */
-  signup: async (request) => {
+  signup: async (request, response) => {
     const existingUser = await Users.getExistingUser(request.body.email);
 
-    if (existingUser) throw new ApplicationError(409, 'you are already registered');
+    if (existingUser) throw new ApplicationError(409, 'You are already registered');
 
     const newUser = await Users.create(request.body);
 
@@ -40,48 +41,50 @@ export default {
       ]
     });
 
-    return { status: 201, data: { user: newUser, token } };
+    return response.status(201).json({ status: 'success', data: { user: newUser, token } });
   },
 
   /**
    * Handles user signin
    *
    * @param {Object} request - the request object to the server
+   * @param {Object} response - express response object
    *
    * @return {Object} - response object
    */
-  signin: async (request) => {
+  signin: async (request, response) => {
     const { password, email } = request.body;
     const user = await Users.getExistingUser(email);
 
-    if (!user) throw new NotFoundError('you are not yet registered');
+    if (!user) throw new NotFoundError('You are not yet registered');
 
     const isRealPassword = await Users.comparePassword(password, user.password);
 
-    if (!isRealPassword) throw new ApplicationError(400, 'invalid user name or password');
+    if (!isRealPassword) throw new ApplicationError(400, 'Invalid user name or password');
 
     delete user?.dataValues?.password;
 
     const token = generateAuthToken(user);
 
-    return { status: 200, data: { user, token } };
+    return response.status(200).json({ status: 'success', data: { user, token } });
   },
 
   /**
    * Handles user signout
    *
    * @param {Object} request - The request object to the server
+   * @param {Object} response - express response object
    *
    * @return {Object} - response object
    */
-  signout: async (request) => {
+  signout: async (request, response) => {
     const authHeader = request.headers.authorization;
     const token = authHeader.split(' ')[1];
     const { id } = request.user;
 
     await BlacklistedTokens.create({ token, userId: id });
 
-    return { status: 200, message: 'User successfully logged out' };
+    return response.status(200).json({ status: 'success', message: 'User successfully logged out' });
   },
 
   /**
@@ -93,18 +96,20 @@ export default {
    * @function
    *
    * @param {Object} request - the request object to the server
+   * @param {Object} response - express response object
    *
    * @return {Object} - response object
    */
-  socialLogin: async (request) => {
+  socialLogin: async (request, response) => {
     const { provider } = request.params;
     const providerHandle = {
       facebook: facebookAuth,
       google: googleAuth
     };
     const userDetails = await providerHandle[provider](request.body);
-    const user = await createOrFindUser(userDetails);
-    return { ...user };
+    const { status, data } = await createOrFindUser(userDetails);
+
+    return response.status(status).json({ status: 'success', data });
   },
 
   /**
@@ -113,11 +118,13 @@ export default {
    * @function
    *
    * @param {Object} request object
+   * @param {Object} response - express response object
    *
    * @return {Object} response object
    */
-  twitterLogin: async (request) => {
-    const user = await createOrFindUser(request.user);
-    return { ...user };
+  twitterLogin: async (request, response) => {
+    const { status, data } = await createOrFindUser(request.user);
+
+    return response.status(status).json({ status: 'success', data });
   },
 };

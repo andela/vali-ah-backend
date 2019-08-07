@@ -5,7 +5,7 @@ import chaiHttp from 'chai-http';
 
 import app from '../../src';
 import models from '../../src/models';
-import { users as bulkUsers } from '../fixtures/users';
+import { users as bulkUsers, userToken } from '../fixtures/users';
 import { articles as bulkArticles, comment as commentData } from '../fixtures/articles';
 
 chai.use(chaiAsPromised);
@@ -29,6 +29,7 @@ describe('Articles API', () => {
     it('should return 201', async () => {
       const { status } = await chai.request(app)
         .post(`${baseRoute}/articles/${articles[0].id}/comments`)
+        .set('Authorization', `Bearer ${userToken}`)
         .send(commentData);
 
       status.should.eql(201);

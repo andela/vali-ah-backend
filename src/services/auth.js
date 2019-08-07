@@ -50,13 +50,11 @@ export const facebookAuth = async ({ accessToken }) => {
   const { is_valid: isValid, app_id: appId } = verificationDetails.data;
 
   if (FACEBOOK_APP_ID !== appId) {
-    throw new ApplicationError(
-      500,
-      `invalid app id: expected [${FACEBOOK_APP_ID}] but was [${appId}]`
-    );
+    throw new ApplicationError(500, `Invalid app id: expected [${FACEBOOK_APP_ID}] but was [${appId}]`);
   }
+
   if (!isValid) {
-    throw new ApplicationError(500, 'user access Token is invalid');
+    throw new ApplicationError(500, 'User access token is invalid');
   }
 
   const getUserDataURL = `https://graph.facebook.com/me?fields=id,first_name,last_name,email,picture&access_token=${accessToken}`;
@@ -64,6 +62,7 @@ export const facebookAuth = async ({ accessToken }) => {
   const { data: userData } = await axios.get(getUserDataURL);
   const { first_name: firstName, last_name: lastName, email } = userData;
   const { url: avatarUrl } = userData.picture.data;
+
   return {
     firstName,
     lastName,
@@ -91,6 +90,7 @@ export const googleAuth = async ({ accessToken }) => {
   const {
     given_name: firstName, family_name: lastName, picture, email
   } = ticket.getPayload();
+
   return {
     avatarUrl: picture,
     email,

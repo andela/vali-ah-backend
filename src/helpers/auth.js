@@ -8,7 +8,7 @@ dotenv.config();
  *
  * @function
  *
- * @param {string} user - token payload
+ * @param {Object} user - token payload
  *
  * @returns {string} - token
  */

@@ -11,8 +11,10 @@ describe('isAdmin middleware', () => {
         isAdmin: true,
       }
     };
+    const next = function next() {};
+
     try {
-      authentication.isAdmin(request);
+      authentication.isAdmin(request, {}, next);
     } catch (error) {
       error.should.be.eql(undefined);
     }
