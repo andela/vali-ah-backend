@@ -17,6 +17,11 @@ export default {
           foreignKey: true,
           type: Sequelize.UUID,
         },
+        isAdmin: {
+          allowNull: false,
+          type: Sequelize.BOOLEAN,
+          defaultValue: false
+        },
         firstName: {
           allowNull: false,
           type: Sequelize.STRING

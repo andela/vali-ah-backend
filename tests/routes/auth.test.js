@@ -11,7 +11,8 @@ import {
   shortUsername,
   invalidEmail,
   shortPassword,
-  user
+  user,
+  anotherUser
 } from '../fixtures/users';
 
 chai.use(chaiHttp);
@@ -19,6 +20,12 @@ should();
 
 const { Users } = database;
 const signupRoute = '/api/v1/auth/signup';
+const signoutRoute = '/api/v1/auth/signout';
+
+let validToken;
+let blacklistedToken;
+
+const server = () => chai.request(app);
 
 describe('Auth Routes', () => {
   describe('Signup Route', () => {
@@ -88,7 +95,7 @@ describe('Auth Routes', () => {
 
       response.should.have.status(400);
       response.body.status.should.eql('error');
-      response.body.error.message.should.equal('invalid user name or password');
+      response.body.error.message.should.equal('Invalid user name or password');
     });
 
     it('should throw an error for wrong email', async () => {
@@ -102,7 +109,7 @@ describe('Auth Routes', () => {
 
       response.should.have.status(404);
       response.body.status.should.eql('error');
-      response.body.error.message.should.equal('you are not yet registered');
+      response.body.error.message.should.equal('You are not yet registered');
     });
   });
 
@@ -111,49 +118,132 @@ describe('Auth Routes', () => {
       const response = await chai.request(app).post(signupRoute).send(undefinedFirstName);
 
       response.should.have.status(400);
-      response.body.error.errors.firstName.should.eql('first name should be between 2 to 15 characters');
+      response.body.error.errors.firstName.should.eql('First name should be between 2 to 15 characters');
     });
 
     it('should return error when first name contains invlaid character', async () => {
       const response = await chai.request(app).post(signupRoute).send(invalidFirstName);
 
       response.should.have.status(400);
-      response.body.error.errors.firstName.should.eql('first name should only contain alphabets');
+      response.body.error.errors.firstName.should.eql('First name should only contain alphabets');
     });
 
     it('should return error when last name is not between 2 to 15 characters', async () => {
       const response = await chai.request(app).post(signupRoute).send(shortLastName);
 
       response.should.have.status(400);
-      response.body.error.errors.lastName.should.eql('last name should be between 2 to 15 characters');
+      response.body.error.errors.lastName.should.eql('Last name should be between 2 to 15 characters');
     });
 
     it('should return error when last name contains invlaid character', async () => {
       const response = await chai.request(app).post(signupRoute).send(invalidLastName);
 
       response.should.have.status(400);
-      response.body.error.errors.lastName.should.eql('last name should only contain alphabets');
+      response.body.error.errors.lastName.should.eql('Last name should only contain alphabets');
     });
 
     it('should return error when userName is invalid', async () => {
       const response = await chai.request(app).post(signupRoute).send(shortUsername);
 
       response.should.have.status(400);
-      response.body.error.errors.userName.should.eql('username should be between 2 to 20 characters');
+      response.body.error.errors.userName.should.eql('Username should be between 2 to 20 characters');
     });
 
     it('should return error when email is invalid', async () => {
       const response = await chai.request(app).post(signupRoute).send(invalidEmail);
 
       response.should.have.status(400);
-      response.body.error.errors.email.should.eql('enter a valid email address');
+      response.body.error.errors.email.should.eql('Enter a valid email address');
     });
 
     it('should return error when password is short', async () => {
       const response = await chai.request(app).post(signupRoute).send(shortPassword);
 
       response.should.have.status(400);
-      response.body.error.errors.password.should.eql('password should be between 8 to 15 characters');
+      response.body.error.errors.password.should.eql('Password should be between 8 to 15 characters');
     });
+  });
+});
+
+describe('Signout Route', () => {
+  before((done) => {
+    server()
+      .post(signupRoute)
+      .send(anotherUser)
+      .end((err, response) => {
+        const { token } = response.body.data;
+        validToken = token;
+        done();
+      });
+  });
+
+  it('should log out a user', async () => {
+    const response = await server()
+      .post(`${signoutRoute}`)
+      .set('Authorization', `Bearer ${validToken}`);
+
+    response.should.have.status(200);
+    response.body.status.should.eql('success');
+    response.body.should.be.a('object');
+  });
+
+  it('should not let a user with an invalid token make a request', async () => {
+    const response = await server()
+      .post(`${signoutRoute}`)
+      .set('Authorization', 'bad token');
+
+    response.should.have.status(401);
+    response.body.should.be.a('object');
+    response.body.status.should.eql('error');
+    response.body.should.have.property('error');
+    response.body.error.should.be.a('object');
+    response.body.error.should.have.property('message');
+    response.body.error.should.have.property('trace');
+    response.body.error.message.should.eql('jwt malformed');
+  });
+
+  it('should not let a user make a request if the header is not set', async () => {
+    const response = await server()
+      .post(`${signoutRoute}`);
+
+    response.should.have.status(412);
+    response.body.should.be.a('object');
+    response.body.status.should.eql('error');
+    response.body.should.have.property('error');
+    response.body.error.should.be.a('object');
+    response.body.error.should.have.property('message');
+    response.body.error.should.have.property('trace');
+    response.body.error.message.should.eql('Authorization header not set');
+  });
+
+  it('should not let a logged out user make a request', async () => {
+    blacklistedToken = validToken;
+    const response = await server()
+      .post(`${signoutRoute}`)
+      .set('Authorization', `Bearer ${blacklistedToken}`);
+
+    response.should.have.status(403);
+    response.body.should.be.a('object');
+    response.body.status.should.eql('error');
+    response.body.should.have.property('error');
+    response.body.error.should.be.a('object');
+    response.body.error.should.have.property('message');
+    response.body.error.should.have.property('trace');
+    response.body.error.message.should.eql('Please login or signup to access this resource');
+  });
+
+  it('should throw 400 status code accessing the signout route without a token', async () => {
+    const response = await server()
+      .post(`${signoutRoute}`)
+      .set('Authorization', '');
+
+    response.should.have.status(400);
+    response.body.should.be.a('object');
+    response.body.status.should.eql('error');
+    response.body.should.have.property('error');
+    response.body.error.should.be.a('object');
+    response.body.error.should.have.property('message');
+    response.body.error.should.have.property('trace');
+    response.body.error.message.should.eql('No token provided. Please signup or login');
   });
 });

@@ -23,7 +23,7 @@ export default (schemas, status = 400) => {
         return acc;
       }, {});
 
-      const appError = new ApplicationError(status, 'validation error', mappedErrors);
+      const appError = new ApplicationError(status, 'Validation error', mappedErrors);
 
       return next(appError);
     }

@@ -129,7 +129,26 @@
         ],
         "responses": {
           "200": {
-            "description": "users"
+            "description": "user successfully signs in"
+          }
+        }
+      }
+    },
+    "/auth/signout": {
+      "post": {
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization"
+          }
+        ],
+        "description": "Signs out a user",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "User successfully signed out"
           }
         }
       }

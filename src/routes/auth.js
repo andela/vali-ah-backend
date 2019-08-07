@@ -2,16 +2,18 @@ import { Router } from 'express';
 import passport from 'passport';
 
 import authController from '../controllers/auth';
+import authentication from '../middlewares/authentication';
 import validator from '../middlewares/validator';
 import Schemas from '../validations/auth';
 import asyncWrapper from '../middlewares/asyncWrapper';
 
 const {
-  signup, signin, socialLogin, twitterLogin
+  signup, signin, signout, socialLogin, twitterLogin
 } = authController;
 const { signupSchema, signinSchema, socialLoginSchema } = Schemas;
 
 const router = Router();
+const { verifyToken } = authentication;
 
 /**
  * @swagger
@@ -74,9 +76,26 @@ router.post('/signup', validator(signupSchema), asyncWrapper(signup));
  *         type: string
  *     responses:
  *       200:
- *         description: users
+ *         description: user successfully signs in
  */
 router.post('/signin', validator(signinSchema), asyncWrapper(signin));
+
+/**
+ * @swagger
+ *
+ * /auth/signout:
+ *   post:
+ *     parameters:
+ *       - in: header
+ *         name: Authorization
+ *     description: Signs out a user
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: User successfully signed out
+ */
+router.post('/signout', asyncWrapper(verifyToken), asyncWrapper(signout));
 
 /**
  * @swagger

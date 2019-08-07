@@ -10,9 +10,7 @@
   */
 export default wrappedFunction => async (request, response, next) => {
   try {
-    const { status, data, message } = await wrappedFunction(request, response, next);
-
-    return response.status(status).json({ status: 'success', data, message });
+    await wrappedFunction(request, response, next);
   } catch (error) {
     return next(error);
   }
