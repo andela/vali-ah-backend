@@ -1,10 +1,13 @@
 import Models from '../models';
 import paginator from '../helpers/paginator';
-import { NotFoundError, ApplicationError } from '../helpers/errors';
+import { ApplicationError, NotFoundError } from '../helpers/errors';
+import notification from '../services/notification';
 
 import * as helpers from '../helpers';
 
-const { Articles, Bookmarks, ArticleCategories } = Models;
+const {
+  Articles, Bookmarks, ArticleCategories, Votes
+} = Models;
 const { filter, extractArticles } = helpers;
 
 export default {
@@ -26,7 +29,9 @@ export default {
 
     const articleData = await Articles.createComment({ articleId, comment });
 
-    return response.status(201).json({ status: 'success', data: articleData, message: 'Comment added succesfully' });
+    return response
+      .status(201)
+      .json({ status: 'success', data: articleData, message: 'Comment added succesfully' });
   },
 
   /**
@@ -51,7 +56,9 @@ export default {
 
     const newBookmark = await articleObject.createBookmark({ userId });
 
-    return response.status(201).json({ status: 'success', data: newBookmark, message: 'Bookmark added succesfully' });
+    return response
+      .status(201)
+      .json({ status: 'success', data: newBookmark, message: 'Bookmark added succesfully' });
   },
 
   /**
@@ -74,33 +81,42 @@ export default {
 
     await Bookmarks.destroy({ where: { articleId, userId } });
 
-    return response.status(200).json({ status: 'success', message: 'Article removed from bookmark' });
+    return response
+      .status(200)
+      .json({ status: 'success', message: 'Article removed from bookmark' });
   },
 
   /**
- * controller for searching for articles
- *
- * @function
- *
- * @param {Object} request - express request object
- * @param {Object} response - express response object
- *
- * @return {Object} - callback that execute the controller
- */
+   * controller for searching for articles
+   *
+   * @function
+   *
+   * @param {Object} request - express request object
+   * @param {Object} response - express response object
+   *
+   * @return {Object} - callback that execute the controller
+   */
   searchArticle: async (request, response) => {
     const {
       author, title, tag, keyword, page = 1, limit = 10
     } = request.query;
 
-    const queriesValues = (title || tag || author || keyword);
-    const standardQueries = (title || author || tag);
+    const queriesValues = title || tag || author || keyword;
+    const standardQueries = title || author || tag;
     const queryFilter = filter(title, tag, author, keyword);
 
     const { data: results, count, currentCount } = await paginator(ArticleCategories, {
-      ...queryFilter, raw: true, page, limit
+      ...queryFilter,
+      raw: true,
+      page,
+      limit
     });
 
-    if (keyword && standardQueries) return response.status(400).json({ status: 'error', message: 'Keyword cannot be used with title, author or tag' });
+    if (keyword && standardQueries) {
+      return response
+        .status(400)
+        .json({ status: 'error', message: 'Keyword cannot be used with title, author or tag' });
+    }
     if (!currentCount) return response.status(404).json({ status: 'error', message: `${queriesValues} Not found` });
 
     const result = extractArticles(results);
@@ -108,9 +124,63 @@ export default {
     return response.status(200).json({
       status: 'success',
       data: {
-        count, page, current: +page, result
+        count,
+        page,
+        current: +page,
+        result
       },
       message: 'Articles retrieved successfully'
+    });
+  },
+
+  /**
+   * controller for up voting and down voting articles
+   *
+   * @function
+   *
+   * @param {Object} request - express request object
+   * @param {Object} response - express response object
+   *
+   * @return {Object} - callback that execute the controller
+   */
+  vote: async (request, response) => {
+    const { voteType } = request.body;
+    const { articleId } = request.params;
+    const { id: userId } = request.user;
+
+    let responseData = {};
+    let created;
+
+    const article = await Articles.findOne({ where: { id: articleId, suspended: false } });
+
+    if (!article) throw new ApplicationError(400, 'This article does not exist or has been suspended');
+
+    if (voteType === 'nullVote') {
+      await Votes.destroy({ where: { userId, articleId } });
+
+      responseData = { data: {}, message: 'Vote successfully removed' };
+    } else {
+      let data;
+      const upVote = voteType === 'upVote';
+      ({ created, data } = await Votes.upsertVote({ articleId, userId, upVote }));
+
+      notification.emit('articleVoted', { articleId, userId, upVote });
+
+      responseData = {
+        data,
+        message: `Article successfully ${upVote ? 'upvoted' : 'downvoted'}`
+      };
+    }
+
+    const suspended = await article.suspendArticle();
+
+    if (suspended) notification.emit('articleSuspended', { articleId });
+
+    const status = created ? 201 : 200;
+
+    return response.status(status).json({
+      status: 'success',
+      ...responseData
     });
   }
 };

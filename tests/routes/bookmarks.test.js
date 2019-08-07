@@ -25,6 +25,10 @@ describe('Bookmark Endpoint', () => {
 
     await Articles.bulkCreate(bulkArticles, { returning: true });
   });
+  after(async () => {
+    await Users.destroy({ where: {} });
+    await Articles.destroy({ where: {} });
+  });
   describe('user adds article to bookmark - POST request to /:articleId/bookmarks/', () => {
     it('should return 201 when user adds a bookmark', async () => {
       const validBookmarkData = {
@@ -32,7 +36,8 @@ describe('Bookmark Endpoint', () => {
         user: `${bulkUsers[0].id}`
       };
 
-      const { status } = await chai.request(app)
+      const { status } = await chai
+        .request(app)
         .post(`${baseRoute}/articles/${bulkArticles[0].id}/bookmarks`)
         .set('Authorization', `Bearer ${userToken}`)
         .send(validBookmarkData);
@@ -45,7 +50,8 @@ describe('Bookmark Endpoint', () => {
         articleId: `${bulkArticles[0].id}`,
         user: `${bulkUsers[0].id}`
       };
-      const { status } = await chai.request(app)
+      const { status } = await chai
+        .request(app)
         .post(`${baseRoute}/articles/${bulkArticles[0].id}/bookmarks`)
         .set('Authorization', `Bearer ${userToken}`)
         .send(validBookmarkData);
@@ -58,7 +64,8 @@ describe('Bookmark Endpoint', () => {
         articleId: '88c0bd9a-b83d-11e9-a2a3-2a2ae2dbcce4',
         user: `${bulkUsers[0].id}`
       };
-      const { status } = await chai.request(app)
+      const { status } = await chai
+        .request(app)
         .post(`${baseRoute}/articles/${validBookmarkData.articleId}/bookmarks`)
         .set('Authorization', `Bearer ${userToken}`)
         .send(validBookmarkData);
@@ -73,7 +80,8 @@ describe('Bookmark Endpoint', () => {
         user: `${bulkUsers[0].id}`
       };
 
-      const { status } = await chai.request(app)
+      const { status } = await chai
+        .request(app)
         .delete(`${baseRoute}/articles/${bulkArticles[0].id}/bookmarks`)
         .set('Authorization', `Bearer ${userToken}`)
         .send(validBookmarkData);
@@ -86,7 +94,8 @@ describe('Bookmark Endpoint', () => {
         articleId: '88c0bd9a-b83d-11e9-a2a3-2a2ae2dbcce4',
         user: `${bulkUsers[0].id}`
       };
-      const { status } = await chai.request(app)
+      const { status } = await chai
+        .request(app)
         .delete(`${baseRoute}/articles/${invalidBookmarkData.articleId}/bookmarks`)
         .set('Authorization', `Bearer ${userToken}`)
         .send(invalidBookmarkData);

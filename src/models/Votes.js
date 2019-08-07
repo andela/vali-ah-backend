@@ -18,7 +18,7 @@ export default class Votes extends Model {
     articleId: Sequelize.UUID,
     userId: Sequelize.UUID,
     upVote: Sequelize.BOOLEAN
-  }
+  };
 
   /**
    * Initializes the Votes model
@@ -55,5 +55,28 @@ export default class Votes extends Model {
       foreignKey: 'articleId',
       onDelete: 'CASCADE'
     });
+  }
+
+  /**
+   * Model associations
+   *
+   * @static
+   * @memberof Votes
+   *
+   * @param {Object} voteData
+   * @param {string} voteData.userId
+   * @param {string} voteData.articleId
+   * @param {boolean} voteData.upVote
+   *
+   * @returns {Object} vote data
+   */
+  static async upsertVote({ userId, articleId, upVote }) {
+    const voteObject = await this.findOne({ where: { userId, articleId } });
+
+    if (voteObject) {
+      return { created: false, data: await voteObject.update({ userId, articleId, upVote }) };
+    }
+
+    return { created: true, data: await this.create({ userId, articleId, upVote }) };
   }
 }

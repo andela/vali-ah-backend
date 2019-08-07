@@ -15,7 +15,7 @@ const anotherUser = {
   lastName: 'Baz',
   userName: 'foofoo',
   email: 'foobar@fakemail.com',
-  password: 'foobarjdb34',
+  password: 'foobarjdb34'
 };
 
 const invalidFirstName = {
@@ -89,14 +89,16 @@ const invalidPassword = {
   password: 'passwordui'
 };
 
-const users = Array(10).fill(0).map(() => ({
-  id: uuid(),
-  firstName: faker.name.firstName(),
-  lastName: faker.name.lastName(),
-  userName: faker.internet.userName(),
-  email: faker.internet.email(),
-  password: faker.internet.password()
-}));
+const users = Array(10)
+  .fill(0)
+  .map(() => ({
+    id: uuid(),
+    firstName: faker.name.firstName(),
+    lastName: faker.name.lastName(),
+    userName: faker.internet.userName(),
+    email: faker.internet.email(),
+    password: faker.internet.password()
+  }));
 
 const userToken = generateAuthToken({ id: 'bd4c4dfa-b2dd-47f9-9599-1b588b35363e' });
 const usersWithFollowing = users.map(({ id }) => ({

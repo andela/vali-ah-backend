@@ -28,7 +28,7 @@ export default {
 
     const token = authHeader.split(' ')[1];
     const blacklistedToken = await BlacklistedTokens.findOne({
-      where: { token },
+      where: { token }
     });
 
     if (blacklistedToken) throw new ApplicationError(403, 'Please login or signup to access this resource');

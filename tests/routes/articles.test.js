@@ -5,10 +5,13 @@ import chaiHttp from 'chai-http';
 
 import app from '../../src';
 import models from '../../src/models';
-import { users as bulkUsers, userToken } from '../fixtures/users';
+import { users as bulkUsers, userToken, user } from '../fixtures/users';
 import {
   articles as bulkArticles,
+  votes as bulkVotes,
+  downVotes as bulkDownVotes,
   comment as commentData,
+  invalidArticleId,
   category as bulkTag,
   articleCategories as bulkArticleCategories
 } from '../fixtures/articles';
@@ -20,10 +23,9 @@ chai.use(chaiHttp);
 should();
 
 const {
-  Articles,
-  Users, Categories,
-  ArticleCategories
+  Articles, Users, Categories, ArticleCategories, Votes
 } = models;
+
 const baseRoute = '/api/v1';
 
 describe('Articles API', () => {
@@ -38,9 +40,17 @@ describe('Articles API', () => {
     await ArticleCategories.bulkCreate(bulkArticleCategories, { returning: true });
   });
 
+  after(async () => {
+    await Users.destroy({ where: {}, truncate: true });
+    await Articles.destroy({ where: {}, truncate: true });
+    await Categories.destroy({ where: {}, truncate: true });
+    await ArticleCategories.destroy({ where: {}, truncate: true });
+  });
+
   describe('POST /articles/:articleId/comment', () => {
     it('should return 201', async () => {
-      const { status } = await chai.request(app)
+      const { status } = await chai
+        .request(app)
         .post(`${baseRoute}/articles/${articles[0].id}/comments`)
         .set('Authorization', `Bearer ${userToken}`)
         .send(commentData);
@@ -49,7 +59,8 @@ describe('Articles API', () => {
     });
 
     it('should return 400', async () => {
-      const { status } = await chai.request(app)
+      const { status } = await chai
+        .request(app)
         .post(`${baseRoute}/articles/${articles[0].id}/comments`)
         .set('Authorization', `Bearer ${userToken}`)
         .send({});
@@ -60,16 +71,12 @@ describe('Articles API', () => {
 
   describe('Search article', () => {
     it('should get all articles', async () => {
-      const response = await chai
-        .request(app)
-        .get(`${baseRoute}/articles`);
+      const response = await chai.request(app).get(`${baseRoute}/articles`);
       response.should.have.status(200);
     });
 
     it('should get users search if tag strings are valid ', async () => {
-      const response = await chai
-        .request(app)
-        .get(`${baseRoute}/articles?tag=${tag[0].category}`);
+      const response = await chai.request(app).get(`${baseRoute}/articles?tag=${tag[0].category}`);
       response.should.have.status(200);
     });
 
@@ -88,23 +95,17 @@ describe('Articles API', () => {
     });
 
     it('should get users search if keyword strings are valid ', async () => {
-      const response = await chai
-        .request(app)
-        .get(`${baseRoute}/articles?keyword=l`);
+      const response = await chai.request(app).get(`${baseRoute}/articles?keyword=l`);
       response.should.have.status(200);
     });
 
     it('should not get user search when is not in the database', async () => {
-      const response = await chai
-        .request(app)
-        .get(`${baseRoute}/articles?tag=Lagos`);
+      const response = await chai.request(app).get(`${baseRoute}/articles?tag=Lagos`);
       response.should.have.status(404);
     });
 
     it('should not get user search when its value is invalid', async () => {
-      const response = await chai
-        .request(app)
-        .get(`${baseRoute}/articles?tag=6566`);
+      const response = await chai.request(app).get(`${baseRoute}/articles?tag=6566`);
       response.should.have.status(400);
     });
 
@@ -114,5 +115,191 @@ describe('Articles API', () => {
         .get(`${baseRoute}/articles?tag=health&keyword=emotion`);
       response.should.have.status(400);
     });
+  });
+});
+
+describe('POST /articles/:articleId/vote', () => {
+  let emptyArticleId;
+  let articles;
+  let userResponseObject;
+  let token;
+
+  before(async () => {
+    await Users.bulkCreate(bulkUsers, { returning: true });
+
+    userResponseObject = await chai
+      .request(app)
+      .post('/api/v1/auth/signup')
+      .send(user);
+
+    articles = await Articles.bulkCreate(bulkArticles, { returning: true });
+    await Votes.bulkCreate(bulkVotes, { returning: true });
+    await Votes.bulkCreate(bulkDownVotes, { returning: true });
+  });
+
+  after(async () => {
+    await Users.destroy({ where: {}, truncate: true });
+    await Articles.destroy({ where: {}, truncate: true });
+    await Votes.destroy({ where: {}, truncate: true });
+  });
+
+  it('should throw error if no Id is supplied', async () => {
+    ({ token } = userResponseObject.body.data);
+
+    const response = await chai
+      .request(app)
+      .post(`${baseRoute}/articles/${emptyArticleId}/vote`)
+      .send({ voteType: 'upvote' })
+      .set('authorization', `Bearer ${token}`);
+
+    response.should.have.status(400);
+    response.body.status.should.eql('error');
+  });
+
+  it('should throw error if no vote type is supplied', async () => {
+    const response = await chai
+      .request(app)
+      .post(`${baseRoute}/articles/${articles[0].dataValues.id}/vote`)
+      .set('authorization', `Bearer ${token}`);
+
+    response.should.have.status(400);
+    response.body.status.should.eql('error');
+    response.body.error.errors.voteType.should.eql(
+      'Vote type is required. e.g upVote, downVote or nullVote'
+    );
+  });
+
+  it('should throw error if wrong vote type is supplied', async () => {
+    const response = await chai
+      .request(app)
+      .post(`${baseRoute}/articles/${articles[0].dataValues.id}/vote`)
+      .send({ voteType: 'invalid' })
+      .set('authorization', `Bearer ${token}`);
+
+    response.should.have.status(400);
+    response.body.status.should.eql('error');
+    response.body.error.errors.voteType.should.eql('Enter a valid vote type');
+  });
+
+  it('should throw error if article ID is not a valid UUID', async () => {
+    const response = await chai
+      .request(app)
+      .post(`${baseRoute}/articles/invalid-article-id/vote`)
+      .send({ voteType: 'upVote' })
+      .set('authorization', `Bearer ${token}`);
+
+    response.should.have.status(400);
+    response.body.status.should.eql('error');
+    response.body.error.errors.articleId.should.eql('Article id is not a valid uuid');
+  });
+
+  it('should throw error if article does not exist or is suspended', async () => {
+    const response = await chai
+      .request(app)
+      .post(`${baseRoute}/articles/${invalidArticleId}/vote`)
+      .send({ voteType: 'upVote' })
+      .set('authorization', `Bearer ${token}`);
+
+    response.should.have.status(400);
+    response.body.status.should.eql('error');
+    response.body.error.message.should.eql('This article does not exist or has been suspended');
+  });
+
+  it('should up vote article', async () => {
+    const response = await chai
+      .request(app)
+      .post(`${baseRoute}/articles/${articles[0].dataValues.id}/vote`)
+      .send({ voteType: 'upVote' })
+      .set('authorization', `Bearer ${token}`);
+
+    response.should.have.status(201);
+    response.body.status.should.eql('success');
+    response.body.message.should.eql('Article successfully upvoted');
+    response.body.data.upVote.should.eql(true);
+  });
+
+  it('should change vote to down vote', async () => {
+    const response = await chai
+      .request(app)
+      .post(`${baseRoute}/articles/${articles[0].dataValues.id}/vote`)
+      .send({ voteType: 'downVote' })
+      .set('authorization', `Bearer ${token}`);
+
+    response.should.have.status(200);
+    response.body.status.should.eql('success');
+    response.body.message.should.eql('Article successfully downvoted');
+    response.body.data.upVote.should.eql(false);
+  });
+
+  it('should remove vote entry', async () => {
+    const response = await chai
+      .request(app)
+      .post(`${baseRoute}/articles/${articles[0].dataValues.id}/vote`)
+      .send({ voteType: 'nullVote' })
+      .set('authorization', `Bearer ${token}`);
+
+    response.should.have.status(200);
+    response.body.message.should.eql('Vote successfully removed');
+  });
+
+  it('should down vote and suspend article', async () => {
+    const response = await chai
+      .request(app)
+      .post(`${baseRoute}/articles/${articles[1].dataValues.id}/vote`)
+      .send({ voteType: 'downVote' })
+      .set('authorization', `Bearer ${token}`);
+
+    response.should.have.status(201);
+    response.body.message.should.eql('Article successfully downvoted');
+    response.body.data.upVote.should.eql(false);
+  });
+
+  it('should up vote article', async () => {
+    const response = await chai
+      .request(app)
+      .post(`${baseRoute}/articles/${articles[2].dataValues.id}/vote`)
+      .send({ voteType: 'upVote' })
+      .set('authorization', `Bearer ${token}`);
+
+    response.should.have.status(201);
+    response.body.status.should.eql('success');
+    response.body.message.should.eql('Article successfully upvoted');
+    response.body.data.upVote.should.eql(true);
+  });
+
+  it('should change vote and suspend article', async () => {
+    const response = await chai
+      .request(app)
+      .post(`${baseRoute}/articles/${articles[2].dataValues.id}/vote`)
+      .send({ voteType: 'downVote' })
+      .set('authorization', `Bearer ${token}`);
+
+    response.should.have.status(200);
+    response.body.message.should.eql('Article successfully downvoted');
+    response.body.data.upVote.should.eql(false);
+  });
+
+  it('should up vote article', async () => {
+    const response = await chai
+      .request(app)
+      .post(`${baseRoute}/articles/${articles[3].dataValues.id}/vote`)
+      .send({ voteType: 'upVote' })
+      .set('authorization', `Bearer ${token}`);
+
+    response.should.have.status(201);
+    response.body.status.should.eql('success');
+    response.body.message.should.eql('Article successfully upvoted');
+    response.body.data.upVote.should.eql(true);
+  });
+
+  it('should change vote and suspend article', async () => {
+    const response = await chai
+      .request(app)
+      .post(`${baseRoute}/articles/${articles[3].dataValues.id}/vote`)
+      .send({ voteType: 'nullVote' })
+      .set('authorization', `Bearer ${token}`);
+
+    response.should.have.status(200);
+    response.body.message.should.eql('Vote successfully removed');
   });
 });
