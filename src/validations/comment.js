@@ -12,5 +12,10 @@ export default {
     check('articleId')
       .matches(uuidRegularExpression)
       .withMessage('Article id not valid. should be of type uuid')
+  ],
+  getCommentSchema: [
+    check('articleId')
+      .matches(uuidRegularExpression)
+      .withMessage('Article id not valid. should be of type uuid')
   ]
 };

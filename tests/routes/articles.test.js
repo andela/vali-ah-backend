@@ -1,3 +1,4 @@
+import uuid from 'uuid';
 import chai, { should } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinonChai from 'sinon-chai';
@@ -15,6 +16,7 @@ import {
   category as bulkTag,
   articleCategories as bulkArticleCategories
 } from '../fixtures/articles';
+import { myArticles, myComments } from '../fixtures/comments';
 
 chai.use(chaiAsPromised);
 chai.use(sinonChai);
@@ -23,9 +25,8 @@ chai.use(chaiHttp);
 should();
 
 const {
-  Articles, Users, Categories, ArticleCategories, Votes
+  Articles, Users, Categories, ArticleCategories, Votes, Comments
 } = models;
-
 const baseRoute = '/api/v1';
 
 describe('Articles API', () => {
@@ -301,5 +302,57 @@ describe('POST /articles/:articleId/vote', () => {
 
     response.should.have.status(200);
     response.body.message.should.eql('Vote successfully removed');
+  });
+});
+
+describe('GET /articles/:articleId/comments', () => {
+  let theArticles;
+  before(async () => {
+    theArticles = await Articles.bulkCreate(myArticles, { returning: true });
+    await Comments.bulkCreate(myComments, { returning: true });
+  });
+
+  it('should return 200 when an article has no comment', async () => {
+    const response = await chai.request(app)
+      .get(`${baseRoute}/articles/${theArticles[0].id}/comments`)
+      .set('Authorization', `Bearer ${userToken}`);
+
+    response.status.should.eql(200);
+    response.body.data.should.be.an('array');
+    response.body.data.should.have.length(0);
+    response.body.message.should.eql('There is no comment for this article');
+  });
+
+  it('should return 200 when an article has only one comment', async () => {
+    const response = await chai.request(app)
+      .get(`${baseRoute}/articles/${theArticles[1].id}/comments`)
+      .set('Authorization', `Bearer ${userToken}`);
+
+    response.status.should.eql(200);
+    response.body.data.should.be.a('array');
+    response.body.data.should.have.length(1);
+    response.body.message.should.eql('Comment retrieved successfully');
+  });
+
+  it('should return 200 when an article has more than one comments', async () => {
+    const response = await chai.request(app)
+      .get(`${baseRoute}/articles/${theArticles[2].id}/comments`)
+      .set('Authorization', `Bearer ${userToken}`);
+
+    response.status.should.eql(200);
+    response.body.data.should.be.a('array');
+    response.body.data.should.have.length(2);
+    response.body.message.should.eql('Comments retrieved successfully');
+  });
+
+  it('should return 404 error if the articleId does not exist', async () => {
+    const nonexistingArticleId = uuid();
+    const response = await chai.request(app)
+      .get(`${baseRoute}/articles/${nonexistingArticleId}/comments`)
+      .set('Authorization', `Bearer ${userToken}`);
+
+    response.status.should.eql(404);
+    response.body.error.should.be.a('object');
+    response.body.error.message.should.eql('Non-existing articleId');
   });
 });

@@ -2,25 +2,24 @@ import Models from '../models';
 import paginator from '../helpers/paginator';
 import { ApplicationError, NotFoundError } from '../helpers/errors';
 import notification from '../services/notification';
-
 import * as helpers from '../helpers';
 
 const {
-  Articles, Bookmarks, ArticleCategories, Votes
+  Articles, Bookmarks, ArticleCategories, Votes, Comments
 } = Models;
 const { filter, extractArticles } = helpers;
 
 export default {
   /**
-   * controller for creating comments
-   *
-   * @function
-   *
-   * @param {Object} request - express request object
-   * @param {Object} response - express response object
-   *
-   * @return {Object} - callback that execute the controller
-   */
+    * controller for creating comments
+    *
+    * @function
+    *
+    * @param {Object} request - express request object
+    * @param {Object} response - express response object
+    *
+    * @return {Object} - the response from the server
+    */
   createComment: async (request, response) => {
     const { articleId } = request.params;
     const { id: userId } = request.user;
@@ -182,5 +181,32 @@ export default {
       status: 'success',
       ...responseData
     });
+  },
+
+  /**
+    * controller for getting comments
+    *
+    * @function
+    *
+    * @param {request} request - express request object
+    * @param {response} response - express response object
+    *
+    * @return {Object} - the response from the server
+    */
+  getComments: async (request, response) => {
+    const { articleId } = request.params;
+
+    const existingArticleId = await Articles.findByPk(articleId);
+
+    if (!existingArticleId) throw new ApplicationError(404, 'Non-existing articleId');
+
+    const comments = await Comments.findAll({
+      where: { articleId }
+    });
+
+    const message = comments.length ? `Comment${comments.length > 1 ? 's' : ''} retrieved successfully`
+      : 'There is no comment for this article';
+
+    return response.status(200).json({ status: 'success', data: comments, message });
   }
 };

@@ -22,7 +22,7 @@ export class ApplicationError extends Error {
 }
 
 /**
- * Class for not found error
+ * Class for notFoundError
  *
  * @class
  *
