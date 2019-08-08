@@ -2,7 +2,7 @@ import EventEmitter from 'events';
 
 import emailService from './email';
 import Models from '../models';
-import { QueryPagination, BatchQuery } from '../helpers/models';
+import { queryPagination, batchQuery } from '../helpers/models';
 
 const { Notifications, Users, Articles } = Models;
 
@@ -118,7 +118,7 @@ class Notification extends EventEmitter {
     const { sessionId } = session || {};
     const event = 'newPublication';
 
-    const followers = await QueryPagination(Users.getUserFollowers, { user: authorId });
+    const followers = await queryPagination(Users.getUserFollowers, { user: authorId });
 
     const schedule = (followersData) => {
       const notificationData = followersData.map(({ followers: { id: userId, email } }) => ({
@@ -133,7 +133,7 @@ class Notification extends EventEmitter {
       return this.scheduleNotification(event, notificationData);
     };
 
-    await BatchQuery(followers, schedule.bind(this));
+    await batchQuery(followers, schedule.bind(this));
 
     return true;
   }
@@ -248,7 +248,7 @@ class Notification extends EventEmitter {
    * @return {Object} - sequelize object for inserted data
    */
   async sendBatch() {
-    const notificationPagination = await QueryPagination(Notifications.getBatchedNotifications);
+    const notificationPagination = await queryPagination(Notifications.getBatchedNotifications);
 
     const batch = async (notificationsObject) => {
       const emailData = Notification.buildNotificationEmailData(notificationsObject);
@@ -258,7 +258,7 @@ class Notification extends EventEmitter {
       this.emit('notificationBatched', { type: 'event', payload: notificationsObject });
     };
 
-    BatchQuery(notificationPagination, batch.bind(this));
+    batchQuery(notificationPagination, batch.bind(this));
 
     return notificationPagination.data();
   }

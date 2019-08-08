@@ -28,7 +28,7 @@ export default async ({ type, payload, template }) => {
 
     template = template || templates[type];
 
-    if (!template) throw new Error('Email Template not available');
+    if (!template) throw new Error('Email template not available');
 
     if (!Array.isArray(payload)) throw new Error('Mail data should be an array');
 

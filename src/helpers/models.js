@@ -11,7 +11,7 @@ import async from 'async';
  *
  * @return {Object} - sequelize object for inserted data
  */
-export const QueryPagination = async (sourceFunction, dataToFunction = {}, size = 50) => {
+export const queryPagination = async (sourceFunction, dataToFunction = {}, size = 50) => {
   let currentPage = 0;
   let offset = currentPage;
   let limit = size;
@@ -46,7 +46,7 @@ export const QueryPagination = async (sourceFunction, dataToFunction = {}, size 
  *
  * @return {void}
  */
-export const BatchQuery = async (dataSource, handler) => {
+export const batchQuery = async (dataSource, handler) => {
   await async.whilst(cb => cb(null, dataSource.data().length),
     async () => {
       await handler(dataSource.data());
