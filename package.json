@@ -84,7 +84,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "npm run sync-env && npm run lint && npm run test && npm run test:coverage && npm run generate:doc"
+      "pre-commit": "npm run sync-env && npm run lint && npm run test:coverage && npm run generate:doc"
     }
   }
 }

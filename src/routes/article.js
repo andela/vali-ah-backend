@@ -18,6 +18,8 @@ const { createBookmarkSchema } = bookmarkSchema;
 
 const router = express.Router();
 
+router.get('/', validator(createPaginationSchema), asyncWrapper(searchArticles));
+
 router.use(asyncWrapper(verifyToken));
 
 /**
@@ -97,7 +99,5 @@ router.post('/:articleId/bookmarks/', validator(createBookmarkSchema), asyncWrap
  *         description: article removed from bookmark
  */
 router.delete('/:articleId/bookmarks/', validator(createBookmarkSchema), asyncWrapper(removeBookmark));
-
-router.get('', validator(createPaginationSchema), asyncWrapper(searchArticles));
 
 export default router;
