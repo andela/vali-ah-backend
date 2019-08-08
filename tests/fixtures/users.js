@@ -89,7 +89,7 @@ const invalidPassword = {
   password: 'passwordui'
 };
 
-const users = Array(2).fill(0).map(() => ({
+const users = Array(10).fill(0).map(() => ({
   id: uuid(),
   firstName: faker.name.firstName(),
   lastName: faker.name.lastName(),
@@ -99,6 +99,10 @@ const users = Array(2).fill(0).map(() => ({
 }));
 
 const userToken = generateAuthToken({ id: 'bd4c4dfa-b2dd-47f9-9599-1b588b35363e' });
+const usersWithFollowing = users.map(({ id }) => ({
+  followeeId: users[0].id,
+  followerId: id
+}));
 
 export {
   invalidFirstName,
@@ -113,5 +117,6 @@ export {
   user,
   anotherUser,
   users,
-  userToken
+  userToken,
+  usersWithFollowing
 };

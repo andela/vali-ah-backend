@@ -40,6 +40,10 @@ export default {
           type: Sequelize.STRING,
           unique: true
         },
+        notify: {
+          type: Sequelize.BOOLEAN,
+          defaultValue: true
+        },
         password: {
           allowNull: false,
           type: Sequelize.STRING

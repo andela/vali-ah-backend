@@ -1,4 +1,5 @@
 import express, { json, urlencoded } from 'express';
+import http from 'http';
 import { config } from 'dotenv';
 import cors from 'cors';
 import Debug from 'debug';
@@ -10,6 +11,8 @@ import session from 'express-session';
 import routes from './routes';
 import swaggerDoc from '../docs/swagger';
 import errorHandler from './middlewares/errorHandler';
+import socketIO from './socket';
+import './services/cron';
 
 config();
 
@@ -49,6 +52,10 @@ app.all('*', (request, response) => {
 
 app.use(errorHandler);
 
-app.listen(PORT, () => debug(`Server started on port ${PORT}`));
+const server = http.createServer(app);
 
-export default app;
+socketIO(server);
+
+server.listen(PORT, () => debug(`Server started on port ${PORT}`));
+
+export default server;

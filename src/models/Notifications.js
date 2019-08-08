@@ -17,6 +17,7 @@ export default class Notifications extends Model {
     },
     event: Sequelize.STRING,
     userId: Sequelize.UUID,
+    email: Sequelize.STRING,
     payload: Sequelize.JSON,
     notified: Sequelize.BOOLEAN
   }
@@ -35,6 +36,27 @@ export default class Notifications extends Model {
     const model = super.init(Notifications.modelFields, { sequelize });
 
     return model;
+  }
+
+  /**
+   * Get batched notification
+   *
+   * @static
+   * @memberof Notifications
+   *
+   * @param {Object} options - sequelize valid options
+   *
+   * @returns {Object} sequelize data object
+   */
+  static async getBatchedNotifications({ options = {} }) {
+    return Notifications
+      .findAll({
+        group: ['userId', 'event', 'Notifications.email', 'notified', 'Notifications.id', 'User.id'],
+        where: { notified: false },
+        attributes: ['userId', 'event', 'email', 'notified', 'id', [Sequelize.fn('array_agg', Sequelize.col('payload')), 'payload']],
+        include: [{ model: Notifications.models.Users, where: { notify: true }, attributes: ['notify'] }],
+        ...options
+      });
   }
 
   /**

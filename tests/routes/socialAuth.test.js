@@ -52,7 +52,7 @@ describe('Social Login Route', () => {
 
     response.should.have.status(500);
     response.body.status.should.eql('error');
-  });
+  }).timeout(20000);
 
   describe('Facebook Authentication method', () => {
     let facebook;

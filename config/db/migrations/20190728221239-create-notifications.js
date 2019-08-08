@@ -18,6 +18,11 @@ export default {
           type: Sequelize.UUID,
           onDelete: 'CASCADE'
         },
+        email: {
+          allowNull: false,
+          type: Sequelize.STRING,
+          unique: false
+        },
         event: {
           allowNull: false,
           type: Sequelize.STRING

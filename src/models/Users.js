@@ -1,5 +1,6 @@
 import { Sequelize, Model } from 'sequelize';
 import bcrypt from 'bcrypt';
+import { NotFoundError } from '../helpers/errors';
 
 const saltRounds = 10;
 
@@ -24,6 +25,7 @@ export default class Users extends Model {
     lastName: Sequelize.STRING,
     userName: Sequelize.STRING,
     email: Sequelize.STRING,
+    notify: Sequelize.BOOLEAN,
     password: Sequelize.STRING,
     avatarUrl: Sequelize.STRING
   }
@@ -112,5 +114,101 @@ export default class Users extends Model {
    */
   static comparePassword(password, hashedPassword) {
     return bcrypt.compare(password, hashedPassword);
+  }
+
+  /**
+   * Get User's Followers
+   *
+   * @static
+   * @memberof User
+   *
+   * @param {Object} query
+   * @param {Object} query.data - details to be used in the query
+   * @param {Object} query.options - extra options to pass to sequlize
+   *
+   * @returns {boolean} true or false
+   */
+  static async getUserFollowers({ data, options = {} }) {
+    const { user } = data;
+
+    const userObject = await Users.findByPk(user);
+
+    if (!userObject) throw new NotFoundError();
+
+    return userObject.getFollowers({
+      attributes: ['id'],
+      order: ['id'],
+      include: [
+        {
+          model: Users, as: 'followers', attributes: ['id', 'firstName', 'lastName', 'email']
+        }
+      ],
+      ...options
+    });
+  }
+
+  /**
+   * Get Users name
+   *
+   * @static
+   * @memberof User
+   *
+   * @param {string} user
+   *
+   * @returns {string} users name
+   */
+  static async getUserName(user) {
+    const { firstName, lastName } = await this.findByPk(user, { attributes: ['firstName', 'lastName'] });
+
+    return `${firstName} ${lastName}`;
+  }
+
+
+  /**
+   * Get single user
+   *
+   * @static
+   * @memberof User
+   *
+   * @param {string} user
+   *
+   * @returns {string} users name
+   */
+  static async getSingleUser(user) {
+    const userObject = await this.findByPk(user, { include: [{ model: this.models.Sessions, as: 'session' }] });
+
+    if (!userObject) throw new NotFoundError();
+
+    return userObject.toJSON();
+  }
+
+  /**
+   *  Model associations
+   *
+   * @static
+   * @memberof Users
+   *
+   * @param {any} models all models
+   *
+   * @returns {void} no return
+   */
+  static associate(models) {
+    this.hasMany(models.Followers, {
+      foreignKey: 'followeeId',
+      as: 'followers',
+      onDelete: 'CASCADE'
+    });
+
+    this.hasOne(models.Sessions, {
+      foreignKey: 'userId',
+      as: 'session',
+      onDelete: 'CASCADE'
+    });
+
+    this.hasMany(models.Followers, {
+      foreignKey: 'followerId',
+      as: 'following',
+      onDelete: 'CASCADE'
+    });
   }
 }
