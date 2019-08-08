@@ -6,13 +6,21 @@ import validator from '../middlewares/validator';
 import commentSchema from '../validations/comment';
 import paginationSchema from '../validations/pagination';
 import asyncWrapper from '../middlewares/asyncWrapper';
+import bookmarkSchema from '../validations/bookmark';
 
-const { createComment, searchArticles } = articleController;
+const {
+  createComment, createBookmark, removeBookmark, searchArticles
+} = articleController;
 const { createCommentSchema } = commentSchema;
 const { verifyToken } = authentication;
 const { createPaginationSchema } = paginationSchema;
+const { createBookmarkSchema } = bookmarkSchema;
 
 const router = express.Router();
+
+router.get('/', validator(createPaginationSchema), asyncWrapper(searchArticles));
+
+router.use(asyncWrapper(verifyToken));
 
 /**
  * @swagger
@@ -44,8 +52,52 @@ const router = express.Router();
  *       201:
  *         description: comment posted
  */
-router.post('/:articleId/comments', validator(createCommentSchema), asyncWrapper(verifyToken), asyncWrapper(createComment));
+router.post('/:articleId/comments', validator(createCommentSchema), asyncWrapper(createComment));
 
-router.get('', validator(createPaginationSchema), asyncWrapper(searchArticles));
+/**
+ * @swagger
+ *
+ * /bookmarks:
+ *   post:
+ *     description: Bookmark an article
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - in: path
+ *         name: articleId
+ *         required: true
+ *       - name: userId
+ *         description: The id of user posting the comment.
+ *         in: body
+ *         required: true
+ *         type: string
+ *     responses:
+ *       201:
+ *         description: article added to bookmark
+ */
+router.post('/:articleId/bookmarks/', validator(createBookmarkSchema), asyncWrapper(createBookmark));
+
+/**
+ * @swagger
+ *
+ * /bookmarks:
+ *   delete:
+ *     description: Remove an article from bookmark
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - in: path
+ *         name: articleId
+ *         required: true
+ *       - name: userId
+ *         description: The id of user posting the comment.
+ *         in: body
+ *         required: true
+ *         type: string
+ *     responses:
+ *       20:
+ *         description: article removed from bookmark
+ */
+router.delete('/:articleId/bookmarks/', validator(createBookmarkSchema), asyncWrapper(removeBookmark));
 
 export default router;

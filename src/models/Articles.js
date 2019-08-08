@@ -138,4 +138,22 @@ export default class Articles extends Model {
 
     return articleData.toJSON();
   }
+
+  /**
+   * Get existing article
+   *
+   * @static
+   * @memberof Articles
+   *
+   * @param {string} articleId
+   *
+   * @return {Object | void} - details of existing article
+   */
+  static async getExistingArticle(articleId) {
+    const article = await this.findByPk(articleId);
+
+    if (!article) throw new NotFoundError();
+
+    return article;
+  }
 }

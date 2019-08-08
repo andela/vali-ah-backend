@@ -13,7 +13,7 @@ export default {
         firstName: faker.name.firstName(),
         lastName: faker.name.lastName(),
         userName: faker.internet.userName(),
-        email: faker.internet.email(),
+        email: faker.internet.email().toLowerCase(),
         password: faker.internet.password()
       })), { returning: true });
 
