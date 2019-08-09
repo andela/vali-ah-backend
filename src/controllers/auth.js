@@ -32,13 +32,11 @@ export default {
 
     notification.emit('notification', {
       type: 'accountActivation',
-      payload: [
-        {
-          email,
-          firstName,
-          verificationLink: `https://${host}/profile`
-        }
-      ]
+      payload: [{
+        email,
+        firstName,
+        verificationLink: `https://${host}/profile`
+      }]
     });
 
     return response.status(201).json({ status: 'success', data: { user: newUser, token } });

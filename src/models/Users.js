@@ -31,6 +31,39 @@ export default class Users extends Model {
   }
 
   /**
+  *  Model associations
+  *
+  * @static
+  * @memberof Users
+  *
+  * @param {any} models all models
+  *
+  * @returns {void} no return
+  */
+  static associate(models) {
+    this.hasMany(models.Followers, {
+      foreignKey: 'followeeId',
+      as: 'followers',
+      onDelete: 'CASCADE'
+    });
+    this.hasMany(models.Followers, {
+      foreignKey: 'followerId',
+      as: 'following',
+      onDelete: 'CASCADE'
+    });
+    this.hasMany(models.Articles, {
+      foreignKey: 'authorId',
+      as: 'articles',
+      onDelete: 'CASCADE'
+    });
+    this.hasOne(models.Sessions, {
+      foreignKey: 'userId',
+      as: 'session',
+      onDelete: 'CASCADE'
+    });
+  }
+
+  /**
    * Initializes the Users model
    *
    * @static
@@ -180,35 +213,5 @@ export default class Users extends Model {
     if (!userObject) throw new NotFoundError();
 
     return userObject.toJSON();
-  }
-
-  /**
-   *  Model associations
-   *
-   * @static
-   * @memberof Users
-   *
-   * @param {any} models all models
-   *
-   * @returns {void} no return
-   */
-  static associate(models) {
-    this.hasMany(models.Followers, {
-      foreignKey: 'followeeId',
-      as: 'followers',
-      onDelete: 'CASCADE'
-    });
-
-    this.hasOne(models.Sessions, {
-      foreignKey: 'userId',
-      as: 'session',
-      onDelete: 'CASCADE'
-    });
-
-    this.hasMany(models.Followers, {
-      foreignKey: 'followerId',
-      as: 'following',
-      onDelete: 'CASCADE'
-    });
   }
 }

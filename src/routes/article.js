@@ -4,23 +4,19 @@ import articleController from '../controllers/article';
 import authentication from '../middlewares/authentication';
 import validator from '../middlewares/validator';
 import commentSchema from '../validations/comment';
-import paginationSchema from '../validations/pagination';
+import searchSchema from '../validations/auth';
 import asyncWrapper from '../middlewares/asyncWrapper';
 import bookmarkSchema from '../validations/bookmark';
 
 const {
-  createComment, createBookmark, removeBookmark, searchArticles
+  createComment, createBookmark, removeBookmark, searchArticle
 } = articleController;
 const { createCommentSchema } = commentSchema;
+const { createSearchSchema } = searchSchema;
 const { verifyToken } = authentication;
-const { createPaginationSchema } = paginationSchema;
 const { createBookmarkSchema } = bookmarkSchema;
 
 const router = express.Router();
-
-router.get('/', validator(createPaginationSchema), asyncWrapper(searchArticles));
-
-router.use(asyncWrapper(verifyToken));
 
 /**
  * @swagger
@@ -52,7 +48,7 @@ router.use(asyncWrapper(verifyToken));
  *       201:
  *         description: comment posted
  */
-router.post('/:articleId/comments', validator(createCommentSchema), asyncWrapper(createComment));
+router.post('/:articleId/comments', validator(createCommentSchema), asyncWrapper(verifyToken), asyncWrapper(createComment));
 
 /**
  * @swagger
@@ -75,7 +71,7 @@ router.post('/:articleId/comments', validator(createCommentSchema), asyncWrapper
  *       201:
  *         description: article added to bookmark
  */
-router.post('/:articleId/bookmarks/', validator(createBookmarkSchema), asyncWrapper(createBookmark));
+router.post('/:articleId/bookmarks/', validator(createBookmarkSchema), asyncWrapper(verifyToken), asyncWrapper(createBookmark));
 
 /**
  * @swagger
@@ -98,6 +94,44 @@ router.post('/:articleId/bookmarks/', validator(createBookmarkSchema), asyncWrap
  *       20:
  *         description: article removed from bookmark
  */
-router.delete('/:articleId/bookmarks/', validator(createBookmarkSchema), asyncWrapper(removeBookmark));
+router.delete('/:articleId/bookmarks/', validator(createBookmarkSchema), asyncWrapper(verifyToken), asyncWrapper(removeBookmark));
+
+/**
+ * @swagger
+ *
+ * /articles:
+ *   get:
+ *     description: Search for an article
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - in: path
+ *         name: SearchArticles
+ *         required: true
+ *       - name: tag
+ *         description: content of the articles.
+ *         in: body
+ *         required: true
+ *         type: string
+ *       - name: title
+ *         description: content of the articles.
+ *         in: body
+ *         required: true
+ *         type: string
+ *       - name: author
+ *         description: associate of the articles model.
+ *         in: body
+ *         type: string
+ *       - name: keyword
+ *         description: a search query for articles.
+ *         in: body
+ *         type: string
+ *     responses:
+ *       200:
+ *         description: request successful
+ *       400:
+ *         description: keyword cannot be used with title, author or tag
+ */
+router.get('', validator(createSearchSchema), asyncWrapper(searchArticle));
 
 export default router;

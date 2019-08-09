@@ -124,7 +124,7 @@ const usersignUpdetail = {
 const profiledataForLowerCase = {
   firstName: 'hearT',
   email: 'PETERchuKS@gmail.com',
-  userName: 'lovIngMe',
+  userName: 'lovIngYOU',
 };
 
 export {

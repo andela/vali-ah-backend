@@ -113,7 +113,7 @@ class Notification extends EventEmitter {
    * @return {Object} - sequelize object for inserted data
    */
   async newPublication({ authorId, articleId }) {
-    const { title, User: { firstName, session } } = await Articles.getSingleArticle(articleId);
+    const { title, authors: { firstName, session } } = await Articles.getSingleArticle(articleId);
 
     const { sessionId } = session || {};
     const event = 'newPublication';
@@ -152,7 +152,7 @@ class Notification extends EventEmitter {
   async articleCommentedOn({ articleId, userId }) {
     const userName = await Users.getUserName(userId);
     const {
-      title, authorId, User: { email, session }
+      title, authorId, authors: { email, session }
     } = await Articles.getSingleArticle(articleId);
 
     const { sessionId } = session || {};
@@ -180,7 +180,7 @@ class Notification extends EventEmitter {
    */
   async articleVoted({ articleId, userId, upVote }) {
     const userName = await Users.getUserName(userId);
-    const { title, authorId, User: { email, session } } = await Articles
+    const { title, authorId, authors: { email, session } } = await Articles
       .getSingleArticle(articleId);
 
     const { sessionId } = session || {};
@@ -206,7 +206,7 @@ class Notification extends EventEmitter {
    * @return {Object} - sequelize object for inserted data
    */
   async articleSuspended({ articleId }) {
-    const { title, authorId, User: { email, session } } = await Articles
+    const { title, authorId, authors: { email, session } } = await Articles
       .getSingleArticle(articleId);
 
     const { sessionId } = session || {};

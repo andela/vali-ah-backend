@@ -53,6 +53,53 @@
             "description": "comment posted"
           }
         }
+      },
+      "get": {
+        "description": "Search for an article",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "SearchArticles",
+            "required": true
+          },
+          {
+            "name": "tag",
+            "description": "content of the articles.",
+            "in": "body",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "title",
+            "description": "content of the articles.",
+            "in": "body",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "author",
+            "description": "associate of the articles model.",
+            "in": "body",
+            "type": "string"
+          },
+          {
+            "name": "keyword",
+            "description": "a search query for articles.",
+            "in": "body",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "request successful"
+          },
+          "400": {
+            "description": "keyword cannot be used with title, author or tag"
+          }
+        }
       }
     },
     "/bookmarks": {
