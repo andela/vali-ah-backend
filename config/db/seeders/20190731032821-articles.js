@@ -4,11 +4,12 @@ import uuid from 'uuid/v4';
 import Debug from 'debug';
 
 const debug = Debug('dev');
+const tags = ['motivation', 'health', 'emotion'];
 
 export default {
   up: async (queryInterface) => {
     try {
-      const users = await queryInterface.bulkInsert('Users', Array(5).fill(0).map(() => ({
+      const users = await queryInterface.bulkInsert('Users', Array(18).fill(0).map(() => ({
         id: uuid(),
         firstName: faker.name.firstName(),
         lastName: faker.name.lastName(),
@@ -25,8 +26,25 @@ export default {
         body: faker.lorem.text()
       })), { returning: true });
 
+      const category = await queryInterface.bulkInsert('Categories', tags.map(tag => ({
+        id: uuid(),
+        category: tag,
+        description: faker.lorem.sentences(),
+      })), { returning: true });
 
-      return Promise.resolve(articles);
+      const categoriesId = category.map(categoriesTab => categoriesTab.id);
+      const duplicatedCategoriesId = Array(6).fill(categoriesId).join().split(',');
+      const usersId = users.map(user => user.id);
+
+      const articleCategories = await queryInterface.bulkInsert('ArticleCategories', articles.map(({ id: articlesId }) => ({
+        id: uuid(),
+        authorId: faker.random.arrayElement(usersId),
+        articleId: articlesId,
+        categoryId: faker.random.arrayElement(duplicatedCategoriesId),
+
+      })), { returning: true });
+
+      return Promise.resolve(articleCategories);
     } catch (error) {
       debug(error);
     }

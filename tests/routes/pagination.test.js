@@ -4,7 +4,7 @@ import chaiHttp from 'chai-http';
 import app from '../../src/index';
 import Models from '../../src/models/index';
 
-const { Articles } = Models;
+const { Articles, ArticleCategories } = Models;
 
 chai.use(chaiHttp);
 should();
@@ -41,6 +41,8 @@ describe('Pagination support for articles', () => {
 
   it('should return no articles found', async () => {
     await Articles.destroy({ where: {} });
+    await ArticleCategories.destroy({ where: {} });
+
     const response = await chai.request(app).get('/api/v1/articles?page=1&limit=5');
 
     response.should.have.status(404);

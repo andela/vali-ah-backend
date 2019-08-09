@@ -24,7 +24,7 @@ const paginator = async (Source, options) => {
 
   const data = await Source.findAll({ ...otherOptions, limit, offset });
 
-  return { data, count };
+  return { data, count, currentCount: data.length };
 };
 
 export default paginator;

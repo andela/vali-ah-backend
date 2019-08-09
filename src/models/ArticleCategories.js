@@ -16,7 +16,9 @@ export default class ArticleCategories extends Model {
       defaultValue: Sequelize.UUIDV4
     },
     articleId: Sequelize.UUID,
-    categoryId: Sequelize.UUID
+    categoryId: Sequelize.UUID,
+    authorId: Sequelize.UUID
+
   }
 
   /**
@@ -47,11 +49,18 @@ export default class ArticleCategories extends Model {
    */
   static associate(models) {
     ArticleCategories.belongsTo(models.Articles, {
+      as: 'article',
       foreignKey: 'articleId',
       onDelete: 'CASCADE'
     });
     ArticleCategories.belongsTo(models.Categories, {
+      as: 'tag',
       foreignKey: 'categoryId',
+      onDelete: 'CASCADE'
+    });
+    ArticleCategories.belongsTo(models.Users, {
+      foreignKey: 'authorId',
+      as: 'author',
       onDelete: 'CASCADE'
     });
   }

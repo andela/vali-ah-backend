@@ -2,7 +2,10 @@ import Models from '../models';
 import paginator from '../helpers/paginator';
 import { NotFoundError, ApplicationError } from '../helpers/errors';
 
-const { Bookmarks, Articles, } = Models;
+import * as helpers from '../helpers';
+
+const { Articles, Bookmarks, ArticleCategories } = Models;
+const { filter, extractArticles } = helpers;
 
 export default {
   /**
@@ -24,29 +27,6 @@ export default {
     const articleData = await Articles.createComment({ articleId, comment });
 
     return response.status(201).json({ status: 'success', data: articleData, message: 'Comment added succesfully' });
-  },
-
-  /**
-   * controller for searching for articles
-   *
-   * @function
-   *
-   * @param {Object} request - express request object
-   * @param {Object} response - express response object
-   *
-   * @return {Object} - callback that execute the controller
-   */
-  searchArticles: async (request, response) => {
-    const { page = 1, limit = 10 } = request.query;
-    const { data: articles, count } = await paginator(Articles, { page, limit });
-
-    return response.status(200).json({
-      status: 'success',
-      data: {
-        count, page, current: +page, articles
-      },
-      message: 'Articles retrieved successfully'
-    });
   },
 
   /**
@@ -95,5 +75,42 @@ export default {
     await Bookmarks.destroy({ where: { articleId, userId } });
 
     return response.status(200).json({ status: 'success', message: 'Article removed from bookmark' });
+  },
+
+  /**
+ * controller for searching for articles
+ *
+ * @function
+ *
+ * @param {Object} request - express request object
+ * @param {Object} response - express response object
+ *
+ * @return {Object} - callback that execute the controller
+ */
+  searchArticle: async (request, response) => {
+    const {
+      author, title, tag, keyword, page = 1, limit = 10
+    } = request.query;
+
+    const queriesValues = (title || tag || author || keyword);
+    const standardQueries = (title || author || tag);
+    const queryFilter = filter(title, tag, author, keyword);
+
+    const { data: results, count, currentCount } = await paginator(ArticleCategories, {
+      ...queryFilter, raw: true, page, limit
+    });
+
+    if (keyword && standardQueries) return response.status(400).json({ status: 'error', message: 'Keyword cannot be used with title, author or tag' });
+    if (!currentCount) return response.status(404).json({ status: 'error', message: `${queriesValues} Not found` });
+
+    const result = extractArticles(results);
+
+    return response.status(200).json({
+      status: 'success',
+      data: {
+        count, page, current: +page, result
+      },
+      message: 'Articles retrieved successfully'
+    });
   }
 };

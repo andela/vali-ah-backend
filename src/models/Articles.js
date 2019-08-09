@@ -56,6 +56,7 @@ export default class Articles extends Model {
   static associate(models) {
     Articles.belongsTo(models.Users, {
       foreignKey: 'authorId',
+      as: 'authors',
       onDelete: 'CASCADE'
     });
 
@@ -80,6 +81,7 @@ export default class Articles extends Model {
     });
 
     Articles.hasMany(models.ArticleCategories, {
+      as: 'category',
       foreignKey: 'articleId',
       onDelete: 'CASCADE'
     });
@@ -91,6 +93,7 @@ export default class Articles extends Model {
 
     Articles.hasMany(models.Articles, {
       foreignKey: 'followUpId',
+      as: 'followUp',
       onDelete: 'CASCADE'
     });
   }
@@ -130,6 +133,7 @@ export default class Articles extends Model {
     const articleData = await this.findByPk(articleId, {
       include: [{
         model: this.models.Users,
+        as: 'authors',
         include: [{ model: this.models.Sessions, as: 'session' }]
       }]
     });

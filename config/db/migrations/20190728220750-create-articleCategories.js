@@ -18,6 +18,12 @@ export default {
           type: Sequelize.UUID,
           onDelete: 'CASCADE'
         },
+        authorId: {
+          allowNull: false,
+          foreignKey: true,
+          type: Sequelize.UUID,
+          onDelete: 'CASCADE'
+        },
         categoryId: {
           allowNull: false,
           foreignKey: true,
