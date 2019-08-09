@@ -265,6 +265,82 @@
           }
         }
       }
+    },
+    "/profile/:id": {
+      "patch": {
+        "description": "update user profile",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "userName",
+            "description": "Username to update.",
+            "in": "body",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "firstName",
+            "description": "first name to update.",
+            "in": "body",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "lastName",
+            "description": "last name to update.",
+            "in": "body",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "email",
+            "description": "email to update.",
+            "in": "body",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "avaterUrl",
+            "description": "image to update.",
+            "in": "body",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "updated successfully."
+          },
+          "400": {
+            "description": "not updated."
+          }
+        }
+      },
+      "get": {
+        "description": "get a user profile",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Username id.",
+            "in": "body",
+            "required": true,
+            "type": "UUID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "request was successful."
+          },
+          "404": {
+            "description": "user does not exist."
+          }
+        }
+      }
     }
   },
   "definitions": {},

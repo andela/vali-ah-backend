@@ -1,4 +1,5 @@
 import { check } from 'express-validator/check';
+import makeUpperCase from '../helpers/makeCapitalize';
 
 export default {
   signupSchema: [
@@ -10,7 +11,7 @@ export default {
       .withMessage('First name should be between 2 to 15 characters')
       .isAlpha()
       .withMessage('First name should only contain alphabets')
-      .customSanitizer(firstName => firstName.toLowerCase()),
+      .customSanitizer(value => makeUpperCase(value)),
     check('lastName')
       .trim()
       .exists()
@@ -19,20 +20,21 @@ export default {
       .withMessage('Last name should be between 2 to 15 characters')
       .isAlpha()
       .withMessage('Last name should only contain alphabets')
-      .customSanitizer(lastName => lastName.toLowerCase()),
+      .customSanitizer(value => makeUpperCase(value)),
     check('userName')
       .trim()
       .exists()
       .withMessage('Username is required')
       .isLength({ min: 2, max: 20 })
-      .withMessage('Username should be between 2 to 20 characters'),
+      .withMessage('Username should be between 2 to 20 characters')
+      .customSanitizer(value => makeUpperCase(value)),
     check('email')
       .trim()
       .exists()
       .withMessage('Email address is required')
       .isEmail()
       .withMessage('Enter a valid email address')
-      .customSanitizer(email => email.toLowerCase()),
+      .customSanitizer(value => makeUpperCase(value)),
     check('password')
       .trim()
       .exists()
@@ -47,7 +49,7 @@ export default {
       .withMessage('Email address is required')
       .isEmail()
       .withMessage('Enter a valid email address')
-      .customSanitizer(email => email.toLowerCase()),
+      .customSanitizer(value => makeUpperCase(value)),
     check('password')
       .trim()
       .exists()
