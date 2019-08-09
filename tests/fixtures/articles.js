@@ -16,4 +16,11 @@ const articles = users.map(({ id }) => ({
   body: faker.lorem.text()
 }));
 
-export { comment, articles };
+const profileData = {
+  firstName: faker.name.firstName(),
+  lastName: faker.name.lastName(),
+  userName: faker.internet.userName(),
+  email: faker.internet.email(),
+  password: faker.internet.password()
+};
+export { comment, articles, profileData };

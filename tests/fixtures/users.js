@@ -103,6 +103,29 @@ const usersWithFollowing = users.map(({ id }) => ({
   followeeId: users[0].id,
   followerId: id
 }));
+const profileId = '94189e3d-0379-4dd2-b03d-73fa8c14b3ab';
+
+const profileData = {
+  firstName: faker.name.firstName(),
+  lastName: faker.name.lastName(),
+  userName: faker.internet.userName(),
+  email: faker.internet.email(),
+  password: faker.internet.password()
+};
+
+const usersignUpdetail = {
+  firstName: faker.name.firstName(),
+  lastName: faker.name.lastName(),
+  userName: faker.internet.userName(),
+  email: faker.internet.email(),
+  password: faker.internet.password()
+};
+
+const profiledataForLowerCase = {
+  firstName: 'hearT',
+  email: 'PETERchuKS@gmail.com',
+  userName: 'lovIngMe',
+};
 
 export {
   invalidFirstName,
@@ -114,9 +137,13 @@ export {
   invalidEmail,
   shortPassword,
   invalidPassword,
+  profileData,
+  usersignUpdetail,
+  profileId,
   user,
   anotherUser,
   users,
   userToken,
-  usersWithFollowing
+  usersWithFollowing,
+  profiledataForLowerCase,
 };
