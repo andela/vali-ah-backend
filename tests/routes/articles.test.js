@@ -32,6 +32,12 @@ import {
   category as bulkTag,
   articleCategories as bulkArticleCategories
 } from '../fixtures/articles';
+import {
+  articles as subscriptionArticles,
+  user as subscriptionUser,
+  articleCategories as subscriptionCategories,
+  subscriptions
+} from '../fixtures/subscriptions';
 
 import { myArticles, myComments, inlineComments } from '../fixtures/comments';
 import Followers from '../../src/models/Followers';
@@ -43,8 +49,9 @@ chai.use(chaiHttp);
 should();
 
 const {
-  Articles, Users, Categories, ArticleCategories, Votes, Comments, InlineComments
+  Articles, Users, Categories, ArticleCategories, Votes, Comments, InlineComments, Subscriptions
 } = models;
+
 const baseRoute = '/api/v1';
 const { updateArticle, createArticle } = articleFunc;
 
@@ -96,6 +103,13 @@ describe('Articles API', () => {
     });
   });
 
+  after(async () => {
+    await Users.destroy({ where: {} });
+    await Articles.destroy({ where: {} });
+    await Categories.destroy({ where: {} });
+    await ArticleCategories.destroy({ where: {} });
+  });
+
   describe('POST /articles/:articleId/comment', () => {
     it('should return 201', async () => {
       const { status } = await chai
@@ -121,14 +135,12 @@ describe('Articles API', () => {
   describe('Search article', () => {
     it('should get all articles', async () => {
       const response = await chai.request(app).get(`${baseRoute}/articles`);
-
       response.should.have.status(200);
     });
 
 
     it('should get users search if tag strings are valid ', async () => {
       const response = await chai.request(app).get(`${baseRoute}/articles?tag=${tag[0].category}`);
-
       response.should.have.status(200);
     });
 
@@ -881,5 +893,50 @@ describe('GET /articles/articleId/inline_comments', () => {
       .set('Authorization', `Bearer ${userToken}`);
 
     status.should.eql(404);
+  });
+});
+
+describe.only('GET /articles/subscriptions', () => {
+  let userResponseObject;
+
+  before(async () => {
+    userResponseObject = await chai
+      .request(app)
+      .post('/api/v1/auth/signup')
+      .send(subscriptionUser);
+
+    userResponseObject = userResponseObject.body.data;
+
+    await Articles.bulkCreate(subscriptionArticles, { returning: true });
+    await ArticleCategories.bulkCreate(subscriptionCategories, { returning: true });
+    await Subscriptions.bulkCreate(subscriptions, { returning: true });
+  });
+
+  after(async () => {
+    await Users.destroy({ where: {} });
+    await Articles.destroy({ where: {} });
+    await ArticleCategories.destroy({ where: {} });
+    await Subscriptions.destroy({ where: {} });
+  });
+  it('should return 404 Resource not found', async () => {
+    const { status } = await chai
+      .request(app)
+      .get(`${baseRoute}/articles/subscriptions`)
+      .set('Authorization', `Bearer ${userToken}`);
+
+    status.should.eql(404);
+  });
+
+  it('should return 200', async () => {
+    const { token } = userResponseObject;
+
+    const { status, body: { data } } = await chai
+      .request(app)
+      .get(`${baseRoute}/articles/subscriptions`)
+      .set('Authorization', `Bearer ${token}`);
+
+    status.should.eql(200);
+    data.should.be.an('array');
+    data[0].should.have.property('title');
   });
 });

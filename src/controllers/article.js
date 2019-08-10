@@ -7,7 +7,6 @@ import notification from '../services/notification';
 import * as helpers from '../helpers';
 import { getTagName } from '../helpers/article';
 
-
 const { filter, extractArticles } = helpers;
 const {
   Articles,
@@ -63,9 +62,12 @@ export default {
 
     const articleObject = await Articles.getExistingArticle(articleId);
 
-    const existingBookmark = await Bookmarks.getExistingBookmark(articleId, userId);
+    const existingBookmark = await Bookmarks.getExistingBookmark(
+      articleId,
+      userId
+    );
 
-    if (existingBookmark) throw new ApplicationError(409, 'Bookmark already added');
+    if (existingBookmark) { throw new ApplicationError(409, 'Bookmark already added'); }
 
     const newBookmark = await articleObject.createBookmark({ userId });
 
@@ -88,7 +90,10 @@ export default {
     const { articleId } = request.params;
     const { id: userId } = request.user;
 
-    const existingBookmark = await Bookmarks.getExistingBookmark(articleId, userId);
+    const existingBookmark = await Bookmarks.getExistingBookmark(
+      articleId,
+      userId
+    );
 
     if (!existingBookmark) throw new NotFoundError();
 
@@ -515,6 +520,63 @@ export default {
 
     return response.status(200).json({
       status: 'success', data: articles, message: 'Articles fetch was succesfully'
+    });
+  },
+
+  /** controller for getting articles subscribed for.
+   *
+   * @function
+   *
+   * @param {Object} request - express request object
+   * @param {Object} response - express response object
+   *
+   * @return {Object} - callback that execute the controller
+   */
+  getArticlesSubscribed: async (request, response) => {
+    const { id: userId } = request.user;
+    const { page = 1, limit = 10 } = request.query;
+
+    const user = await Users.findByPk(userId);
+
+    if (!user) throw new NotFoundError();
+
+    const categories = (await user.getSubscriptions({ attributes: ['categoryId'] })).map(sub => sub.categoryId);
+
+    const query = {
+      limit,
+      page,
+      include: [{
+        model: Users,
+        as: 'authors'
+      }, {
+        model: ArticleCategories,
+        as: 'category',
+        where: { categoryId: categories },
+        attributes: [['categoryId', 'id']],
+        include: [{
+          model: Categories,
+          as: 'tag',
+          attributes: ['category']
+        }]
+      }]
+    };
+
+    const { data, ...otherDatas } = await paginator(Articles, query);
+
+    const articles = data.map((article) => {
+      const { category, ...articleData } = article.toJSON();
+
+      return {
+        ...articleData,
+        category: category.map(({ id, tag }) => ({ id, category: tag && tag.category }))
+      };
+    });
+
+    return response.status(200).json({
+      status: 'success',
+      data: articles,
+      ...otherDatas,
+      message: 'Article category subscribed for retrieved successfully'
     });
   }
 };

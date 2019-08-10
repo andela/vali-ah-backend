@@ -25,7 +25,8 @@ const {
   deleteArticle,
   createInlineComment,
   updateInlineComment, deleteInlineComment, getInlineComment, getArticleInlineComment,
-  getUserFeed
+  getUserFeed,
+  vote, getArticlesSubscribed
 } = articleController;
 const {
   createCommentSchema, getCommentSchema, createInlineCommentSchema, updateInlineCommentSchema,
@@ -546,5 +547,46 @@ router.get(
   asyncWrapper(getInlineComment)
 );
 
+
+/**
+ * @swagger
+ *
+ * /articles/{articleId}/vote:
+ *   post:
+ *     description: up vote or down vote an article
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: Authorization
+ *         in: header
+ *         required: true
+ *         type: string
+ *         default: Bearer {token}
+ *       - name: Content-Type
+ *         in: header
+ *         required: true
+ *         type: string
+ *         default: application/json
+ *       - name: articleId
+ *         in: path
+ *         required: true
+ *         type: string
+ *       - name: voteType
+ *         description: Vote type. i.e upVote, downVote or nullVote
+ *         in: formData
+ *         required: true
+ *         type: string
+ *     responses:
+ *       200:
+ *         description: Success
+ */
+router.post(
+  '/:articleId/vote',
+  asyncWrapper(verifyToken),
+  validator(voteSchema),
+  asyncWrapper(vote)
+);
+
+router.get('/subscriptions', asyncWrapper(verifyToken), asyncWrapper(getArticlesSubscribed));
 
 export default router;

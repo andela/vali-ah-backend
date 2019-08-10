@@ -30,7 +30,7 @@ let currentUserId;
 
 describe('Profile', () => {
   before(async () => {
-    await Users.destroy({ cascade: true, truncate: true });
+    await Users.destroy({ cascade: true, where: {} });
     responseToken = await chai.request(app)
       .post(signUrl)
       .send(usersignUpdetail);
