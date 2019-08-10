@@ -148,8 +148,50 @@
           }
         ],
         "responses": {
-          "20": {
+          "200": {
             "description": "article removed from bookmark"
+          }
+        }
+      }
+    },
+    "/articles/{articleId}/vote": {
+      "post": {
+        "description": "up vote or down vote an article",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "default": "Bearer {token}"
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "default": "application/json"
+          },
+          {
+            "name": "articleId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "voteType",
+            "description": "Vote type. i.e upVote, downVote or nullVote",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
           }
         }
       }

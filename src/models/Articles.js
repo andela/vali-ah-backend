@@ -25,7 +25,7 @@ export default class Articles extends Model {
     coverImageUrl: Sequelize.STRING,
     followUpId: Sequelize.UUID,
     authorId: Sequelize.UUID
-  }
+  };
 
   /**
    * Initializes the Articles model
@@ -118,7 +118,6 @@ export default class Articles extends Model {
     return articleObject.createComment(comment);
   }
 
-
   /**
    * Get details for a single article
    *
@@ -131,11 +130,13 @@ export default class Articles extends Model {
    */
   static async getSingleArticle(articleId) {
     const articleData = await this.findByPk(articleId, {
-      include: [{
-        model: this.models.Users,
-        as: 'authors',
-        include: [{ model: this.models.Sessions, as: 'session' }]
-      }]
+      include: [
+        {
+          model: this.models.Users,
+          as: 'authors',
+          include: [{ model: this.models.Sessions, as: 'session' }]
+        }
+      ]
     });
 
     if (!articleData) throw new NotFoundError();
@@ -159,5 +160,24 @@ export default class Articles extends Model {
     if (!article) throw new NotFoundError();
 
     return article;
+  }
+
+  /**
+   * function to check if an article has been suspended
+   *
+   * @method
+   * @memberof Articles
+   *
+   * @return {false | Object} return false or returned object
+   */
+  async suspendArticle() {
+    const upVotes = await this.countVotes({ where: { upVote: true } });
+    const downVotes = await this.countVotes({ where: { upVote: false } });
+
+    if (downVotes - upVotes >= 5) {
+      await this.update({ suspended: true }, { returning: true });
+      return true;
+    }
+    return false;
   }
 }
