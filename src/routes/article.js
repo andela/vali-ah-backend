@@ -10,9 +10,9 @@ import bookmarkSchema from '../validations/bookmark';
 import articleSchema from '../validations/articles';
 
 const {
-  createComment, createBookmark, removeBookmark, searchArticle, vote
+  createComment, createBookmark, removeBookmark, searchArticle, vote, getComments
 } = articleController;
-const { createCommentSchema } = commentSchema;
+const { createCommentSchema, getCommentSchema } = commentSchema;
 const { createSearchSchema } = searchSchema;
 const { verifyToken } = authentication;
 const { createBookmarkSchema } = bookmarkSchema;
@@ -23,14 +23,14 @@ const router = express.Router();
 /**
  * @swagger
  *
- * /articles:
+ * /articles/:articleId/comments:
  *   post:
  *     description: Create comment for an article
  *     produces:
  *       - application/json
  *     parameters:
  *       - in: path
- *         name: article
+ *         name: articleId
  *         required: true
  *       - name: content
  *         description: content of the comment.
@@ -149,7 +149,7 @@ router.delete(
  *       400:
  *         description: keyword cannot be used with title, author or tag
  */
-router.get('', validator(createSearchSchema), asyncWrapper(searchArticle));
+router.get('/', validator(createSearchSchema), asyncWrapper(searchArticle));
 
 /**
  * @swagger
@@ -189,5 +189,25 @@ router.post(
   validator(voteSchema),
   asyncWrapper(vote)
 );
+
+/**
+ * @swagger
+ *
+ * /articles/:articleId/comments:
+ *   get:
+ *     description: Get comments for an article
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - in: path
+ *         name: articleId
+ *         description: articleId is the unique identifier for the article to get the comments
+ *         required: true
+ *         type: string
+ *     responses:
+ *       200:
+ *         description: Comments retrieved successfully
+ */
+router.get('/:articleId/comments', validator(getCommentSchema), asyncWrapper(getComments));
 
 export default router;

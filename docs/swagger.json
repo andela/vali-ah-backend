@@ -15,7 +15,7 @@
   "basePath": "/api/v1",
   "swagger": "2.0",
   "paths": {
-    "/articles": {
+    "/articles/:articleId/comments": {
       "post": {
         "description": "Create comment for an article",
         "produces": [
@@ -24,7 +24,7 @@
         "parameters": [
           {
             "in": "path",
-            "name": "article",
+            "name": "articleId",
             "required": true
           },
           {
@@ -55,49 +55,22 @@
         }
       },
       "get": {
-        "description": "Search for an article",
+        "description": "Get comments for an article",
         "produces": [
           "application/json"
         ],
         "parameters": [
           {
             "in": "path",
-            "name": "SearchArticles",
-            "required": true
-          },
-          {
-            "name": "tag",
-            "description": "content of the articles.",
-            "in": "body",
+            "name": "articleId",
+            "description": "articleId is the unique identifier for the article to get the comments",
             "required": true,
-            "type": "string"
-          },
-          {
-            "name": "title",
-            "description": "content of the articles.",
-            "in": "body",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "author",
-            "description": "associate of the articles model.",
-            "in": "body",
-            "type": "string"
-          },
-          {
-            "name": "keyword",
-            "description": "a search query for articles.",
-            "in": "body",
             "type": "string"
           }
         ],
         "responses": {
           "200": {
-            "description": "request successful"
-          },
-          "400": {
-            "description": "keyword cannot be used with title, author or tag"
+            "description": "Comments retrieved successfully"
           }
         }
       }
@@ -150,6 +123,55 @@
         "responses": {
           "200": {
             "description": "article removed from bookmark"
+          }
+        }
+      }
+    },
+    "/articles": {
+      "get": {
+        "description": "Search for an article",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "SearchArticles",
+            "required": true
+          },
+          {
+            "name": "tag",
+            "description": "content of the articles.",
+            "in": "body",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "title",
+            "description": "content of the articles.",
+            "in": "body",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "author",
+            "description": "associate of the articles model.",
+            "in": "body",
+            "type": "string"
+          },
+          {
+            "name": "keyword",
+            "description": "a search query for articles.",
+            "in": "body",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "request successful"
+          },
+          "400": {
+            "description": "keyword cannot be used with title, author or tag"
           }
         }
       }
