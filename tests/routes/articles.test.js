@@ -159,6 +159,7 @@ describe('Articles API', () => {
         .post(`${baseRoute}/articles`)
         .set('Authorization', `Bearer ${userAuth1}`)
         .send(article1);
+
       slug1 = response.body.data.slug;
 
       response.body.status.should.eql('success');
@@ -373,7 +374,6 @@ describe('POST /articles/:articleId/vote', () => {
     await Users.destroy({ where: {}, });
     await Articles.destroy({ where: {}, });
     await Votes.destroy({ where: {}, });
-
     await Users.bulkCreate(bulkUsers, { returning: true });
 
     userResponseObject = await chai
