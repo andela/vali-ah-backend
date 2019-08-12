@@ -51,4 +51,20 @@ export default class Categories extends Model {
       onDelete: 'CASCADE'
     });
   }
+
+  /**
+ * checks tags and returns those in database
+ *
+ * @function
+ *
+ * @param {Array} tag - tag to validate
+ *
+ * @returns {Array} - returns array of tags present in database
+ */
+  static async checkTagsExistence(tag) {
+    const availableCategory = await Categories.findAll({
+      where: { id: tag }
+    });
+    return availableCategory;
+  }
 }

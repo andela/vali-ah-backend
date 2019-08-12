@@ -48,6 +48,9 @@ export default {
         coverImageUrl: {
           type: Sequelize.STRING
         },
+        slug: {
+          type: Sequelize.STRING
+        },
         createdAt: {
           allowNull: false,
           type: Sequelize.DATE,

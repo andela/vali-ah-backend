@@ -1,13 +1,23 @@
+import slugify from 'slugify';
+
 import Models from '../models';
 import paginator from '../helpers/paginator';
 import { ApplicationError, NotFoundError } from '../helpers/errors';
 import notification from '../services/notification';
 import * as helpers from '../helpers';
+import { getTagName } from '../helpers/article';
 
-const {
-  Articles, Bookmarks, ArticleCategories, Votes, Comments
-} = Models;
 const { filter, extractArticles } = helpers;
+const {
+  Articles,
+  Users,
+  ArticleCategories,
+  ReadStats,
+  Votes,
+  Reports,
+  Comments,
+  Bookmarks,
+} = Models;
 
 export default {
   /**
@@ -208,5 +218,154 @@ export default {
       : 'There is no comment for this article';
 
     return response.status(200).json({ status: 'success', data: comments, message });
+  },
+
+  /** controller for creating articles
+    *
+    * @function
+    *
+    * @param {Object} request - express request object
+    * @param {Object} response - express response object
+    *
+    * @return {Object} - callback that execute the controller
+    */
+  createArticle: async (request, response) => {
+    const { tag } = request.body;
+
+    const article = {
+      ...request.body,
+      authorId: request.user.id,
+      coverImageUrl: (request.file) ? request.file.secure_url : null,
+      slug: slugify(request.body.title)
+    };
+
+    const titlePresent = await Articles.getArticles(request.body.title);
+
+    if (titlePresent.length) article.slug = slugify(`${request.body.title} ${titlePresent.length}`);
+
+    const articleResponse = await Articles.create(article);
+    const tagResponse = (tag) ? await ArticleCategories.createTags(
+      tag, articleResponse.id, request.user.id
+    ) : [];
+    const tagName = await getTagName(tagResponse);
+
+    return response.status(201).json({ status: 'success', data: { ...articleResponse.dataValues, Tags: tagName }, message: 'Article successfully created' });
+  },
+
+  /**
+    * controller for getting articles by slug
+    *
+    * @function
+    *
+    * @param {Object} request - express request object
+    * @param {Object} response - express response object
+    *
+    * @return {Object} - callback that execute the controller
+    */
+  getBySlug: async (request, response) => {
+    const { slug } = request.params;
+
+    let articleResponse = await Articles.findOne({
+      where: {
+        slug
+      },
+      include: [{
+        model: ArticleCategories,
+        as: 'category'
+      },
+      {
+        model: Users,
+        as: 'authors'
+      },
+      {
+        model: ReadStats
+      },
+      {
+        model: Votes
+      }, {
+        model: Reports
+      },
+      {
+        model: Comments
+      }],
+    });
+
+    if (!articleResponse) throw new ApplicationError(404, 'Article not found');
+    const { dataValues } = articleResponse;
+    const tags = dataValues.category.map(eachTag => eachTag.categoryId);
+
+    let voteCount = 0;
+    articleResponse.dataValues.Votes.forEach((vote) => {
+      voteCount = (vote.upVote) ? voteCount += 1 : voteCount -= 1;
+    });
+
+    const tagName = await getTagName(tags);
+    const { password, ...author } = articleResponse.dataValues.authors.dataValues;
+    const { category, authors, ...newArticleResponse } = articleResponse.dataValues;
+
+    articleResponse = {
+      ...newArticleResponse,
+      Tags: tagName,
+      Votes: voteCount,
+      Author: author
+    };
+
+    return response.status(200).json({ status: 'success', data: articleResponse, message: 'Article successfully returned' });
+  },
+
+  /**
+    * controller to update article by slug
+    *
+    * @function
+    *
+    * @param {Object} request - express request object
+    * @param {Object} response - express response object
+    *
+    * @return {Object} - callback that execute the controller
+    */
+  updateArticle: async (request, response) => {
+    const { slug } = request.params;
+    const { tag } = request.body;
+    const {
+      articleId,
+      authorId,
+      slug: invalidSlug,
+      ...article
+    } = request.body;
+
+    if (request.file) article.coverImageUrl = request.file.secure_url;
+
+    const articleResponse = await Articles.update(article,
+      {
+        returning: true,
+        where: { slug }
+      });
+
+    let tagName = [];
+    if (tag) {
+      await ArticleCategories.deleteTags(articleResponse[1][0].id);
+      const tagResponse = await ArticleCategories.createTags(
+        tag, articleResponse[1][0].id, request.user.id
+      );
+      tagName = await getTagName(tagResponse);
+    }
+
+    return response.status(200).json({ status: 'success', data: { ...articleResponse[1][0].dataValues, Tags: tagName }, message: 'Article succesfully updated' });
+  },
+
+  /**
+    * controller for deleting articles by slug
+    *
+    * @function
+    *
+    * @param {Object} request - express request object
+    * @param {Object} response - express response object
+    *
+    * @return {Object} - callback that execute the controller
+    */
+  deleteArticle: async (request, response) => {
+    const { slug } = request.params;
+    await Articles.deleteArticle(slug);
+    return response.status(200).json({ status: 'success', data: {}, message: 'Article deleted succesfully' });
   }
 };

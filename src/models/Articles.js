@@ -24,8 +24,9 @@ export default class Articles extends Model {
     status: Sequelize.STRING,
     coverImageUrl: Sequelize.STRING,
     followUpId: Sequelize.UUID,
-    authorId: Sequelize.UUID
-  };
+    authorId: Sequelize.UUID,
+    slug: Sequelize.STRING
+  }
 
   /**
    * Initializes the Articles model
@@ -179,5 +180,40 @@ export default class Articles extends Model {
       return true;
     }
     return false;
+  }
+
+  /** Returns article array or undefined
+ *
+ * @function
+ *
+ * @param {string} title - title of the article to be sort
+ *
+ * @returns {Array} - array or undefined
+ */
+  static async getArticles(title) {
+    const article = await Articles.findAll({
+      where: {
+        title
+      }
+    });
+    return article;
+  }
+
+  /**
+ * Returns article array or undefined
+ *
+ * @function
+ *
+ * @param {string} slug - title of the article to be sort
+ *
+ * @returns {void} - return nothing
+ */
+  static async deleteArticle(slug) {
+    await Articles.destroy({
+      returning: true,
+      where: {
+        slug
+      }
+    });
   }
 }

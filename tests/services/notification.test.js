@@ -17,7 +17,7 @@ describe('Notification System', () => {
   before(async () => {
     sinon.stub(sendgrid, 'send').resolves();
 
-    await Articles.destroy({ where: {}, truncate: true });
+    await Articles.destroy({ where: {} });
     await Users.bulkCreate(users);
     await Followers.bulkCreate(usersWithFollowing);
     await Articles.bulkCreate(articles);
@@ -25,7 +25,7 @@ describe('Notification System', () => {
 
   after(async () => {
     if (sendgrid.send.restore) sendgrid.send.restore();
-    await Articles.destroy({ where: {}, truncate: true });
+    await Articles.destroy({ where: {} });
   });
 
   describe('Notifications', () => {

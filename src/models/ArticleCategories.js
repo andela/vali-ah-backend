@@ -64,4 +64,44 @@ export default class ArticleCategories extends Model {
       onDelete: 'CASCADE'
     });
   }
+
+  /**
+ * destroys all tags for given article
+ *
+ * @function
+ *
+ * @param {uuid} id - id of the article to which tags belong
+ *
+ * @returns {void} - returns nothing
+ */
+  static async deleteTags(id) {
+    await ArticleCategories.destroy({
+      returning: true,
+      where: {
+        articleId: id
+      }
+    });
+  }
+
+  /**
+ * creates tags for given article
+ *
+ * @function
+ *
+ * @param {Object} tag - tags to be created
+ * @param {uuid} id - id of the article to which tags belong
+ *@param {uuid} authorId - id of the author
+ *
+ * @returns {Array} - array
+ */
+  static async createTags(tag, id, authorId) {
+    const tags = tag.map(eachTag => ({
+      articleId: id,
+      categoryId: eachTag,
+      authorId
+    }));
+    const response = await ArticleCategories.bulkCreate(tags);
+    const createdTags = response.map(eachTag => eachTag.dataValues.categoryId);
+    return createdTags;
+  }
 }

@@ -22,9 +22,9 @@ describe('Pagination support for articles', () => {
   });
 
   after(async () => {
-    await Users.destroy({ where: {}, truncate: true });
-    await Articles.destroy({ where: {}, truncate: true });
-    await ArticleCategories.destroy({ where: {}, truncate: true });
+    await Users.destroy({ where: {}, });
+    await Articles.destroy({ where: {}, });
+    await ArticleCategories.destroy({ where: {}, });
   });
 
   it('should return page must be a number', async () => {

@@ -14,12 +14,12 @@ should();
 
 describe('Users Model', () => {
   before(async () => {
-    await Users.destroy({ where: {}, truncate: true });
+    await Users.destroy({ where: {} });
     await Users.bulkCreate(users);
   });
 
   afterEach(async () => {
-    await Users.destroy({ where: {}, truncate: true });
+    await Users.destroy({ where: {} });
   });
 
   it('should save session', async () => {

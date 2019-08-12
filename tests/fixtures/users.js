@@ -10,6 +10,14 @@ const user = {
   password: 'gillberto5'
 };
 
+const user2 = {
+  firstName: 'gilbert',
+  lastName: 'erick',
+  userName: 'erickBlazee',
+  email: 'gillberto55@gmail.com',
+  password: 'gillberto5'
+};
+
 const anotherUser = {
   firstName: 'Foo',
   lastName: 'Baz',
@@ -143,6 +151,7 @@ export {
   usersignUpdetail,
   profileId,
   user,
+  user2,
   anotherUser,
   users,
   userToken,

@@ -23,12 +23,12 @@ describe('Articles model', () => {
   };
 
   before(async () => {
-    await Articles.destroy({ where: {}, truncate: true });
+    await Articles.destroy({ where: {} });
     await Articles.bulkCreate(articles);
   });
 
   after(async () => {
-    await Articles.destroy({ where: {}, truncate: true });
+    await Articles.destroy({ where: {} });
   });
   afterEach(() => {
     if (Articles.findByPk.restore) Articles.findByPk.restore();

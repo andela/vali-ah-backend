@@ -16,7 +16,12 @@ export default {
           allowNull: false,
           foreignKey: true,
           type: Sequelize.UUID,
-          onDelete: 'CASCADE'
+          onDelete: 'CASCADE',
+          references: {
+            model: 'Articles',
+            key: 'id',
+            as: 'articleId'
+          }
         },
         authorId: {
           allowNull: false,
