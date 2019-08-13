@@ -2,10 +2,10 @@ import { config } from 'dotenv';
 import jwt from 'jsonwebtoken';
 
 import database from '../models';
-import { ApplicationError } from '../helpers/errors';
+import { ApplicationError, NotFoundError } from '../helpers/errors';
 
 const { SECRET_KEY } = process.env;
-const { BlacklistedTokens, Articles } = database;
+const { BlacklistedTokens, Articles, InlineComments } = database;
 
 config();
 
@@ -81,5 +81,20 @@ export default {
 
     if (!article) throw new ApplicationError(403, 'Unauthorized Access. For author only');
     next();
+  },
+
+  ownComment: async (request, response, next) => {
+    const { commentId } = request.params;
+    const { id: userId } = request.user;
+
+    const comment = await InlineComments.findByPk(commentId);
+
+    if (!comment) throw new NotFoundError('Comment does not exist');
+
+    if (comment.userId !== userId) next(new ApplicationError(403, 'You are not authorized'));
+
+    request.comment = comment;
+
+    return next();
   }
 };

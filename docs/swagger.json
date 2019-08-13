@@ -373,6 +373,147 @@
         }
       }
     },
+    "/articles/:articleId/inline_comments": {
+      "post": {
+        "description": "Create an inline comment for an article",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "articleId",
+            "required": true
+          },
+          {
+            "name": "content",
+            "description": "content of the comment.",
+            "in": "body",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "startIndex",
+            "description": "start index of highlight.",
+            "in": "body",
+            "type": "number",
+            "required": true
+          },
+          {
+            "name": "endIndex",
+            "description": "end index of highlight",
+            "in": "body",
+            "type": "number",
+            "required": true
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "comment successfully created"
+          }
+        }
+      },
+      "get": {
+        "description": "Queries inline comments for an article",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "articleId",
+            "required": true
+          },
+          {
+            "name": "content",
+            "description": "content of the comment.",
+            "in": "body",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "comments successfully retrieved"
+          }
+        }
+      }
+    },
+    "/articles/inline_comments/commentId": {
+      "put": {
+        "description": "Edit an articles inline comment",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "commentId",
+            "required": true
+          },
+          {
+            "name": "content",
+            "description": "content of the comment.",
+            "in": "body",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "startIndex",
+            "description": "start index of highlight.",
+            "in": "body",
+            "type": "number"
+          },
+          {
+            "name": "endIndex",
+            "description": "end index of highlight",
+            "in": "body",
+            "type": "number"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "comment updated"
+          }
+        }
+      },
+      "delete": {
+        "description": "Create comment for an article",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "commentId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "comment posted"
+          }
+        }
+      },
+      "get": {
+        "description": "Queries a single inline comment",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "commentId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Query successfull"
+          }
+        }
+      }
+    },
     "/auth/signup": {
       "post": {
         "description": "Signup to the application",

@@ -17,6 +17,7 @@ const {
   Reports,
   Comments,
   Bookmarks,
+  InlineComments
 } = Models;
 
 export default {
@@ -162,7 +163,7 @@ export default {
 
     const article = await Articles.findOne({ where: { id: articleId, suspended: false } });
 
-    if (!article) throw new ApplicationError(400, 'This article does not exist or has been suspended');
+    if (!article) throw new ApplicationError(404, 'This article does not exist or has been suspended');
 
     if (voteType === 'nullVote') {
       await Votes.destroy({ where: { userId, articleId } });
@@ -244,6 +245,7 @@ export default {
     if (titlePresent.length) article.slug = slugify(`${request.body.title} ${titlePresent.length}`);
 
     const articleResponse = await Articles.create(article);
+
     const tagResponse = (tag) ? await ArticleCategories.createTags(
       tag, articleResponse.id, request.user.id
     ) : [];
@@ -367,5 +369,101 @@ export default {
     const { slug } = request.params;
     await Articles.deleteArticle(slug);
     return response.status(200).json({ status: 'success', data: {}, message: 'Article deleted succesfully' });
+  },
+
+  /**
+  * controller for creating inline comments for an article
+  *
+  * @function
+  *
+  * @param {Object} request - express request object
+  * @param {Object} response - express response object
+  *
+  * @return {Object} - callback that execute the controller
+  */
+  createInlineComment: async (request, response) => {
+    const { articleId } = request.params;
+    const commentData = { ...request.body, userId: request.user.id };
+
+    const comment = (await Articles.createInlineComment(articleId, commentData)).toJSON();
+
+    return response.status(201).json({ status: 'success', data: comment, message: 'Inline comment added succesfully' });
+  },
+
+  /**
+  * controller for updating inline comments for an article
+  *
+  * @function
+  *
+  * @param {Object} request - express request object
+  * @param {Object} response - express response object
+  *
+  * @return {Object} - callback that execute the controller
+  */
+  updateInlineComment: async (request, response) => {
+    const { articleId, userId: userIdInBody, ...commentData } = request.body;
+    const { comment } = request;
+
+    const updatedComment = (await Articles.updateInlineComment(comment, commentData)).toJSON();
+
+    return response.status(200).json({ status: 'success', data: updatedComment, message: 'Inline comment updated succesfully' });
+  },
+
+  /**
+    * controller for deleting inline comments for an article
+    *
+    * @function
+    *
+    * @param {Object} request - express request object
+    * @param {Object} response - express response object
+    *
+    * @return {Object} - callback that execute the controller
+    */
+  deleteInlineComment: async (request, response) => {
+    const { comment } = request;
+
+    await comment.destroy();
+
+    return response.status(200).json({ status: 'success', data: { }, message: 'Inline comment deleted succesfully' });
+  },
+
+  /**
+    * controller for getting an inline comment
+    *
+    * @function
+    *
+    * @param {Object} request - express request object
+    * @param {Object} response - express response object
+    *
+    * @return {Object} - callback that execute the controller
+    */
+  getInlineComment: async (request, response) => {
+    const { commentId } = request.params;
+
+    const comment = await InlineComments.findByPk(commentId, { include: [{ model: Users, attributes: ['id', 'firstName', 'lastName', 'userName', 'avatarUrl'] }] });
+
+    if (!comment) throw new NotFoundError('Comment does not exist');
+
+    const commentData = comment.toJSON();
+
+    return response.status(200).json({ status: 'success', data: commentData, message: 'Inline comment updated succesfully' });
+  },
+
+  /**
+    * controller for getting inline comments for an article
+    *
+    * @function
+    *
+    * @param {Object} request - express request object
+    * @param {Object} response - express response object
+    *
+    * @return {Object} - callback that execute the controller
+    */
+  getArticleInlineComment: async (request, response) => {
+    const { articleId } = request.params;
+
+    const comments = await Articles.getInlineComments(articleId);
+
+    return response.status(200).json({ status: 'success', data: comments, message: 'Inline comment retrieved succesfully' });
   }
 };

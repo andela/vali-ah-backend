@@ -10,7 +10,7 @@ import app from '../../src';
 import models from '../../src/models';
 import {
   users as bulkUsers,
-  userToken, user, user2
+  userToken, user, user2, randomUserToken
 } from '../fixtures/users';
 import {
   articles as bulkArticles,
@@ -30,7 +30,8 @@ import {
   category as bulkTag,
   articleCategories as bulkArticleCategories
 } from '../fixtures/articles';
-import { myArticles, myComments } from '../fixtures/comments';
+
+import { myArticles, myComments, inlineComments } from '../fixtures/comments';
 
 chai.use(chaiAsPromised);
 chai.use(sinonChai);
@@ -39,7 +40,7 @@ chai.use(chaiHttp);
 should();
 
 const {
-  Articles, Users, Categories, ArticleCategories, Votes, Comments
+  Articles, Users, Categories, ArticleCategories, Votes, Comments, InlineComments
 } = models;
 const baseRoute = '/api/v1';
 const { updateArticle, createArticle } = articleFunc;
@@ -448,7 +449,7 @@ describe('POST /articles/:articleId/vote', () => {
       .send({ voteType: 'upVote' })
       .set('authorization', `Bearer ${token}`);
 
-    response.should.have.status(400);
+    response.should.have.status(404);
     response.body.status.should.eql('error');
     response.body.error.message.should.eql('This article does not exist or has been suspended');
   });
@@ -482,7 +483,7 @@ describe('POST /articles/:articleId/vote', () => {
   it('should remove vote entry', async () => {
     const response = await chai
       .request(app)
-      .post(`${baseRoute}/articles/${articles[0].dataValues.id}/vote`)
+      .post(`${baseRoute}/articles/${bulkArticles[0].id}/vote`)
       .send({ voteType: 'nullVote' })
       .set('authorization', `Bearer ${token}`);
 
@@ -493,7 +494,7 @@ describe('POST /articles/:articleId/vote', () => {
   it('should down vote and suspend article', async () => {
     const response = await chai
       .request(app)
-      .post(`${baseRoute}/articles/${articles[1].dataValues.id}/vote`)
+      .post(`${baseRoute}/articles/${bulkArticles[1].id}/vote`)
       .send({ voteType: 'downVote' })
       .set('authorization', `Bearer ${token}`);
 
@@ -601,5 +602,245 @@ describe('GET /articles/:articleId/comments', () => {
     response.status.should.eql(404);
     response.body.error.should.be.a('object');
     response.body.error.message.should.eql('Non-existing articleId');
+  });
+});
+
+describe('POST /articles/:articleId/inline_comment', () => {
+  const { startIndex, endIndex } = inlineComments[0];
+  const highlightedText = bulkArticles[0].body.substring(startIndex, endIndex);
+  const inlineCommentData = { ...inlineComments[0], highlightedText };
+
+  before(async () => {
+    await Articles.destroy({ where: {} });
+    await Articles.bulkCreate(bulkArticles, { returning: true });
+  });
+
+  after(async () => {
+    await Articles.destroy({ where: {} });
+    await InlineComments.destroy({ where: {} });
+  });
+
+  it('should return 201', async () => {
+    const { status, body: { data } } = await chai
+      .request(app)
+      .post(`${baseRoute}/articles/${bulkArticles[0].id}/inline_comments`)
+      .set('Authorization', `Bearer ${userToken}`)
+      .send(inlineCommentData);
+
+    status.should.eql(201);
+    data.articleId.should.eql(bulkArticles[0].id);
+  });
+
+  it('should return 404 for non existing article', async () => {
+    const { status } = await chai
+      .request(app)
+      .post(`${baseRoute}/articles/${uuid()}/inline_comments`)
+      .set('Authorization', `Bearer ${userToken}`)
+      .send(inlineCommentData);
+
+    status.should.eql(404);
+  });
+});
+
+describe('PUT /articles/inline_comments/commentId', () => {
+  const { startIndex, endIndex } = inlineComments[0];
+  const highlightedText = bulkArticles[0].body.substring(startIndex, endIndex);
+  const inlineCommentData = { ...inlineComments[0], highlightedText };
+
+  before(async () => {
+    await Articles.destroy({ where: {} });
+    await Articles.bulkCreate(bulkArticles, { returning: true });
+  });
+
+  after(async () => {
+    await Articles.destroy({ where: {} });
+    await InlineComments.destroy({ where: {} });
+  });
+
+  it('should return 201', async () => {
+    const { status, body: { data } } = await chai
+      .request(app)
+      .post(`${baseRoute}/articles/${bulkArticles[0].id}/inline_comments`)
+      .set('Authorization', `Bearer ${userToken}`)
+      .send(inlineCommentData);
+
+    status.should.eql(201);
+    data.articleId.should.eql(bulkArticles[0].id);
+  });
+
+  it('should return 403 for unauthorized update', async () => {
+    const { status } = await chai
+      .request(app)
+      .put(`${baseRoute}/articles/inline_comments/${inlineCommentData.id}`)
+      .set('Authorization', `Bearer ${randomUserToken}`)
+      .send(inlineCommentData);
+
+    status.should.eql(403);
+  });
+
+  it('should return 200 for updated comment', async () => {
+    const { status, body: { data } } = await chai
+      .request(app)
+      .put(`${baseRoute}/articles/inline_comments/${inlineCommentData.id}`)
+      .set('Authorization', `Bearer ${userToken}`)
+      .send(inlineCommentData);
+
+    status.should.eql(200);
+    data.id.should.eql(inlineCommentData.id);
+  });
+
+  it('should return 404 for non existing comment', async () => {
+    const { status } = await chai
+      .request(app)
+      .put(`${baseRoute}/articles/inline_comments/${uuid()}`)
+      .set('Authorization', `Bearer ${userToken}`)
+      .send(inlineCommentData);
+
+    status.should.eql(404);
+  });
+});
+
+describe('DELETE /articles/inline_comments/commentId', () => {
+  const { startIndex, endIndex } = inlineComments[0];
+  const highlightedText = bulkArticles[0].body.substring(startIndex, endIndex);
+  const inlineCommentData = { ...inlineComments[0], highlightedText };
+
+  before(async () => {
+    await Articles.destroy({ where: {} });
+    await Articles.bulkCreate(bulkArticles, { returning: true });
+  });
+
+  after(async () => {
+    await Articles.destroy({ where: {} });
+    await InlineComments.destroy({ where: {} });
+  });
+
+  it('should return 201', async () => {
+    const { status, body: { data } } = await chai
+      .request(app)
+      .post(`${baseRoute}/articles/${bulkArticles[0].id}/inline_comments`)
+      .set('Authorization', `Bearer ${userToken}`)
+      .send(inlineCommentData);
+
+    status.should.eql(201);
+    data.articleId.should.eql(bulkArticles[0].id);
+  });
+
+  it('should return 403 for unauthorized delete', async () => {
+    const { status } = await chai
+      .request(app)
+      .delete(`${baseRoute}/articles/inline_comments/${inlineCommentData.id}`)
+      .set('Authorization', `Bearer ${randomUserToken}`);
+
+    status.should.eql(403);
+  });
+
+  it('should return 200 for deleted comment', async () => {
+    const { status } = await chai
+      .request(app)
+      .delete(`${baseRoute}/articles/inline_comments/${inlineCommentData.id}`)
+      .set('Authorization', `Bearer ${userToken}`);
+
+    status.should.eql(200);
+  });
+
+  it('should return 404 for non existing comment', async () => {
+    const { status } = await chai
+      .request(app)
+      .delete(`${baseRoute}/articles/inline_comments/${uuid()}`)
+      .set('Authorization', `Bearer ${userToken}`);
+
+    status.should.eql(404);
+  });
+});
+
+describe('GET /articles/inline_comments/commentId', () => {
+  const { startIndex, endIndex } = inlineComments[0];
+  const highlightedText = bulkArticles[0].body.substring(startIndex, endIndex);
+  const inlineCommentData = { ...inlineComments[0], highlightedText };
+
+  before(async () => {
+    await Articles.destroy({ where: {} });
+    await Articles.bulkCreate(bulkArticles, { returning: true });
+  });
+
+  after(async () => {
+    await Articles.destroy({ where: {} });
+    await InlineComments.destroy({ where: {} });
+  });
+
+  it('should return 201', async () => {
+    const { status, body: { data } } = await chai
+      .request(app)
+      .post(`${baseRoute}/articles/${bulkArticles[0].id}/inline_comments`)
+      .set('Authorization', `Bearer ${userToken}`)
+      .send(inlineCommentData);
+
+    status.should.eql(201);
+    data.articleId.should.eql(bulkArticles[0].id);
+  });
+
+  it('should return 200 for existing comment', async () => {
+    const { status } = await chai
+      .request(app)
+      .get(`${baseRoute}/articles/inline_comments/${inlineCommentData.id}`)
+      .set('Authorization', `Bearer ${userToken}`);
+
+    status.should.eql(200);
+  });
+
+  it('should return 404 for non existing comment', async () => {
+    const { status } = await chai
+      .request(app)
+      .get(`${baseRoute}/articles/inline_comments/${uuid()}`)
+      .set('Authorization', `Bearer ${userToken}`);
+
+    status.should.eql(404);
+  });
+});
+
+describe('GET /articles/articleId/inline_comments', () => {
+  const { startIndex, endIndex } = inlineComments[0];
+  const highlightedText = bulkArticles[0].body.substring(startIndex, endIndex);
+  const inlineCommentData = { ...inlineComments[0], highlightedText };
+
+  before(async () => {
+    await Articles.destroy({ where: {} });
+    await Articles.bulkCreate(bulkArticles, { returning: true });
+  });
+
+  after(async () => {
+    await Articles.destroy({ where: {} });
+    await InlineComments.destroy({ where: {} });
+  });
+
+  it('should return 201', async () => {
+    const { status, body: { data } } = await chai
+      .request(app)
+      .post(`${baseRoute}/articles/${bulkArticles[0].id}/inline_comments`)
+      .set('Authorization', `Bearer ${userToken}`)
+      .send(inlineCommentData);
+
+    status.should.eql(201);
+    data.articleId.should.eql(bulkArticles[0].id);
+  });
+
+  it('should return 200 for existing comment', async () => {
+    const { status, body: { data } } = await chai
+      .request(app)
+      .get(`${baseRoute}/articles/${bulkArticles[0].id}/inline_comments`)
+      .set('Authorization', `Bearer ${userToken}`);
+
+    status.should.eql(200);
+    data.should.be.an('array');
+  });
+
+  it('should return 404 for non existing comment', async () => {
+    const { status } = await chai
+      .request(app)
+      .get(`${baseRoute}/articles/${uuid()}/inline_comments`)
+      .set('Authorization', `Bearer ${userToken}`);
+
+    status.should.eql(404);
   });
 });
