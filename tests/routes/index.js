@@ -5,3 +5,4 @@ import './pagination.test';
 import './bookmarks.test';
 import './profile.test';
 import './resetPassword.test';
+import './comments.test';

@@ -20,7 +20,7 @@ export default class Comments extends Model {
     articleId: Sequelize.UUID,
     repliedToId: Sequelize.UUID,
     suspended: Sequelize.BOOLEAN
-  }
+  };
 
   /**
    * Initializes the Comments model
@@ -61,5 +61,28 @@ export default class Comments extends Model {
       foreignKey: 'repliedToId',
       onDelete: 'CASCADE'
     });
+    Comments.hasMany(models.CommentVotes, {
+      foreignKey: 'commentId',
+      onDelete: 'CASCADE'
+    });
+  }
+
+  /**
+   * function to check if a comment has been suspended
+   *
+   * @method
+   * @memberof Comments
+   *
+   * @return {false | Object} return false or returned object
+   */
+  async suspendComment() {
+    const upVotes = await this.countCommentVotes({ where: { vote: true } });
+    const downVotes = await this.countCommentVotes({ where: { vote: false } });
+
+    if (downVotes - upVotes >= 5) {
+      await this.update({ suspended: true });
+      return true;
+    }
+    return false;
   }
 }

@@ -590,6 +590,48 @@
         }
       }
     },
+    "/comments/{commentId}/vote": {
+      "post": {
+        "description": "up vote or down vote a comment",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "default": "Bearer {token}"
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "default": "application/json"
+          },
+          {
+            "name": "commentId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "voteType",
+            "description": "Vote type. i.e upVote, downVote or nullVote",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
     "/profile/:id": {
       "patch": {
         "description": "update user profile",

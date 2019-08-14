@@ -152,7 +152,7 @@ export default {
    *
    * @return {Object} - callback that execute the controller
    */
-  vote: async (request, response) => {
+  voteArticle: async (request, response) => {
     const { voteType } = request.body;
     const { articleId } = request.params;
     const { id: userId } = request.user;

@@ -29,18 +29,18 @@ export default class Users extends Model {
     notify: Sequelize.BOOLEAN,
     password: Sequelize.STRING,
     avatarUrl: Sequelize.STRING
-  }
+  };
 
   /**
-  *  Model associations
-  *
-  * @static
-  * @memberof Users
-  *
-  * @param {any} models all models
-  *
-  * @returns {void} no return
-  */
+   *  Model associations
+   *
+   * @static
+   * @memberof Users
+   *
+   * @param {any} models all models
+   *
+   * @returns {void} no return
+   */
   static associate(models) {
     this.hasMany(models.Followers, {
       foreignKey: 'followeeId',
@@ -60,6 +60,16 @@ export default class Users extends Model {
     this.hasOne(models.Sessions, {
       foreignKey: 'userId',
       as: 'session',
+      onDelete: 'CASCADE'
+    });
+    this.hasMany(models.Votes, {
+      foreignKey: 'userId',
+      as: 'articleVotes',
+      onDelete: 'CASCADE'
+    });
+    this.hasMany(models.CommentVotes, {
+      foreignKey: 'userId',
+      as: 'commentVotes',
       onDelete: 'CASCADE'
     });
   }
@@ -143,7 +153,7 @@ export default class Users extends Model {
     user.password = hash;
 
     return user;
-  }
+  };
 
   /**
    * Hook (after creation) for the User model
@@ -199,7 +209,9 @@ export default class Users extends Model {
       order: ['id'],
       include: [
         {
-          model: Users, as: 'followers', attributes: ['id', 'firstName', 'lastName', 'email']
+          model: Users,
+          as: 'followers',
+          attributes: ['id', 'firstName', 'lastName', 'email']
         }
       ],
       ...options
@@ -217,7 +229,9 @@ export default class Users extends Model {
    * @returns {string} users name
    */
   static async getUserName(user) {
-    const { firstName, lastName } = await this.findByPk(user, { attributes: ['firstName', 'lastName'] });
+    const { firstName, lastName } = await this.findByPk(user, {
+      attributes: ['firstName', 'lastName']
+    });
 
     return `${firstName} ${lastName}`;
   }
@@ -233,7 +247,9 @@ export default class Users extends Model {
    * @returns {string} users name
    */
   static async getSingleUser(user) {
-    const userObject = await this.findByPk(user, { include: [{ model: this.models.Sessions, as: 'session' }] });
+    const userObject = await this.findByPk(user, {
+      include: [{ model: this.models.Sessions, as: 'session' }]
+    });
 
     if (!userObject) throw new NotFoundError();
 

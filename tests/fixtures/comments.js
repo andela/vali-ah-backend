@@ -2,6 +2,7 @@ import faker from 'faker';
 import uuid from 'uuid';
 
 import { users } from './users';
+import { articles } from './articles';
 
 const userId = users[0].id;
 
@@ -26,7 +27,7 @@ const myArticles = [
     title: faker.lorem.sentence(),
     summary: faker.lorem.sentence(),
     body: faker.lorem.text()
-  },
+  }
 ];
 
 const myComments = [
@@ -50,4 +51,27 @@ const myComments = [
   }
 ];
 
-export { myComments, myArticles };
+const sampleComments = articles.map(({ id: articleId, authorId }) => ({
+  id: uuid(),
+  content: faker.lorem.sentence(15),
+  userId: authorId,
+  articleId
+}));
+
+const commentVotes = sampleComments.map(({ userId: usersId }, i, array) => ({
+  id: uuid(),
+  userId: usersId,
+  commentId: i > 3 ? array[array.length - 1].id : array[1].id,
+  vote: i > 3
+}));
+
+const commentDownVotes = sampleComments.map(({ userId: usersId }, i, array) => ({
+  id: uuid(),
+  userId: usersId,
+  commentId: i > 4 ? array[3].id : array[2].id,
+  vote: false
+}));
+
+export {
+  myComments, myArticles, commentVotes, commentDownVotes, sampleComments
+};
