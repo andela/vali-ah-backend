@@ -17,11 +17,13 @@ import {
   votes as bulkVotes,
   downVotes as bulkDownVotes,
   comment as commentData,
+  followers,
   invalidArticleId,
   article1,
   article2,
   article3,
   article4,
+  userAuth,
   badFollowupIdArticle,
   articleNoTag,
   votes1 as bulkVotes1,
@@ -32,6 +34,7 @@ import {
 } from '../fixtures/articles';
 
 import { myArticles, myComments, inlineComments } from '../fixtures/comments';
+import Followers from '../../src/models/Followers';
 
 chai.use(chaiAsPromised);
 chai.use(sinonChai);
@@ -55,11 +58,13 @@ describe('Articles API', () => {
   before(async () => {
     users = await Users.bulkCreate(bulkUsers, { returning: true });
     articles = await Articles.bulkCreate(bulkArticles, { returning: true });
+
     tag = await Categories.bulkCreate(bulkTag, { returning: true });
     await ArticleCategories.bulkCreate(bulkArticleCategories, { returning: true });
     await Votes.bulkCreate(bulkVotes1, { returning: true });
     await Votes.bulkCreate(bulkVotes2, { returning: true });
     await Votes.bulkCreate(bulkVotes3, { returning: true });
+    await Followers.bulkCreate(followers, { returning: true });
   });
 
   after(async () => {
@@ -67,6 +72,28 @@ describe('Articles API', () => {
     await Articles.destroy({ where: {}, });
     await Categories.destroy({ where: {}, });
     await ArticleCategories.destroy({ where: {}, });
+  });
+
+  describe('GET /articles/feed', () => {
+    it('should get all articles followed by user', async () => {
+      const response = await chai.request(app)
+        .get(`${baseRoute}/articles/feed`)
+        .set('Authorization', `Bearer ${userAuth}`);
+
+      response.body.status.should.equal('success');
+      response.body.should.have.property('data');
+      response.body.data[0].status.should.equal('published');
+      response.body.message.should.equal('Articles fetch was succesfully');
+    });
+
+    it('should throw error if user not found', async () => {
+      const response = await chai.request(app)
+        .get(`${baseRoute}/articles/feed`)
+        .set('Authorization', `Bearer ${userToken}`);
+
+      response.body.status.should.equal('error');
+      response.body.error.message.should.equal('User not found');
+    });
   });
 
   describe('POST /articles/:articleId/comment', () => {
@@ -94,11 +121,14 @@ describe('Articles API', () => {
   describe('Search article', () => {
     it('should get all articles', async () => {
       const response = await chai.request(app).get(`${baseRoute}/articles`);
+
       response.should.have.status(200);
     });
 
+
     it('should get users search if tag strings are valid ', async () => {
       const response = await chai.request(app).get(`${baseRoute}/articles?tag=${tag[0].category}`);
+
       response.should.have.status(200);
     });
 
@@ -121,9 +151,17 @@ describe('Articles API', () => {
       response.should.have.status(200);
     });
 
-    it('should not get user search when is not in the database', async () => {
+    it('should not get user search when tag is not in the database', async () => {
       const response = await chai.request(app).get(`${baseRoute}/articles?tag=Lagos`);
+
       response.should.have.status(404);
+    });
+
+    it('should not get user search when author is not in the database', async () => {
+      const response = await chai.request(app).get(`${baseRoute}/articles?author=Lagosplk`);
+
+      response.should.have.status(404);
+      response.body.message.should.equal('Lagosplk Not found');
     });
 
     it('should not get user search when its value is invalid', async () => {
@@ -142,6 +180,7 @@ describe('Articles API', () => {
       response.should.have.status(400);
     });
   });
+
   describe('Post to /articles/', () => {
     before(async () => {
       const res = await chai.request(app)

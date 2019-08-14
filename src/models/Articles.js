@@ -93,8 +93,16 @@ export default class Articles extends Model {
     });
 
     Articles.hasMany(models.ArticleCategories, {
-      as: 'category',
       foreignKey: 'articleId',
+      as: 'category',
+      onDelete: 'CASCADE'
+    });
+
+    Articles.belongsToMany(models.Categories, {
+      as: 'categories',
+      through: 'ArticleCategories',
+      foreignKey: 'articleId',
+      otherKey: 'categoryId',
       onDelete: 'CASCADE'
     });
 

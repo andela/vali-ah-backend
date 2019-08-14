@@ -58,4 +58,18 @@ export default class Followers extends Model {
       onDelete: 'CASCADE'
     });
   }
+
+  /** Returns an array of authors the user is following
+   *
+   * @function
+   *
+   * @param {string} userId - id of the user following authors
+   *
+   * @returns {Array} - array of authors followed by user
+   */
+  static async getAuthors(userId) {
+    return Followers.findAll({
+      where: { followerId: userId }
+    });
+  }
 }

@@ -1,6 +1,7 @@
 import faker from 'faker';
 import uuid from 'uuid';
 import randomBool from 'random-bool';
+import { generateAuthToken } from '../../src/helpers/auth';
 
 import {
   users
@@ -22,8 +23,17 @@ const articles = users.map(({
   title: faker.lorem.sentence(),
   summary: faker.lorem.sentence(),
   slug: faker.lorem.sentence(),
-  body: faker.lorem.text()
+  body: faker.lorem.text(),
+  status: 'published'
 }));
+
+const followers = users.map(({ id }) => ({
+  id: uuid(),
+  followeeId: articles[0].authorId,
+  followerId: id
+}));
+
+const userAuth = generateAuthToken({ id: users[0].id });
 
 const profileData = {
   firstName: faker.name.firstName(),
@@ -166,5 +176,7 @@ export {
   articleNoTag,
   votes1,
   votes2,
-  votes3
+  votes3,
+  followers,
+  userAuth
 };

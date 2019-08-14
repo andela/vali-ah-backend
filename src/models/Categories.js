@@ -46,8 +46,11 @@ export default class Categories extends Model {
    * @returns {void} no return
    */
   static associate(models) {
-    Categories.hasMany(models.ArticleCategories, {
-      foreignKey: 'categoryId',
+    Categories.belongsToMany(models.Articles, {
+      as: 'article',
+      through: 'ArticleCategories',
+      foreignKey: 'articleId',
+      otherKey: 'categoryId',
       onDelete: 'CASCADE'
     });
   }

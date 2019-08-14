@@ -24,7 +24,8 @@ const {
   updateArticle,
   deleteArticle,
   createInlineComment,
-  updateInlineComment, deleteInlineComment, getInlineComment, getArticleInlineComment
+  updateInlineComment, deleteInlineComment, getInlineComment, getArticleInlineComment,
+  getUserFeed
 } = articleController;
 const {
   createCommentSchema, getCommentSchema, createInlineCommentSchema, updateInlineCommentSchema,
@@ -75,6 +76,20 @@ router.post(
   asyncWrapper(verifyToken),
   asyncWrapper(createComment)
 );
+
+/**
+ * @swagger
+ *
+ * /articles/feed:
+ *   get:
+ *     description: get paginated followed aticles
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: success
+ */
+router.get('/feed', asyncWrapper(verifyToken), asyncWrapper(getUserFeed));
 
 /**
  * @swagger

@@ -6,6 +6,7 @@ import chaiHttp from 'chai-http';
 
 import app from '../../src/index';
 import { invalidUserId } from '../fixtures/users';
+import Users from '../../src/models/Users';
 
 const baseRoute = '/api/v1';
 
@@ -29,15 +30,18 @@ describe('Reset and Update Password Endpoint', () => {
   let secret;
 
   before(async () => {
-    const sampleUserObject = await chai
+    const user = await chai
       .request(app)
       .post('/api/v1/auth/signup')
       .send(sampleUser);
-    secret = `${sampleUserObject.body.data.user.password}!${sampleUserObject.body.data.user.createdAt}`;
-    tokens.validToken = jwt.sign({ id: sampleUserObject.body.data.user.id }, secret);
-    tokens.invalidToken = jwt.sign({ id: sampleUserObject.body.data.user.id }, 'secret');
-    validToken = sampleUserObject.body.data.token;
-    validId = sampleUserObject.body.data.user.id;
+    const sampleUserObject = await Users.findByPk(user.body.data.user.id);
+
+    secret = `${sampleUserObject.password}!${sampleUserObject.createdAt.toISOString()}`;
+
+    tokens.validToken = jwt.sign({ id: sampleUserObject.id }, secret);
+    tokens.invalidToken = jwt.sign({ id: sampleUserObject.id }, 'secret');
+    validToken = user.body.data.token;
+    validId = user.body.data.user.id;
   });
 
   it('should return 404 for non existing user - Reset Password', async () => {
@@ -73,10 +77,11 @@ describe('Reset and Update Password Endpoint', () => {
   });
 
   it('should return success if user is found, password and token is valid', async () => {
-    const { status } = await chai.request(app)
+    const response = await chai.request(app)
       .patch(`${baseRoute}/auth/update_password/${validId}/${tokens.validToken}`)
       .send({ password: 'newPassword' });
 
-    status.should.eql(200);
+    response.status.should.eql(200);
+    response.body.message.should.equal('Your password was successfully updated');
   });
 });

@@ -75,6 +75,19 @@
         }
       }
     },
+    "/articles/feed": {
+      "get": {
+        "description": "get paginated followed aticles",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "success"
+          }
+        }
+      }
+    },
     "/bookmarks": {
       "post": {
         "description": "Bookmark an article",
