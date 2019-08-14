@@ -196,7 +196,7 @@ class Notification extends EventEmitter {
   }
 
   /**
-   * Handles notification when an article is upvoted
+   * Handles notification when an article is suspended
    *
    * @function
    *
@@ -306,6 +306,20 @@ class Notification extends EventEmitter {
     this.emit('notificationSent', { type, payload });
 
     return { status: 'sent' };
+  }
+
+  /**
+   * Handles notification for password recovery link
+   *
+   * @function
+   *
+   * @param {Array} payload - An Object that contains necessary info to send the reset password link
+   *
+   *
+   * @return {Object} - status of event executed
+   */
+  async passwordRecovery(payload) {
+    return this.sendMail('passwordRecovery', payload);
   }
 }
 

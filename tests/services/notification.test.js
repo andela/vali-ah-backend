@@ -124,3 +124,11 @@ describe('Notification System', () => {
     });
   });
 });
+
+describe('Password recovery Notification', () => {
+  it('should handle notification for password recovery', () => {
+    const payload = { type: 'passwordRecovery', payload: { email: 'demo@demo.com', userId: 'id' } };
+    const data = notification.handleNotification(payload);
+    should.not.equal(data, undefined);
+  });
+});

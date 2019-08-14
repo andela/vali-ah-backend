@@ -10,6 +10,14 @@ export default {
     userName: faker.internet.userName(),
     email: faker.internet.email(),
     password: faker.internet.password()
+  },
+  {
+    id: uuid(),
+    firstName: 'francis',
+    lastName: 'nduamaka',
+    userName: 'bastien',
+    email: 'francis.nduamaka@gmail.com',
+    password: '123456'
   }], {}),
 
   down: async queryInterface => queryInterface.bulkDelete('Users', null, {})

@@ -5,10 +5,17 @@ import Debug from 'debug';
 config();
 
 const debug = Debug('dev');
-const { SENDGRID_API_KEY, SENDGRID_EMAIL } = process.env;
+
+const {
+  SENDGRID_API_KEY,
+  SENDGRID_EMAIL,
+  SENDGRID_PASSWORD_RECOVERY_TEMPLATE
+} = process.env;
+
 const templates = {
   accountActivation: process.env.SENDGRID_ACTIVATION_TEMPLATE,
-  activityNotification: process.env.SENDGRID_ACTIVITY_TEMPLATE
+  activityNotification: process.env.SENDGRID_ACTIVITY_TEMPLATE,
+  passwordRecovery: SENDGRID_PASSWORD_RECOVERY_TEMPLATE,
 };
 
 /**

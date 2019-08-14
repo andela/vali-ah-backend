@@ -92,5 +92,22 @@ export default {
       .isNumeric()
       .withMessage('Limit must be a number')
       .customSanitizer(page => page.toLowerCase())
+  ],
+  emailSchema: [
+    check('email')
+      .trim()
+      .exists()
+      .withMessage('Email address is required')
+      .isEmail()
+      .withMessage('Enter a valid email address')
+      .customSanitizer(value => makeUpperCase(value))
+  ],
+  passwordSchema: [
+    check('password')
+      .trim()
+      .exists()
+      .withMessage('Password is required')
+      .isLength({ min: 8, max: 15 })
+      .withMessage('Password should be between 8 to 15 characters')
   ]
 };

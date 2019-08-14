@@ -112,17 +112,17 @@ const badFollowupIdArticle = {
   followUpId: '842b0c1e-bd2b-4a4a-82e9-610869f02fd5'
 };
 
-const votes = articles.map(({ authorId }, i) => ({
+const votes = articles.map(({ authorId }, i, array) => ({
   id: uuid(),
   userId: authorId,
-  articleId: articleIds[i],
+  articleId: i > 3 ? array[array.length - 1].id : array[1].id,
   upVote: i > 3
 }));
 
-const downVotes = articles.map(({ authorId }, i) => ({
+const downVotes = articles.map(({ authorId }, i, array) => ({
   id: uuid(),
   userId: authorId,
-  articleId: articleIds[i],
+  articleId: i > 4 ? array[3].id : array[2].id,
   upVote: false
 }));
 
