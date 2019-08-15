@@ -1,21 +1,37 @@
 import { check } from 'express-validator/check';
 
-const uuidRegularExpression = new RegExp(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
-
 export default {
   createCommentSchema: [
-    check('content').trim()
-      .exists().withMessage('Comment content is required')
+    check('content')
+      .trim()
+      .exists()
+      .withMessage('Comment content is required')
       .isLength({ min: 2, max: 256 })
       .withMessage('Comment content should be between 2 to 256 characters'),
-    check('userId').matches(uuidRegularExpression).optional(),
+    check('userId')
+      .isUUID()
+      .optional(),
     check('articleId')
-      .matches(uuidRegularExpression)
+      .isUUID()
       .withMessage('Article id not valid. should be of type uuid')
   ],
   getCommentSchema: [
     check('articleId')
-      .matches(uuidRegularExpression)
+      .isUUID()
       .withMessage('Article id not valid. should be of type uuid')
+  ],
+  voteCommentSchema: [
+    check('commentId')
+      .trim()
+      .exists({ checkFalsy: true })
+      .withMessage('Comment id parameter is required')
+      .isUUID()
+      .withMessage('Comment id is not a valid uuid'),
+    check('voteType')
+      .trim()
+      .exists()
+      .withMessage('Vote type is required. e.g upVote, downVote or nullVote')
+      .isIn(['upVote', 'downVote', 'nullVote'])
+      .withMessage('Enter a valid vote type')
   ]
 };

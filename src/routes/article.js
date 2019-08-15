@@ -13,8 +13,16 @@ import bookmarkSchema from '../validations/bookmark';
 import articlesSchema from '../validations/articles';
 
 const {
-  createComment, createBookmark, removeBookmark, searchArticle, vote, getComments,
-  createArticle, getBySlug, updateArticle, deleteArticle
+  createComment,
+  createBookmark,
+  removeBookmark,
+  searchArticle,
+  voteArticle,
+  getComments,
+  createArticle,
+  getBySlug,
+  updateArticle,
+  deleteArticle
 } = articleController;
 const { createCommentSchema, getCommentSchema } = commentSchema;
 const { createSearchSchema } = searchSchema;
@@ -23,7 +31,6 @@ const { createBookmarkSchema } = bookmarkSchema;
 const { voteSchema } = articlesSchema;
 const { checkArticle, checkArticleUpdate } = articleValidator;
 const { articleCreateSchema } = articleSchema;
-
 
 const router = express.Router();
 
@@ -194,7 +201,7 @@ router.post(
   '/:articleId/vote',
   asyncWrapper(verifyToken),
   validator(voteSchema),
-  asyncWrapper(vote)
+  asyncWrapper(voteArticle)
 );
 
 /**
@@ -260,7 +267,14 @@ router.get('/:articleId/comments', validator(getCommentSchema), asyncWrapper(get
  *       201:
  *         description: article created
  */
-router.post('/', upload.single('image'), validator(articleCreateSchema), asyncWrapper(verifyToken), asyncWrapper(checkArticle), asyncWrapper(createArticle));
+router.post(
+  '/',
+  upload.single('image'),
+  validator(articleCreateSchema),
+  asyncWrapper(verifyToken),
+  asyncWrapper(checkArticle),
+  asyncWrapper(createArticle)
+);
 
 /**
  * @swagger
@@ -326,7 +340,15 @@ router.get('/:slug', asyncWrapper(verifyToken), asyncWrapper(getBySlug));
  *       200:
  *         description: success
  */
-router.put('/:slug', upload.single('image'), validator(articleCreateSchema), asyncWrapper(verifyToken), asyncWrapper(isAuthor), asyncWrapper(checkArticleUpdate), asyncWrapper(updateArticle));
+router.put(
+  '/:slug',
+  upload.single('image'),
+  validator(articleCreateSchema),
+  asyncWrapper(verifyToken),
+  asyncWrapper(isAuthor),
+  asyncWrapper(checkArticleUpdate),
+  asyncWrapper(updateArticle)
+);
 
 /**
  * @swagger
@@ -344,6 +366,11 @@ router.put('/:slug', upload.single('image'), validator(articleCreateSchema), asy
  *       200:
  *         description: successful delete
  */
-router.delete('/:slug', asyncWrapper(verifyToken), asyncWrapper(isAuthor), asyncWrapper(deleteArticle));
+router.delete(
+  '/:slug',
+  asyncWrapper(verifyToken),
+  asyncWrapper(isAuthor),
+  asyncWrapper(deleteArticle)
+);
 
 export default router;

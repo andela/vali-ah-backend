@@ -36,7 +36,10 @@ const category = tag.map(() => ({
 }));
 
 const categoriesId = category.map(categoriesTab => categoriesTab.id);
-const duplicatedCategoriesId = Array(10).fill(categoriesId).join().split(',');
+const duplicatedCategoriesId = Array(10)
+  .fill(categoriesId)
+  .join()
+  .split(',');
 const usersId = users.map(user => user.id);
 const articleIds = articles.map(article => article.id);
 
@@ -75,20 +78,24 @@ const article1 = {
   summary: 'summarysummary',
   body: faker.lorem.sentences(),
   tag: ['842b0c1e-bd2b-4a4a-82e9-610869f02fd5'],
-  authorId: '842b0c1e-bd2b-4a4a-82e9-610869f02fd5',
+  authorId: '842b0c1e-bd2b-4a4a-82e9-610869f02fd5'
 };
 
 const articleNoTag = {
   title: 'summarysummary',
   summary: 'summarysummary',
-  body: faker.lorem.sentences(),
+  body: faker.lorem.sentences()
 };
 
 const article2 = {
   title: 'summarysummary',
   summary: 'summarysummary',
   body: faker.lorem.sentences(),
-  tag: ['842b0c1e-bd2b-4a4a-82e9-610869f02fd4', '842b0c1e-bd2b-4a4a-82e9-610869f02fd5', '842b0c1e-bd2b-4a4a-82e9-610869f02fd6']
+  tag: [
+    '842b0c1e-bd2b-4a4a-82e9-610869f02fd4',
+    '842b0c1e-bd2b-4a4a-82e9-610869f02fd5',
+    '842b0c1e-bd2b-4a4a-82e9-610869f02fd6'
+  ]
 };
 
 const article3 = {
