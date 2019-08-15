@@ -42,7 +42,7 @@ const {
   Articles, Users, Categories, ArticleCategories, Votes, Comments
 } = models;
 const baseRoute = '/api/v1';
-const { updateArticle, createArticle } = articleFunc;
+const { updateArticle, createArticle, shareArticle } = articleFunc;
 
 describe('Articles API', () => {
   let users;
@@ -374,6 +374,7 @@ describe('POST /articles/:articleId/vote', () => {
     await Users.destroy({ where: {}, });
     await Articles.destroy({ where: {}, });
     await Votes.destroy({ where: {}, });
+
     await Users.bulkCreate(bulkUsers, { returning: true });
 
     userResponseObject = await chai
@@ -602,5 +603,98 @@ describe('GET /articles/:articleId/comments', () => {
     response.status.should.eql(404);
     response.body.error.should.be.a('object');
     response.body.error.message.should.eql('Non-existing articleId');
+  });
+});
+
+describe('GET /articles/:articleId/share/{socialPlatform}', () => {
+  it('should throw an error if article slug is not found', async () => {
+    const badSlug = 'some random string';
+    const response = await chai
+      .request(app)
+      .get(`${baseRoute}/articles/${badSlug}/share/facebook`)
+      .set('authorization', `Bearer ${userToken}`);
+
+    response.should.have.status(404);
+    response.body.status.should.eql('error');
+  });
+
+  it('should share an article via facebook', async () => {
+    const request = {
+      params: { slug: 'we-love-team-vali' },
+      url: '/slug/share/facebook'
+    };
+    const response = {
+      status() {},
+      redirect: () => true
+    };
+    const stub = sinon.stub(response, 'redirect').callsFake(() => 'url link');
+
+    sinon.stub(Articles, 'findOne').callsFake(() => []);
+    sinon.stub(response, 'status').returnsThis();
+    await shareArticle(request, response);
+    Articles.findOne.restore();
+
+    response.redirect.should.be.a('function');
+    stub.restore();
+  });
+
+  it('should share an article via twitter', async () => {
+    const request = {
+      params: { slug: 'things-we-do-for-love' },
+      url: '/slug/share/twitter'
+    };
+    const response = {
+      status() {},
+      redirect: () => true
+    };
+    const stub = sinon.stub(response, 'redirect').callsFake(() => 'url link');
+
+    sinon.stub(Articles, 'findOne').callsFake(() => []);
+    sinon.stub(response, 'status').returnsThis();
+    await shareArticle(request, response);
+    Articles.findOne.restore();
+
+    response.redirect.should.be.a('function');
+    stub.restore();
+  });
+
+  it('should share an article via twitter', async () => {
+    const request = {
+      params: { slug: 'incredible-me' },
+      url: '/slug/share/linkedin'
+    };
+    const response = {
+      status() {},
+      redirect: () => true
+    };
+    const stub = sinon.stub(response, 'redirect').callsFake(() => 'url link');
+
+    sinon.stub(Articles, 'findOne').callsFake(() => []);
+    sinon.stub(response, 'status').returnsThis();
+    await shareArticle(request, response);
+    Articles.findOne.restore();
+
+    response.redirect.should.be.a('function');
+    stub.restore();
+  });
+
+  it('should not share an article if request.url is invalid', async () => {
+    const request = {
+      params: { slug: 'we-love-to-create' },
+      url: '/slug/share/linked'
+    };
+    const response = {
+      status() {},
+      redirect: () => true
+    };
+
+    sinon.stub(Articles, 'findOne').callsFake(() => []);
+    const stub = sinon.stub(response, 'redirect').callsFake(() => 'url link');
+    await shareArticle(request, response);
+    sinon.stub(response, 'status').returnsThis();
+    Articles.findOne.restore();
+
+    response.redirect.should.be.a('function');
+    stub.restore();
   });
 });

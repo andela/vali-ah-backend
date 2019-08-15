@@ -22,7 +22,8 @@ const {
   createArticle,
   getBySlug,
   updateArticle,
-  deleteArticle
+  deleteArticle,
+  shareArticle
 } = articleController;
 const { createCommentSchema, getCommentSchema } = commentSchema;
 const { createSearchSchema } = searchSchema;
@@ -372,5 +373,59 @@ router.delete(
   asyncWrapper(isAuthor),
   asyncWrapper(deleteArticle)
 );
+
+/**
+ * @swagger
+ *
+ * /articles/{slug}/share/facebook:
+ *   get:
+ *     description: share an article on Facebook
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *        - in: path
+ *          name: slug
+ *          required: true
+ *     responses:
+ *       200:
+ *         description: success
+ */
+router.get('/:slug/share/facebook', asyncWrapper(verifyToken), asyncWrapper(shareArticle));
+
+/**
+ * @swagger
+ *
+ * /articles/{slug}/share/twitter:
+ *   get:
+ *     description: share an article on Twitter
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *        - in: path
+ *          name: slug
+ *          required: true
+ *     responses:
+ *       200:
+ *         description: success
+ */
+router.get('/:slug/share/twitter', asyncWrapper(verifyToken), asyncWrapper(shareArticle));
+
+/**
+ * @swagger
+ *
+ * /articles/{slug}/share/linkedin:
+ *   get:
+ *     description: share an article on Linkedin
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *        - in: path
+ *          name: slug
+ *          required: true
+ *     responses:
+ *       200:
+ *         description: success
+ */
+router.get('/:slug/share/linkedin', asyncWrapper(verifyToken), asyncWrapper(shareArticle));
 
 export default router;

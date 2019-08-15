@@ -5,7 +5,12 @@ import paginator from '../helpers/paginator';
 import { ApplicationError, NotFoundError } from '../helpers/errors';
 import notification from '../services/notification';
 import * as helpers from '../helpers';
-import { getTagName } from '../helpers/article';
+import {
+  getTagName,
+  createFacebookShareLink,
+  createTwitterShareLink,
+  createLinkedinShareLink
+} from '../helpers/article';
 
 const { filter, extractArticles } = helpers;
 const {
@@ -367,5 +372,34 @@ export default {
     const { slug } = request.params;
     await Articles.deleteArticle(slug);
     return response.status(200).json({ status: 'success', data: {}, message: 'Article deleted succesfully' });
+  },
+
+  /**
+   * controller for sharing article
+   * @param {Object} request - express request object
+   * @param {Object} response - express response object
+   *
+   * @return {Object} - the response from the server
+   */
+  shareArticle: async (request, response) => {
+    const { slug } = request.params;
+    const article = await Articles.findOne({ where: { slug } });
+
+    if (!article) throw new ApplicationError(404, 'Invalid slug');
+
+    if (request.url.search(/\/facebook/) > 0) {
+      const facebookShareLink = createFacebookShareLink(slug);
+      return response.redirect(facebookShareLink);
+    }
+
+    if (request.url.search(/\/twitter/) > 0) {
+      const twitterShareLink = createTwitterShareLink(slug);
+      return response.redirect(twitterShareLink);
+    }
+
+    if (request.url.search(/\/linkedin/) > 0) {
+      const linkedinShareLink = createLinkedinShareLink(slug);
+      return response.redirect(linkedinShareLink);
+    }
   }
 };

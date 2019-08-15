@@ -1,6 +1,10 @@
+import dotenv from 'dotenv';
 import Models from '../models/index';
 import { ApplicationError } from './errors';
 
+dotenv.config();
+
+const appUrl = process.env.APP_URL;
 const uuidRegularExpression = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
 
 const {
@@ -65,8 +69,51 @@ export const getTagName = async (tags) => {
   return tagNames;
 };
 
-export default {
-  idPresent,
-  checkTags,
-  getTagName
+/**
+ * Create facebook share link
+ *
+ * @function
+ *
+ * @param {String} slug - article slug
+ *
+ * @returns {String} - facebook share link
+ */
+export const createFacebookShareLink = (slug) => {
+  const articleUrl = `${appUrl}/api/v1/articles/${slug}`;
+  const facebookShareLink = `https://web.facebook.com/sharer.php?u=${articleUrl}`;
+
+  return facebookShareLink;
+};
+
+/**
+ * Create twitter share link
+ *
+ * @function
+ *
+ * @param {String} slug - article slug
+ *
+ * @returns {String} - twitter share link
+ */
+export const createTwitterShareLink = (slug) => {
+  const articleUrl = `${appUrl}/api/v1/articles/${slug}`;
+  const twitterShareLink = `https://twitter.com/intent/tweet?text=${articleUrl}`;
+
+  return twitterShareLink;
+};
+
+/**
+ * Create linkedin share link
+ *
+ * @function
+ *
+ * @param {String} slug - article slug
+ *
+ * @returns {String} - linkedin share link
+ */
+export const createLinkedinShareLink = (slug) => {
+  const articleUrl = `${appUrl}/api/v1/articles/${slug}`;
+  // const naira = 'google.com';
+  const linkedinShareLink = `https://www.linkedin.com/sharing/share-offsite/?url=${articleUrl}`;
+
+  return linkedinShareLink;
 };
