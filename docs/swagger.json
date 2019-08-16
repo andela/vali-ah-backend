@@ -590,6 +590,22 @@
         }
       }
     },
+    "/authors": {
+      "get": {
+        "description": "get a list of all authors",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "authors found"
+          },
+          "404": {
+            "description": "authors not found"
+          }
+        }
+      }
+    },
     "/comments/{commentId}/vote": {
       "post": {
         "description": "up vote or down vote a comment",
