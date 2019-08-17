@@ -111,7 +111,8 @@ const users = Array(10)
 const userToken = generateAuthToken({ id: 'bd4c4dfa-b2dd-47f9-9599-1b588b35363e' });
 const usersWithFollowing = users.map(({ id }) => ({
   followeeId: users[0].id,
-  followerId: id
+  followerId: id,
+  active: true
 }));
 const profileId = '94189e3d-0379-4dd2-b03d-73fa8c14b3ab';
 

@@ -11,7 +11,7 @@ import Sequelize from 'sequelize';
  * @param {Object} dataToFunction - data to pass to source function as parameter
  * @param {number} size - size of data to return per page
  *
- * @return {Object} - sequelize object for inserted data
+ * @returns {Object} - sequelize object for inserted data
  */
 export const queryPagination = async (sourceFunction, dataToFunction = {}, size = 50) => {
   let currentPage = 0;
@@ -46,7 +46,7 @@ export const queryPagination = async (sourceFunction, dataToFunction = {}, size 
  * @param {Function} dataSource - function to call as data source. must have a data attribute
  * @param {Function} handler - callback function
  *
- * @return {void}
+ * @returns {void}
  */
 export const batchQuery = async (dataSource, handler) => {
   await async.whilst(cb => cb(null, dataSource.data().length),

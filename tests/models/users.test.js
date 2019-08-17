@@ -33,6 +33,13 @@ describe('Users Model', () => {
     followers.should.not.empty;
   });
 
+  it('should get users follower for existing users', async () => {
+    const searchData = { data: { user: users[0].id } };
+    const followers = await Users.getUserFollowings(searchData);
+
+    followers.should.not.empty;
+  });
+
   it('should throw error for non existing users', async () => {
     const searchData = { data: { user: faker.random.uuid() } };
 

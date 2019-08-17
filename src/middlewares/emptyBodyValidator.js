@@ -6,7 +6,7 @@
  * @param {Object} response  express response object
  * @param {Function} next  express next function
  *
- * @return {Void} undefined
+ * @returns {Void} undefined
  */
 export default (request, response, next) => {
   const { body } = request;

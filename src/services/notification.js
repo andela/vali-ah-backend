@@ -41,7 +41,7 @@ class Notification extends EventEmitter {
    * @param {string} eventPayload.type - type of event.
    * @param {Object} eventPayload.payload - The event payload
    *
-   * @return {void}
+   * @returns {void}
    */
   handleNotification({ type, payload }) {
     if (type in this) return this[type](payload);
@@ -55,7 +55,7 @@ class Notification extends EventEmitter {
    * @param {string} type - the type of notification
    * @param {Function} notificationHandler - function that handles defined notification
    *
-   * @return {Notification} -instance of notification
+   * @returns {Notification} -instance of notification
    */
   addNotification(type, notificationHandler) {
     if (!(type in this)) this[type] = notificationHandler.bind(this);
@@ -70,7 +70,7 @@ class Notification extends EventEmitter {
    *
    * @param {Object} payload - An Object that contains necessary info to send the notification
    *
-   * @return {Object} - status of event executed
+   * @returns {Object} - status of event executed
    */
   accountActivation(payload) {
     return this.sendMail('accountActivation', payload);
@@ -85,7 +85,7 @@ class Notification extends EventEmitter {
    * @param {string} eventDetails.userId - id of user been followed
    * @param {Object} eventDetails.followerId - id of user following the user
    *
-   * @return {Object} - sequelize object for inserted data
+   * @returns {Object} - sequelize object for inserted data
    */
   async following({ userId, followerId }) {
     const { email, firstName, session } = await Users.getSingleUser(userId);
@@ -110,7 +110,7 @@ class Notification extends EventEmitter {
    * @param {string} eventDetails.authorId - id of author publishing article
    * @param {Object} eventDetails.articleId - id of article published
    *
-   * @return {Object} - sequelize object for inserted data
+   * @returns {Object} - sequelize object for inserted data
    */
   async newPublication({ authorId, articleId }) {
     const { title, authors: { firstName, session } } = await Articles.getSingleArticle(articleId);
@@ -118,7 +118,7 @@ class Notification extends EventEmitter {
     const { sessionId } = session || {};
     const event = 'newPublication';
 
-    const followers = await queryPagination(Users.getUserFollowers, { user: authorId });
+    const followers = await queryPagination(Users.getUserFollowers, { user: authorId, attributes: ['email'] });
 
     const schedule = (followersData) => {
       const notificationData = followersData.map(({ followers: { id: userId, email } }) => ({
@@ -147,7 +147,7 @@ class Notification extends EventEmitter {
    * @param {string} eventDetails.userId - id of user making a comment
    * @param {Object} eventDetails.articleId - id of article
    *
-   * @return {Object} - sequelize object for inserted data
+   * @returns {Object} - sequelize object for inserted data
    */
   async articleCommentedOn({ articleId, userId }) {
     const userName = await Users.getUserName(userId);
@@ -176,7 +176,7 @@ class Notification extends EventEmitter {
    * @param {string} eventDetails.authorId - id of author publishing article
    * @param {Object} eventDetails.articleId - id of article published
    *
-   * @return {Object} - sequelize object for inserted data
+   * @returns {Object} - sequelize object for inserted data
    */
   async articleVoted({ articleId, userId, upVote }) {
     const userName = await Users.getUserName(userId);
@@ -203,7 +203,7 @@ class Notification extends EventEmitter {
    * @param {Object} eventDetails - Details of the event
    * @param {Object} eventDetails.articleId - id of article published
    *
-   * @return {Object} - sequelize object for inserted data
+   * @returns {Object} - sequelize object for inserted data
    */
   async articleSuspended({ articleId }) {
     const { title, authorId, authors: { email, session } } = await Articles
@@ -228,7 +228,7 @@ class Notification extends EventEmitter {
    * @param {string} event
    * @param {Array} notificationData
    *
-   * @return {Object} - sequelize object for inserted data
+   * @returns {Object} - sequelize object for inserted data
    */
   async scheduleNotification(event, notificationData) {
     const notificationObject = await Notifications
@@ -245,7 +245,7 @@ class Notification extends EventEmitter {
    *
    * @function
    *
-   * @return {Object} - sequelize object for inserted data
+   * @returns {Object} - sequelize object for inserted data
    */
   async sendBatch() {
     const notificationPagination = await queryPagination(Notifications.getBatchedNotifications);
@@ -270,7 +270,7 @@ class Notification extends EventEmitter {
    *
    * @param {Array} notificationData
    *
-   * @return {Object} - sequelize object for inserted data
+   * @returns {Object} - sequelize object for inserted data
    */
   static buildNotificationEmailData(notificationData) {
     const emailData = notificationData.reduce((acc, notifications) => {
@@ -299,7 +299,7 @@ class Notification extends EventEmitter {
    * @param {Array} payload - message data.
    * @param {string} template -email template to use.
    *
-   * @return {Object} - status of event executed
+   * @returns {Object} - status of event executed
    */
   async sendMail(type, payload, template) {
     await emailService({ type, payload, template });
@@ -316,7 +316,7 @@ class Notification extends EventEmitter {
    * @param {Array} payload - An Object that contains necessary info to send the reset password link
    *
    *
-   * @return {Object} - status of event executed
+   * @returns {Object} - status of event executed
    */
   async passwordRecovery(payload) {
     return this.sendMail('passwordRecovery', payload);

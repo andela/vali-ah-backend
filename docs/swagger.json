@@ -723,6 +723,78 @@
           }
         }
       }
+    },
+    "/profile/:userId/following": {
+      "post": {
+        "description": "follower a user",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Users id.",
+            "in": "body",
+            "required": true,
+            "type": "UUID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully followed a user"
+          },
+          "404": {
+            "description": "User does not exist."
+          },
+          "409": {
+            "description": "User cannot perform this action."
+          }
+        }
+      }
+    },
+    "/profile/:userId/followers": {
+      "get": {
+        "description": "get allfollowers",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Username id.",
+            "in": "body",
+            "required": true,
+            "type": "UUID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Request was successful."
+          }
+        }
+      }
+    },
+    "/profile/userId:/followings": {
+      "get": {
+        "description": "get all followings",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Users id.",
+            "in": "body",
+            "required": true,
+            "type": "UUID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Request was successful."
+          }
+        }
+      }
     }
   },
   "definitions": {},

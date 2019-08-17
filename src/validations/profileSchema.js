@@ -52,13 +52,19 @@ const profileSchemas = {
     check('id')
       .trim()
       .isUUID()
-      .withMessage('Invalid id')
+      .withMessage('Id does not exist')
   ],
   profileViewSchema: [
     check('id')
       .trim()
       .isUUID()
-      .withMessage('Invalid id')
+      .withMessage('Id does not exist')
+  ],
+  followerSchema: [
+    check('userId')
+      .trim()
+      .isUUID()
+      .withMessage('Id does not exist')
   ]
 };
 

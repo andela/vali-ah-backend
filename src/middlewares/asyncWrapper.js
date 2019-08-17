@@ -7,7 +7,7 @@
   * @param {Function} wrappedFunction - the main controller
   * @param {Boolean} middleware - A flag to know if it is a middleware
   *
-  * @return {Function} - callback that execute the controller
+  * @returns {Function} - callback that execute the controller
   */
 export default wrappedFunction => async (request, response, next) => {
   try {

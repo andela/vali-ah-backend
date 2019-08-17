@@ -5,7 +5,7 @@
  *
  * @param {string} word
  *
- * @return {Function} call to turn upper case to lower case
+ * @returns {Function} call to turn upper case to lower case
  */
 const makeCapitalize = (word) => {
   const formattedWord = word

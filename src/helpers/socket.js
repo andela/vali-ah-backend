@@ -13,7 +13,7 @@ const debug = Debug('dev');
  *
  * @param {Object} io - socket io instance
  *
- * @return {Function} - notification handler
+ * @returns {Function} - notification handler
  */
 export const notificationHandler = io => ({ payload: notificationData = [] }) => notificationData
   .map(({ payload }) => {
@@ -28,7 +28,7 @@ export const notificationHandler = io => ({ payload: notificationData = [] }) =>
  *
  * @param {Object} io - socket io instance
  *
- * @return {Function} - connection handler
+ * @returns {Function} - connection handler
  */
 export const onConnection = (io) => {
   const inAppNotificationHandler = notificationHandler(io);

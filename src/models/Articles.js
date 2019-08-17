@@ -109,7 +109,7 @@ export default class Articles extends Model {
    * @param {String} data.articleId - id of the article to comment on
    * @param {String} data.comment - comment contents
    *
-   * @return {Object | void} - details of comment data
+   * @returns {Object | void} - details of comment data
    */
   static async createComment({ articleId, comment }) {
     const articleObject = await this.findByPk(articleId);
@@ -153,7 +153,7 @@ export default class Articles extends Model {
    *
    * @param {string} articleId
    *
-   * @return {Object | void} - details of existing article
+   * @returns {Object | void} - details of existing article
    */
   static async getExistingArticle(articleId) {
     const article = await this.findByPk(articleId);
@@ -169,7 +169,7 @@ export default class Articles extends Model {
    * @method
    * @memberof Articles
    *
-   * @return {false | Object} return false or returned object
+   * @returns {false | Object} return false or returned object
    */
   async suspendArticle() {
     const upVotes = await this.countVotes({ where: { upVote: true } });
@@ -188,7 +188,7 @@ export default class Articles extends Model {
  *
  * @param {string} title - title of the article to be sort
  *
- * @returns {Array} - array or undefined
+ *  @returns {Array} - array or undefined
  */
   static async getArticles(title) {
     const article = await Articles.findAll({

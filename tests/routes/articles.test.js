@@ -373,7 +373,6 @@ describe('POST /articles/:articleId/vote', () => {
     await Users.destroy({ where: {}, });
     await Articles.destroy({ where: {}, });
     await Votes.destroy({ where: {}, });
-
     await Users.bulkCreate(bulkUsers, { returning: true });
 
     userResponseObject = await chai

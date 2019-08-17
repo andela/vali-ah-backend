@@ -14,7 +14,7 @@ const { Users, Categories, Articles } = models;
    * @param {author} author - express request object
    * @param {keyword} keyword - express request object
    *
-   * @return {Object} - sequlize Object
+   * @returns {Object} - sequlize Object
    */
 const filter = (title, tag, author, keyword) => {
   const queryParams = {
@@ -62,7 +62,7 @@ const filter = (title, tag, author, keyword) => {
    *
    * @param {result} result - array of object
    *
-   * @return {Object} - callback that execute the controller
+   * @returns {Object} - callback that execute the controller
    */
 const extractArticles = result => result.map((entry) => {
   const firstName = entry['author.firstName'];
