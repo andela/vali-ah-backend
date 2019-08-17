@@ -109,6 +109,8 @@ const users = Array(10)
   }));
 
 const userToken = generateAuthToken({ id: 'bd4c4dfa-b2dd-47f9-9599-1b588b35363e' });
+const randomUserToken = generateAuthToken({ id: uuid() });
+
 const usersWithFollowing = users.map(({ id }) => ({
   followeeId: users[0].id,
   followerId: id,
@@ -158,6 +160,7 @@ export {
   anotherUser,
   users,
   userToken,
+  randomUserToken,
   usersWithFollowing,
   profiledataForLowerCase,
   invalidUserId

@@ -22,13 +22,18 @@ const {
   createArticle,
   getBySlug,
   updateArticle,
-  deleteArticle
+  deleteArticle,
+  createInlineComment,
+  updateInlineComment, deleteInlineComment, getInlineComment, getArticleInlineComment
 } = articleController;
-const { createCommentSchema, getCommentSchema } = commentSchema;
+const {
+  createCommentSchema, getCommentSchema, createInlineCommentSchema, updateInlineCommentSchema,
+  inlineCommentSchema
+} = commentSchema;
 const { createSearchSchema } = searchSchema;
-const { verifyToken, isAuthor } = authentication;
+const { verifyToken, isAuthor, ownComment } = authentication;
 const { createBookmarkSchema } = bookmarkSchema;
-const { voteSchema } = articlesSchema;
+const { voteSchema, articlePathSchema } = articlesSchema;
 const { checkArticle, checkArticleUpdate } = articleValidator;
 const { articleCreateSchema } = articleSchema;
 
@@ -372,5 +377,159 @@ router.delete(
   asyncWrapper(isAuthor),
   asyncWrapper(deleteArticle)
 );
+
+
+/**
+ * @swagger
+ *
+ * /articles/:articleId/inline_comments:
+ *   post:
+ *     description: Create an inline comment for an article
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - in: path
+ *         name: articleId
+ *         required: true
+ *       - name: content
+ *         description: content of the comment.
+ *         in: body
+ *         required: true
+ *         type: string
+ *       - name: startIndex
+ *         description: start index of highlight.
+ *         in: body
+ *         type: number
+ *         required: true
+ *       - name: endIndex
+ *         description: end index of highlight
+ *         in: body
+ *         type: number
+ *         required: true
+ *     responses:
+ *       201:
+ *         description: comment successfully created
+ */
+router.post(
+  '/:articleId/inline_comments',
+  validator(createInlineCommentSchema),
+  asyncWrapper(verifyToken),
+  asyncWrapper(createInlineComment)
+);
+
+/**
+ * @swagger
+ *
+ * /articles/:articleId/inline_comments:
+ *   get:
+ *     description: Queries inline comments for an article
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - in: path
+ *         name: articleId
+ *         required: true
+ *       - name: content
+ *         description: content of the comment.
+ *         in: body
+ *         required: true
+ *         type: string
+ *     responses:
+ *       201:
+ *         description: comments successfully retrieved
+ */
+router.get(
+  '/:articleId/inline_comments',
+  validator(articlePathSchema),
+  asyncWrapper(verifyToken),
+  asyncWrapper(getArticleInlineComment)
+);
+
+/**
+ * @swagger
+ *
+ * /articles/inline_comments/commentId:
+ *   put:
+ *     description: Edit an articles inline comment
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - in: path
+ *         name: commentId
+ *         required: true
+ *       - name: content
+ *         description: content of the comment.
+ *         in: body
+ *         required: true
+ *         type: string
+ *       - name: startIndex
+ *         description: start index of highlight.
+ *         in: body
+ *         type: number
+ *       - name: endIndex
+ *         description: end index of highlight
+ *         in: body
+ *         type: number
+ *     responses:
+ *       201:
+ *         description: comment updated
+ */
+router.put(
+  '/inline_comments/:commentId',
+  validator(updateInlineCommentSchema),
+  asyncWrapper(verifyToken),
+  asyncWrapper(ownComment),
+  asyncWrapper(updateInlineComment)
+);
+
+
+/**
+ * @swagger
+ *
+ * /articles/inline_comments/commentId:
+ *   delete:
+ *     description: Create comment for an article
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - in: path
+ *         name: commentId
+ *         required: true
+ *     responses:
+ *       201:
+ *         description: comment posted
+ */
+router.delete(
+  '/inline_comments/:commentId',
+  validator(inlineCommentSchema),
+  asyncWrapper(verifyToken),
+  asyncWrapper(ownComment),
+  asyncWrapper(deleteInlineComment)
+);
+
+
+/**
+ * @swagger
+ *
+ * /articles/inline_comments/commentId:
+ *   get:
+ *     description: Queries a single inline comment
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - in: path
+ *         name: commentId
+ *         required: true
+ *     responses:
+ *       201:
+ *         description: Query successfull
+ */
+router.get(
+  '/inline_comments/:commentId',
+  validator(inlineCommentSchema),
+  asyncWrapper(verifyToken),
+  asyncWrapper(getInlineComment)
+);
+
 
 export default router;

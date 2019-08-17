@@ -57,6 +57,16 @@ export default class Users extends Model {
       as: 'articles',
       onDelete: 'CASCADE'
     });
+    this.hasMany(models.Comments, {
+      foreignKey: 'userId',
+      as: 'comments',
+      onDelete: 'CASCADE'
+    });
+    this.hasMany(models.InlineComments, {
+      foreignKey: 'userId',
+      as: 'inlineComments',
+      onDelete: 'CASCADE'
+    });
     this.hasOne(models.Sessions, {
       foreignKey: 'userId',
       as: 'session',

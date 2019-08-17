@@ -72,6 +72,16 @@ const commentDownVotes = sampleComments.map(({ userId: usersId }, i, array) => (
   vote: false
 }));
 
+
+const inlineComments = Array(5).fill(0).map(() => ({
+  id: uuid(),
+  userId,
+  content: faker.lorem.sentence(),
+  highlightedText: faker.lorem.sentence(),
+  startIndex: 4,
+  endIndex: 14
+}));
+
 export {
-  myComments, myArticles, commentVotes, commentDownVotes, sampleComments
+  myComments, myArticles, commentVotes, commentDownVotes, sampleComments, inlineComments
 };

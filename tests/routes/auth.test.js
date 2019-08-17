@@ -166,15 +166,11 @@ describe('Auth Routes', () => {
 });
 
 describe('Signout Route', () => {
-  before((done) => {
-    server()
+  before(async () => {
+    const { body: { data } } = await server()
       .post(signupRoute)
-      .send(anotherUser)
-      .end((err, response) => {
-        const { token } = response.body.data;
-        validToken = token;
-        done();
-      });
+      .send(anotherUser);
+    validToken = data.token;
   });
 
   it('should log out a user', async () => {

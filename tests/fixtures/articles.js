@@ -2,7 +2,9 @@ import faker from 'faker';
 import uuid from 'uuid';
 import randomBool from 'random-bool';
 
-import { users } from './users';
+import {
+  users
+} from './users';
 
 const comment = {
   content: faker.lorem.sentence(),
@@ -11,7 +13,9 @@ const comment = {
 
 const tag = ['motivation', 'health', 'emotion'];
 
-const articles = users.map(({ id }) => ({
+const articles = users.map(({
+  id
+}) => ({
   id: uuid(),
   authorId: id,
   tag: faker.random.arrayElement(tag),
@@ -43,7 +47,9 @@ const duplicatedCategoriesId = Array(10)
 const usersId = users.map(user => user.id);
 const articleIds = articles.map(article => article.id);
 
-const votes1 = articles.map(({ id }, index) => ({
+const votes1 = articles.map(({
+  id
+}, index) => ({
   id: uuid(),
   articleId: articleIds[index],
   userId: usersId[Math.floor(Math.random() * 5)],
@@ -51,7 +57,9 @@ const votes1 = articles.map(({ id }, index) => ({
   num: id
 }));
 
-const votes2 = articles.map(({ id }, index) => ({
+const votes2 = articles.map(({
+  id
+}, index) => ({
   id: uuid(),
   articleId: articleIds[index],
   userId: usersId[Math.floor(Math.random() * 5)],
@@ -59,7 +67,9 @@ const votes2 = articles.map(({ id }, index) => ({
   num: id
 }));
 
-const votes3 = articles.map(({ id }, index) => ({
+const votes3 = articles.map(({
+  id
+}, index) => ({
   id: uuid(),
   articleId: articleIds[index],
   userId: usersId[Math.floor(Math.random() * 5)],
@@ -67,7 +77,9 @@ const votes3 = articles.map(({ id }, index) => ({
   num: id
 }));
 
-const articleCategories = articles.map(({ id }, index) => ({
+const articleCategories = articles.map(({
+  id
+}, index) => ({
   id: uuid(),
   authorId: usersId[index],
   articleId: id,
@@ -126,7 +138,9 @@ const votes = articles.map(({ authorId }, i, array) => ({
   upVote: i > 3
 }));
 
-const downVotes = articles.map(({ authorId }, i, array) => ({
+const downVotes = articles.map(({
+  authorId
+}, i, array) => ({
   id: uuid(),
   userId: authorId,
   articleId: i > 4 ? array[3].id : array[2].id,
