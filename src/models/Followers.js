@@ -16,7 +16,8 @@ export default class Followers extends Model {
       defaultValue: Sequelize.UUIDV4
     },
     followeeId: Sequelize.UUID,
-    followerId: Sequelize.UUID
+    followerId: Sequelize.UUID,
+    active: Sequelize.BOOLEAN
   }
 
   /**

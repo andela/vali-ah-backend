@@ -90,7 +90,7 @@ export default class ArticleCategories extends Model {
  *
  * @param {Object} tag - tags to be created
  * @param {uuid} id - id of the article to which tags belong
- *@param {uuid} authorId - id of the author
+ * @param {uuid} authorId - id of the author
  *
  * @returns {Array} - array
  */

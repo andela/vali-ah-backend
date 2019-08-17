@@ -14,7 +14,7 @@ const debug = Debug('dev');
   * @param {Object} response - express response object
   * @param {Function} next - callback function to call next middleware
   *
-  * @return {object} - the response from the server
+  * @returns {object} - the response from the server
   */
 export default (err, request, response, next) => {
   const isProduction = process.env.NODE_ENV === 'production';

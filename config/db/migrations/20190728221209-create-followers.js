@@ -24,6 +24,11 @@ export default {
           type: Sequelize.UUID,
           onDelete: 'CASCADE'
         },
+        active: {
+          allowNull: false,
+          type: Sequelize.BOOLEAN,
+          defaultValue: true
+        },
         createdAt: {
           allowNull: false,
           type: Sequelize.DATE,

@@ -67,7 +67,7 @@ export default class Bookmarks extends Model {
    * @param {string} articleId - id of the article to bookmark
    * @param {string} userId - id of user
    *
-   * @return {Object | void} - details of existing bookmark
+   * @returns {Object | void} - details of existing bookmark
    */
   static async getExistingBookmark(articleId, userId) {
     const bookmark = await Bookmarks.findOne({ where: { articleId, userId } });

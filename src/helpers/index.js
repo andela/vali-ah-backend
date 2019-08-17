@@ -1,13 +1,16 @@
 import makeCapitalize from './makeCapitalize';
 import { ApplicationError, NotFoundError } from './errors';
 import genericArticle from './genericArticleHelper';
+import paginator from './paginator';
 
 const { filter, extractArticles } = genericArticle;
 
-export { filter, extractArticles };
 
-export default {
+export {
   makeCapitalize,
   ApplicationError,
-  NotFoundError
+  NotFoundError,
+  filter,
+  extractArticles,
+  paginator
 };

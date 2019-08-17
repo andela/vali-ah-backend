@@ -35,7 +35,7 @@ const twitterConfig = {
  *
  * @param {Object} request.body request body
  *
- * @return {Object} User Details gotten from Facebook
+ * @returns {Object} User Details gotten from Facebook
  */
 export const facebookAuth = async ({ accessToken }) => {
   const appAccessTokenURL = `https://graph.facebook.com/oauth/access_token?client_id=${FACEBOOK_APP_ID}&client_secret=${FACEBOOK_APP_SECRET}&grant_type=client_credentials`;
@@ -78,7 +78,7 @@ export const facebookAuth = async ({ accessToken }) => {
  *
  * @param {Object} request request body
  *
- * @return {Object} User Details gotten from google
+ * @returns {Object} User Details gotten from google
  */
 export const googleAuth = async ({ accessToken }) => {
   const client = new OAuth2Client(GOOGLE_CLIENT_ID);
@@ -106,7 +106,7 @@ export const googleAuth = async ({ accessToken }) => {
  *
  * @param {Object} request request object containing user details
  *
- * @return {Object} response object
+ * @returns {Object} response object
  */
 export const createOrFindUser = async ({
   firstName,
@@ -156,7 +156,7 @@ export const createOrFindUser = async ({
  * @param {Object} profile user profile returned from twitter
  * @param {Function} done
  *
- * @return {Object} user details returned from twitter
+ * @returns {Object} user details returned from twitter
  */
 export const performCallback = (accessToken, refreshToken, profile, done) => {
   const {

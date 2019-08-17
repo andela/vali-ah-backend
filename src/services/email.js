@@ -27,7 +27,7 @@ const templates = {
  * @param {Array} payload - can be a list for bulk sending. must contain email parameter
  * @param {string} template - sendgrid template to use
  *
- * @return {Promise} - Returns a promise that get resolved to a success object
+ * @returns {Promise} - Returns a promise that get resolved to a success object
  */
 export default async ({ type, payload, template }) => {
   try {

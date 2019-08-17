@@ -17,7 +17,7 @@ export default {
    * @param {Object} request - the request object to the server
    * @param {Object} response - express response object
    *
-   * @return {Object} - response object
+   * @returns {Object} - response object
    */
   signup: async (request, response) => {
     const existingUser = await Users.getExistingUser(request.body.email);
@@ -48,7 +48,7 @@ export default {
    * @param {Object} request - the request object to the server
    * @param {Object} response - express response object
    *
-   * @return {Object} - response object
+   *  @returns {Object} - response object
    */
   signin: async (request, response) => {
     const { password, email } = request.body;
@@ -73,7 +73,7 @@ export default {
    * @param {Object} request - The request object to the server
    * @param {Object} response - express response object
    *
-   * @return {Object} - response object
+   * @returns {Object} - response object
    */
   signout: async (request, response) => {
     const authHeader = request.headers.authorization;
@@ -96,7 +96,7 @@ export default {
    * @param {Object} request - the request object to the server
    * @param {Object} response - express response object
    *
-   * @return {Object} - response object
+   * @returns {Object} - response object
    */
   socialLogin: async (request, response) => {
     const { provider } = request.params;
@@ -118,7 +118,7 @@ export default {
    * @param {Object} request object
    * @param {Object} response - express response object
    *
-   * @return {Object} response object
+   * @returns {Object} response object
    */
   twitterLogin: async (request, response) => {
     const { status, data } = await createOrFindUser(request.user);
@@ -133,7 +133,7 @@ export default {
    * @param {Object} request - request object to the server
    * @param {Object} response - response object from the server
    *
-   * @return {void} - empty object
+   * @returns {void} - empty object
    */
   resetPassword: async (request, response) => {
     const host = request.get('host');
@@ -165,7 +165,7 @@ export default {
    * @param {Object} request - The request object to the server
    * @param {Object} response - The response object from the server
    *
-   * @return {void} - empty object
+   * @returns {void} - empty object
    */
   updatePassword: async (request, response) => {
     const { id, token } = request.params;

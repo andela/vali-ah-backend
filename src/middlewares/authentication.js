@@ -17,7 +17,7 @@ export default {
    * @param {Object} response - express response object
    * @param {Function} next
    *
-   * @return {void} - undefined
+   * @returns {void} - undefined
    */
   verifyToken: async (request, response, next) => {
     const authHeader = request.headers.authorization;
@@ -48,7 +48,7 @@ export default {
    * @param {Object} response - express response object
    * @param {Function} next
    *
-   * @return {Object} - response object
+   * @returns {Object} - response object
    */
   isAdmin: (request, response, next) => {
     const { isAdmin } = request.user;
@@ -64,7 +64,7 @@ export default {
    * @param {Object} response - express response object
    * @param {Function} next
    *
-   * @return {void} - passes control to the next middleware
+   * @returns {void} - passes control to the next middleware
    */
   isAuthor: async (request, response, next) => {
     const { id } = request.user;

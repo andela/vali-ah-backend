@@ -28,7 +28,7 @@ export default {
     * @param {Object} request - express request object
     * @param {Object} response - express response object
     *
-    * @return {Object} - the response from the server
+    * @returns {Object} - the response from the server
     */
   createComment: async (request, response) => {
     const { articleId } = request.params;
@@ -51,7 +51,7 @@ export default {
    * @param {Object} request - express request object
    * @param {Object} response - express response object
    *
-   * @return {Object} - the created bookmark
+   * @returns {Object} - the created bookmark
    */
   createBookmark: async (request, response) => {
     const { articleId } = request.params;
@@ -78,7 +78,7 @@ export default {
    * @param {Object} request - express request object
    * @param {Object} response - express response object
    *
-   * @return {string} - article removed success message
+   * @returns {string} - article removed success message
    */
   removeBookmark: async (request, response) => {
     const { articleId } = request.params;
@@ -103,7 +103,7 @@ export default {
    * @param {Object} request - express request object
    * @param {Object} response - express response object
    *
-   * @return {Object} - callback that execute the controller
+   * @returns {Object} - callback that execute the controller
    */
   searchArticle: async (request, response) => {
     const {
@@ -150,7 +150,7 @@ export default {
    * @param {Object} request - express request object
    * @param {Object} response - express response object
    *
-   * @return {Object} - callback that execute the controller
+   * @returns {Object} - callback that execute the controller
    */
   voteArticle: async (request, response) => {
     const { voteType } = request.body;
@@ -201,7 +201,7 @@ export default {
     * @param {request} request - express request object
     * @param {response} response - express response object
     *
-    * @return {Object} - the response from the server
+    * @returns {Object} - the response from the server
     */
   getComments: async (request, response) => {
     const { articleId } = request.params;
@@ -227,7 +227,7 @@ export default {
     * @param {Object} request - express request object
     * @param {Object} response - express response object
     *
-    * @return {Object} - callback that execute the controller
+    * @returns {Object} - callback that execute the controller
     */
   createArticle: async (request, response) => {
     const { tag } = request.body;
@@ -260,7 +260,7 @@ export default {
     * @param {Object} request - express request object
     * @param {Object} response - express response object
     *
-    * @return {Object} - callback that execute the controller
+    * @returns {Object} - callback that execute the controller
     */
   getBySlug: async (request, response) => {
     const { slug } = request.params;
@@ -321,7 +321,7 @@ export default {
     * @param {Object} request - express request object
     * @param {Object} response - express response object
     *
-    * @return {Object} - callback that execute the controller
+    * @returns {Object} - callback that execute the controller
     */
   updateArticle: async (request, response) => {
     const { slug } = request.params;
@@ -361,7 +361,7 @@ export default {
     * @param {Object} request - express request object
     * @param {Object} response - express response object
     *
-    * @return {Object} - callback that execute the controller
+    * @returns {Object} - callback that execute the controller
     */
   deleteArticle: async (request, response) => {
     const { slug } = request.params;

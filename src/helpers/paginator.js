@@ -11,8 +11,19 @@ import { NotFoundError } from './errors';
  * @returns {Object} returns object
  */
 const paginator = async (Source, options) => {
+  const {
+    page,
+    limit,
+    dataSource,
+    dataToSource,
+    ...otherOptions
+  } = options;
+
+  if (!Source) {
+    return { data: await dataSource({ data: dataToSource, options: otherOptions }) };
+  }
+
   const countResult = await Source.findAndCountAll({});
-  const { page, limit, ...otherOptions } = options;
   const { count } = countResult;
 
   if (!count) throw new NotFoundError('No articles found');

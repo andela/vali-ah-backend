@@ -102,7 +102,7 @@ export default class Users extends Model {
    *
    * @param {string} email
    *
-   * @return {Object | void} - details of existing user
+   * @returns {Object | void} - details of existing user
    */
   static async getExistingUser(email) {
     const user = await Users.findOne({
@@ -198,20 +198,51 @@ export default class Users extends Model {
    * @returns {boolean} true or false
    */
   static async getUserFollowers({ data, options = {} }) {
-    const { user } = data;
+    const { user, attributes = [] } = data;
 
     const userObject = await Users.findByPk(user);
 
     if (!userObject) throw new NotFoundError();
 
     return userObject.getFollowers({
+      where: { active: true },
       attributes: ['id'],
       order: ['id'],
       include: [
         {
-          model: Users,
-          as: 'followers',
-          attributes: ['id', 'firstName', 'lastName', 'email']
+          model: Users, as: 'followers', attributes: ['id', 'firstName', 'lastName', 'userName', ...attributes]
+        }
+      ],
+      ...options
+    });
+  }
+
+  /**
+   * Get User's Followings
+   *
+   * @static
+   * @memberof User
+   *
+   * @param {Object} query
+   * @param {Object} query.data - details to be used in the query
+   * @param {Object} query.options - extra options to pass to sequlize
+   *
+   * @returns {boolean} true or false
+   */
+  static async getUserFollowings({ data, options = {} }) {
+    const { user, attributes = [] } = data;
+
+    const userObject = await Users.findByPk(user);
+
+    if (!userObject) throw new NotFoundError();
+
+    return userObject.getFollowing({
+      where: { active: true },
+      attributes: ['id'],
+      order: ['id'],
+      include: [
+        {
+          model: Users, as: 'following', attributes: ['id', 'firstName', 'lastName', 'userName', ...attributes]
         }
       ],
       ...options
