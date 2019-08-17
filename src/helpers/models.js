@@ -1,4 +1,6 @@
 import async from 'async';
+import Sequelize from 'sequelize';
+
 
 /**
  * paginates sequelize model query
@@ -53,3 +55,6 @@ export const batchQuery = async (dataSource, handler) => {
       await dataSource.next();
     });
 };
+
+export const modelFieldsToLiteral = ({ alias, fields }) => (fields)
+  .map(column => [Sequelize.literal(`${alias}."${column}"`), column]);
