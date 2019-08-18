@@ -27,6 +27,7 @@ export default {
     const newUser = await Users.create(request.body);
 
     const { email, firstName } = newUser;
+    const { password, ...createdUser } = newUser.dataValues;
     const host = request.get('host');
     const token = generateAuthToken(newUser);
 
@@ -39,7 +40,7 @@ export default {
       }]
     });
 
-    return response.status(201).json({ status: 'success', data: { user: newUser, token } });
+    return response.status(201).json({ status: 'success', data: { user: createdUser, token } });
   },
 
   /**

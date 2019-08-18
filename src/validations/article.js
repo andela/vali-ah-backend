@@ -1,6 +1,6 @@
 import { check } from 'express-validator/check';
 
-const regEx = /^(draft|public)$/;
+const regEx = /^(draft|published)$/;
 
 export default {
   articleCreateSchema: [
@@ -35,6 +35,6 @@ export default {
     check('status')
       .optional()
       .matches(regEx)
-      .withMessage('status must be either "draft" or "public"'),
+      .withMessage('status must be either "draft" or "published"'),
   ]
 };

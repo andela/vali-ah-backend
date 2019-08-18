@@ -98,7 +98,6 @@ export default class Users extends Model {
     const model = super.init(Users.modelFields, { sequelize });
 
     model.beforeCreate(Users.beforeHook);
-    model.afterCreate(this.afterCreateHook);
     model.beforeUpdate(Users.beforeUpdateHook);
 
     return model;
@@ -164,21 +163,6 @@ export default class Users extends Model {
 
     return user;
   };
-
-  /**
-   * Hook (after creation) for the User model
-   *
-   * @static
-   * @memberof User
-   *
-   * @param {Object} user
-   *
-   * @returns {Object} user to return
-   */
-  static afterCreateHook(user) {
-    delete user.password;
-    return user;
-  }
 
   /**
    * Compares user password to hashed password
@@ -326,5 +310,19 @@ export default class Users extends Model {
   async decodeVerificationToken(token) {
     const secret = `${this.password}!${this.createdAt.toISOString()}`;
     return jwt.verify(token, secret);
+  }
+
+  /**
+   * Get single user by id
+   *
+   * @static
+   * @memberof User
+   *
+   * @param {string} userId - Id of user to be sort
+   *
+   * @returns {Object} user object
+   */
+  static async getSingleUserById(userId) {
+    return this.findByPk(userId);
   }
 }

@@ -7,6 +7,7 @@ import notification from '../services/notification';
 import * as helpers from '../helpers';
 import { getTagName } from '../helpers/article';
 
+
 const { filter, extractArticles } = helpers;
 const {
   Articles,
@@ -16,8 +17,10 @@ const {
   Votes,
   Reports,
   Comments,
+  Followers,
   Bookmarks,
-  InlineComments
+  InlineComments,
+  Categories
 } = Models;
 
 export default {
@@ -115,18 +118,18 @@ export default {
     const standardQueries = title || author || tag;
     const queryFilter = filter(title, tag, author, keyword);
 
+    if (keyword && standardQueries) {
+      return response
+        .status(400)
+        .json({ status: 'error', message: 'Keyword cannot be used with title, author or tag' });
+    }
+
     const { data: results, count, currentCount } = await paginator(ArticleCategories, {
       ...queryFilter,
       raw: true,
       page,
       limit
     });
-
-    if (keyword && standardQueries) {
-      return response
-        .status(400)
-        .json({ status: 'error', message: 'Keyword cannot be used with title, author or tag' });
-    }
     if (!currentCount) return response.status(404).json({ status: 'error', message: `${queriesValues} Not found` });
 
     const result = extractArticles(results);
@@ -465,5 +468,53 @@ export default {
     const comments = await Articles.getInlineComments(articleId);
 
     return response.status(200).json({ status: 'success', data: comments, message: 'Inline comment retrieved succesfully' });
+  },
+
+  /**
+    * controller for fetching articles followed by user
+    *
+    * @function
+    *
+    * @param {Object} request - express request object
+    * @param {Object} response - express response object
+    *
+    * @return {Object} - callback that execute the controller
+    */
+  getUserFeed: async (request, response) => {
+    const { id: userId } = request.user;
+    const user = await Users.getSingleUserById(userId);
+
+    if (!user) throw new ApplicationError(404, 'User not found');
+
+    const { page = 1, limit = 10 } = request.query;
+    const followedAuthors = await Followers.getAuthors(userId);
+    const followedAuthorsId = followedAuthors.map(eachAuthor => eachAuthor.followeeId);
+    const { data } = await paginator(Articles, {
+      where: {
+        authorId: followedAuthorsId,
+        status: 'published'
+      },
+      include: [{
+        model: Categories,
+        as: 'categories'
+      },
+      {
+        model: Users,
+        as: 'authors'
+      }],
+      page,
+      limit
+    });
+    const articles = await data.map((eachArticle) => {
+      const { authors, categories, ...article } = eachArticle.dataValues;
+      const { password, ...author } = authors.dataValues;
+      const tags = categories.map(eachCategory => eachCategory.category);
+
+      return { ...article, tags, author };
+    });
+
+    return response.status(200).json({
+      status: 'success', data: articles, message: 'Articles fetch was succesfully'
+    });
   }
 };
