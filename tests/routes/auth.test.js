@@ -12,7 +12,8 @@ import {
   invalidEmail,
   shortPassword,
   user,
-  anotherUser
+  anotherUser,
+  sameUserName
 } from '../fixtures/users';
 
 chai.use(chaiHttp);
@@ -43,6 +44,18 @@ describe('Auth Routes', () => {
       response.body.data.user.should.have.property('firstName');
       response.body.data.user.should.have.property('lastName');
       response.body.data.user.should.have.property('email');
+    });
+
+    it('should throw an error if userName is already in use', async () => {
+      const response = await chai
+        .request(app)
+        .post('/api/v1/auth/signup')
+        .send(sameUserName);
+
+      response.should.have.status(409);
+      response.body.error.message.should.equal('UserName already in use');
+      response.body.status.should.eql('error');
+      response.body.should.have.property('error');
     });
 
     it('should return an error if user is already registered', async () => {

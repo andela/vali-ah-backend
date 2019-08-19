@@ -10,6 +10,14 @@ const user = {
   password: 'gillberto5'
 };
 
+const sameUserName = {
+  firstName: 'gilbert',
+  lastName: 'erick',
+  userName: 'erickBlaze',
+  email: 'gillberto55@gmail.com',
+  password: 'gillberto5'
+};
+
 const user2 = {
   firstName: 'gilbert',
   lastName: 'erick',
@@ -163,5 +171,6 @@ export {
   randomUserToken,
   usersWithFollowing,
   profiledataForLowerCase,
-  invalidUserId
+  invalidUserId,
+  sameUserName
 };

@@ -114,14 +114,15 @@ export default class Users extends Model {
    * @static
    * @memberof Users
    *
-   * @param {string} email
+   * @param {string} queryString - string to sort in the database
+   * @param {string} column - column to search
    *
    * @returns {Object | void} - details of existing user
    */
-  static async getExistingUser(email) {
+  static async getExistingUser(queryString, column = 'email') {
     const user = await Users.findOne({
       where: {
-        email
+        [column]: queryString
       }
     });
 
