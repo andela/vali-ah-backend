@@ -38,7 +38,7 @@ const userAuth = generateAuthToken({ id: users[0].id });
 const profileData = {
   firstName: faker.name.firstName(),
   lastName: faker.name.lastName(),
-  userName: faker.internet.userName(),
+  userName: faker.internet.userName({ min: 2, max: 10 }).slice(0, 19),
   email: faker.internet.email(),
   password: faker.internet.password()
 };

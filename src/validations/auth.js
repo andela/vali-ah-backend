@@ -63,36 +63,6 @@ export default {
       .exists()
       .withMessage('Access token is required'),
   ],
-  createSearchSchema: [
-    check('title')
-      .optional()
-      .trim(),
-    check('tag')
-      .optional()
-      .trim()
-      .isAlpha()
-      .withMessage('Tag can only be alphabets'),
-    check('author')
-      .optional()
-      .trim()
-      .withMessage('Author can only be alphabets'),
-    check('keyword')
-      .optional()
-      .trim()
-      .withMessage('Keyword can only be alphabets'),
-    check('page')
-      .optional()
-      .trim()
-      .isInt()
-      .withMessage('Page must be a number')
-      .customSanitizer(page => page.toLowerCase()),
-    check('limit')
-      .optional()
-      .trim()
-      .isNumeric()
-      .withMessage('Limit must be a number')
-      .customSanitizer(page => page.toLowerCase())
-  ],
   emailSchema: [
     check('email')
       .trim()

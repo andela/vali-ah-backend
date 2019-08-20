@@ -1,9 +1,9 @@
 import express from 'express';
-import authors from '../controllers/author';
+import AuthorController from '../controllers/author';
 import middlewares from '../middlewares';
 
 const { asyncWrapper, verifyToken } = middlewares;
-const { getAllAuthors } = authors;
+const { getAllAuthors } = AuthorController;
 const router = express.Router();
 
 /**

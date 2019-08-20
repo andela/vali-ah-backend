@@ -71,11 +71,20 @@ export default {
           content: faker.lorem.sentence(15),
           userId: authorId,
           articleId
+        }))
+      );
+
+      const Subscriptions = await queryInterface.bulkInsert(
+        'Subscriptions',
+        category.map(() => ({
+          id: uuid(),
+          userId: users[0].id,
+          categoryId: faker.random.arrayElement(categoriesId)
         })),
         { returning: true }
       );
 
-      return Promise.resolve(articleCategories);
+      return Promise.resolve(articleCategories, Subscriptions);
     } catch (error) {
       debug(error);
     }

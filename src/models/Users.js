@@ -82,6 +82,11 @@ export default class Users extends Model {
       as: 'commentVotes',
       onDelete: 'CASCADE'
     });
+    this.hasMany(models.Subscriptions, {
+      foreignKey: 'userId',
+      as: 'subscriptions',
+      onDelete: 'CASCADE'
+    });
   }
 
   /**
@@ -310,19 +315,5 @@ export default class Users extends Model {
   async decodeVerificationToken(token) {
     const secret = `${this.password}!${this.createdAt.toISOString()}`;
     return jwt.verify(token, secret);
-  }
-
-  /**
-   * Get single user by id
-   *
-   * @static
-   * @memberof User
-   *
-   * @param {string} userId - Id of user to be sort
-   *
-   * @returns {Object} user object
-   */
-  static async getSingleUserById(userId) {
-    return this.findByPk(userId);
   }
 }

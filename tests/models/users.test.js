@@ -22,7 +22,7 @@ describe('Users Model', () => {
     await Users.destroy({ where: {} });
   });
 
-  it('getSingleUser() if exist', async () => {
+  it('should throw an error for a user that doesn\'t exists', async () => {
     (Users.getSingleUser(faker.random.uuid())).should.eventually.rejected;
   });
 

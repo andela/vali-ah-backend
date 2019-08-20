@@ -18,4 +18,5 @@ export const generateAuthToken = ({ id, isAdmin }) => jwt.sign(
   { expiresIn: '24h' }
 );
 
+
 export default { generateAuthToken };

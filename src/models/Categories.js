@@ -17,7 +17,7 @@ export default class Categories extends Model {
     },
     category: Sequelize.STRING,
     description: Sequelize.STRING
-  }
+  };
 
   /**
    * Initializes the Categories model

@@ -30,12 +30,17 @@ let currentUserId;
 
 describe('Profile', () => {
   before(async () => {
-    await Users.destroy({ cascade: true, truncate: true });
+    await Users.destroy({ where: {} });
     responseToken = await chai.request(app)
       .post(signUrl)
       .send(usersignUpdetail);
   });
-  describe('Patch /users/profile/', () => {
+
+  after(async () => {
+    await Users.destroy({ where: {} });
+  });
+
+  describe('PATCH /users/profile/', () => {
     it('should update user with valid input', async () => {
       newUser = await Users.create(profileData);
       validToken = responseToken.body.data.token;
@@ -89,7 +94,7 @@ describe('Profile', () => {
     });
   });
 
-  describe('Get /users/profile/', () => {
+  describe('GET /users/profile/', () => {
     it('should get a user', async () => {
       const response = await chai
         .request(app)
@@ -110,7 +115,7 @@ describe('Profile', () => {
     });
   });
 
-  describe('Patch users/profile/:userId/following', () => {
+  describe('PATCH users/profile/:userId/following', () => {
     it('should follow if a user exist', async () => {
       const response = await chai.request(app)
         .patch(`${profileUrl}${newUser.dataValues.id}${followUnfollowUrl}`)
@@ -192,14 +197,14 @@ describe('Profile', () => {
     });
   });
 
-  describe('get users/profile/:userId/followers', () => {
+  describe('GET users/profile/:userId/followers', () => {
     it('should get all followers if user exist', async () => {
       const response = await chai.request(app)
         .get(`${profileUrl}${newUser.dataValues.id}${getFollowersUrl}`)
         .set('authorization', `Bearer ${validToken}`);
 
       response.should.have.status(200);
-      response.body.should.have.a.property('allFollowers');
+      response.body.should.have.a.property('data');
       response.body.status.should.eql('success');
     });
 
@@ -214,14 +219,14 @@ describe('Profile', () => {
     });
   });
 
-  describe('get users/profile/:userId/followings', () => {
+  describe('GET users/profile/:userId/followings', () => {
     it('should get followings if a user exist', async () => {
       const response = await chai.request(app)
         .get(`${profileUrl}${newUser.dataValues.id}${getFollowingsUrl}`)
         .set('authorization', `Bearer ${validToken}`);
 
       response.should.have.status(200);
-      response.body.should.have.a.property('allFollowings');
+      response.body.should.have.a.property('data');
       response.body.status.should.eql('success');
     });
 

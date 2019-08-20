@@ -7,7 +7,6 @@ import notification from '../services/notification';
 import * as helpers from '../helpers';
 import { getTagName } from '../helpers/article';
 
-
 const { filter, extractArticles } = helpers;
 const {
   Articles,
@@ -63,9 +62,12 @@ export default {
 
     const articleObject = await Articles.getExistingArticle(articleId);
 
-    const existingBookmark = await Bookmarks.getExistingBookmark(articleId, userId);
+    const existingBookmark = await Bookmarks.getExistingBookmark(
+      articleId,
+      userId
+    );
 
-    if (existingBookmark) throw new ApplicationError(409, 'Bookmark already added');
+    if (existingBookmark) { throw new ApplicationError(409, 'Bookmark already added'); }
 
     const newBookmark = await articleObject.createBookmark({ userId });
 
@@ -88,7 +90,10 @@ export default {
     const { articleId } = request.params;
     const { id: userId } = request.user;
 
-    const existingBookmark = await Bookmarks.getExistingBookmark(articleId, userId);
+    const existingBookmark = await Bookmarks.getExistingBookmark(
+      articleId,
+      userId
+    );
 
     if (!existingBookmark) throw new NotFoundError();
 
@@ -106,17 +111,22 @@ export default {
    *
    * @param {Object} request - express request object
    * @param {Object} response - express response object
+   * @param {Function} next
    *
    * @returns {Object} - callback that execute the controller
    */
-  searchArticle: async (request, response) => {
+  searchArticle: async (request, response, next) => {
     const {
-      author, title, tag, keyword, page = 1, limit = 10
+      author, title, tag, keyword, includeSubscriptions, page = 1, limit = 10
     } = request.query;
 
     const queriesValues = title || tag || author || keyword;
     const standardQueries = title || author || tag;
     const queryFilter = filter(title, tag, author, keyword);
+
+    if (includeSubscriptions) {
+      return next();
+    }
 
     if (keyword && standardQueries) {
       return response
@@ -132,16 +142,13 @@ export default {
     });
     if (!currentCount) return response.status(404).json({ status: 'error', message: `${queriesValues} Not found` });
 
-    const result = extractArticles(results);
+    const data = extractArticles(results);
 
     return response.status(200).json({
       status: 'success',
-      data: {
-        count,
-        page,
-        current: +page,
-        result
-      },
+      data,
+      count,
+      page,
       message: 'Articles retrieved successfully'
     });
   },
@@ -280,7 +287,7 @@ export default {
       },
       {
         model: Users,
-        as: 'authors'
+        as: 'author'
       },
       {
         model: ReadStats
@@ -305,8 +312,8 @@ export default {
     });
 
     const tagName = await getTagName(tags);
-    const { password, ...author } = articleResponse.dataValues.authors.dataValues;
-    const { category, authors, ...newArticleResponse } = articleResponse.dataValues;
+    const { category, author: articleAuthor, ...newArticleResponse } = articleResponse.dataValues;
+    const { password, ...author } = articleAuthor.dataValues;
 
     articleResponse = {
       ...newArticleResponse,
@@ -482,14 +489,10 @@ export default {
     */
   getUserFeed: async (request, response) => {
     const { id: userId } = request.user;
-    const user = await Users.getSingleUserById(userId);
-
-    if (!user) throw new ApplicationError(404, 'User not found');
-
     const { page = 1, limit = 10 } = request.query;
     const followedAuthors = await Followers.getAuthors(userId);
     const followedAuthorsId = followedAuthors.map(eachAuthor => eachAuthor.followeeId);
-    const { data } = await paginator(Articles, {
+    const { data, count } = await paginator(Articles, {
       where: {
         authorId: followedAuthorsId,
         status: 'published'
@@ -500,21 +503,78 @@ export default {
       },
       {
         model: Users,
-        as: 'authors'
+        as: 'author'
       }],
       page,
       limit
     });
     const articles = await data.map((eachArticle) => {
-      const { authors, categories, ...article } = eachArticle.dataValues;
-      const { password, ...author } = authors.dataValues;
+      const { author: articleAuthor, categories, ...article } = eachArticle.dataValues;
+      const { password, ...author } = articleAuthor.dataValues;
       const tags = categories.map(eachCategory => eachCategory.category);
 
       return { ...article, tags, author };
     });
 
     return response.status(200).json({
-      status: 'success', data: articles, message: 'Articles fetch was succesfully'
+      status: 'success', data: articles, count, page, message: 'Articles fetch was succesfully'
+    });
+  },
+
+  /** controller for getting articles subscribed for.
+   *
+   * @function
+   *
+   * @param {Object} request - express request object
+   * @param {Object} response - express response object
+   *
+   * @return {Object} - callback that execute the controller
+   */
+  getSubscribedArticles: async (request, response) => {
+    const { id: userId } = request.user;
+    const { page = 1, limit = 10 } = request.query;
+
+    const user = await Users.findByPk(userId);
+    const categoryIds = (await user.getSubscriptions({ attributes: ['categoryId'] })).map(sub => sub.categoryId);
+
+    const query = {
+      limit,
+      page,
+      include: [{
+        model: Users,
+        as: 'author',
+        attributes: ['id', 'firstName', 'lastName', 'avatarUrl']
+
+      }, {
+        model: ArticleCategories,
+        as: 'category',
+        where: { categoryId: categoryIds },
+        attributes: [['categoryId', 'id']],
+        include: [{
+          model: Categories,
+          as: 'tag',
+          attributes: ['category']
+        }]
+      }]
+    };
+
+    const { data, count } = await paginator(Articles, query);
+
+    const articles = data.map((article) => {
+      const { category, ...articleData } = article.toJSON();
+
+      return {
+        ...articleData,
+        category: category.map(({ id, tag }) => ({ id, category: tag && tag.category }))
+      };
+    });
+
+    return response.status(200).json({
+      status: 'success',
+      data: articles,
+      count,
+      page,
+      message: 'Subscribed articles retrieved successfully'
     });
   }
 };

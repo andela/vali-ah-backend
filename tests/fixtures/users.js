@@ -103,12 +103,12 @@ const users = Array(10)
     id: uuid(),
     firstName: faker.name.firstName(),
     lastName: faker.name.lastName(),
-    userName: faker.internet.userName(),
+    userName: faker.internet.userName({ min: 2, max: 10 }).slice(0, 19),
     email: faker.internet.email(),
     password: faker.internet.password()
   }));
 
-const userToken = generateAuthToken({ id: 'bd4c4dfa-b2dd-47f9-9599-1b588b35363e' });
+const userToken = generateAuthToken({ id: users[0].id });
 const randomUserToken = generateAuthToken({ id: uuid() });
 
 const usersWithFollowing = users.map(({ id }) => ({
@@ -121,7 +121,7 @@ const profileId = '94189e3d-0379-4dd2-b03d-73fa8c14b3ab';
 const profileData = {
   firstName: faker.name.firstName(),
   lastName: faker.name.lastName(),
-  userName: faker.internet.userName(),
+  userName: faker.internet.userName({ min: 2, max: 10 }).slice(0, 19),
   email: faker.internet.email(),
   password: faker.internet.password()
 };
@@ -129,7 +129,7 @@ const profileData = {
 const usersignUpdetail = {
   firstName: faker.name.firstName(),
   lastName: faker.name.lastName(),
-  userName: faker.internet.userName(),
+  userName: faker.internet.userName({ min: 2, max: 10 }).slice(0, 19),
   email: faker.internet.email(),
   password: faker.internet.password()
 };

@@ -155,27 +155,33 @@
           {
             "name": "tag",
             "description": "content of the articles.",
-            "in": "body",
+            "in": "query",
             "required": true,
             "type": "string"
           },
           {
             "name": "title",
             "description": "content of the articles.",
-            "in": "body",
+            "in": "query",
             "required": true,
             "type": "string"
           },
           {
             "name": "author",
             "description": "associate of the articles model.",
-            "in": "body",
+            "in": "query",
             "type": "string"
+          },
+          {
+            "name": "includeSubscriptions",
+            "description": "boolean to include articles in categories user is subscribed to",
+            "in": "query",
+            "type": "boolean"
           },
           {
             "name": "keyword",
             "description": "a search query for articles.",
-            "in": "body",
+            "in": "query",
             "type": "string"
           }
         ],
@@ -254,7 +260,7 @@
           },
           {
             "name": "suspended",
-            "description": "Boolean to show if article is suspended or not.",
+            "description": "boolean to show if article is suspended or not.",
             "in": "body",
             "type": "boolean",
             "required": false
@@ -268,7 +274,7 @@
           },
           {
             "name": "tag",
-            "description": "Array of uuid's representing article categories.",
+            "description": "array of uuid's representing article categories.",
             "in": "body",
             "type": "array",
             "required": false
@@ -329,7 +335,7 @@
           },
           {
             "name": "suspended",
-            "description": "Boolean to show if article is suspended or not.",
+            "description": "boolean to show if article is suspended or not.",
             "in": "body",
             "type": "boolean",
             "required": false
@@ -343,7 +349,7 @@
           },
           {
             "name": "tag",
-            "description": "Array of uuid's representing article categories.",
+            "description": "array of uuid's representing article categories.",
             "in": "body",
             "type": "array",
             "required": false
