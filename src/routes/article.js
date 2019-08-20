@@ -7,10 +7,8 @@ import articleController from '../controllers/article';
 import authentication from '../middlewares/authentication';
 import validator from '../middlewares/validator';
 import commentSchema from '../validations/comment';
-import searchSchema from '../validations/auth';
 import asyncWrapper from '../middlewares/asyncWrapper';
 import bookmarkSchema from '../validations/bookmark';
-import articlesSchema from '../validations/articles';
 
 const {
   createComment,
@@ -24,20 +22,27 @@ const {
   updateArticle,
   deleteArticle,
   createInlineComment,
-  updateInlineComment, deleteInlineComment, getInlineComment, getArticleInlineComment,
+  updateInlineComment,
+  deleteInlineComment,
+  getInlineComment,
+  getArticleInlineComment,
   getUserFeed,
-  vote, getArticlesSubscribed
+  getSubscribedArticles
 } = articleController;
 const {
-  createCommentSchema, getCommentSchema, createInlineCommentSchema, updateInlineCommentSchema,
+  createCommentSchema,
+  getCommentSchema,
+  createInlineCommentSchema,
+  updateInlineCommentSchema,
   inlineCommentSchema
 } = commentSchema;
-const { createSearchSchema } = searchSchema;
 const { verifyToken, isAuthor, ownComment } = authentication;
 const { createBookmarkSchema } = bookmarkSchema;
-const { voteSchema, articlePathSchema } = articlesSchema;
 const { checkArticle, checkArticleUpdate } = articleValidator;
-const { articleCreateSchema } = articleSchema;
+
+const {
+  createArticleSchema, voteSchema, articlePathSchema, searchSchema
+} = articleSchema;
 
 const router = express.Router();
 
@@ -162,21 +167,25 @@ router.delete(
  *         required: true
  *       - name: tag
  *         description: content of the articles.
- *         in: body
+ *         in: query
  *         required: true
  *         type: string
  *       - name: title
  *         description: content of the articles.
- *         in: body
+ *         in: query
  *         required: true
  *         type: string
  *       - name: author
  *         description: associate of the articles model.
- *         in: body
+ *         in: query
  *         type: string
+ *       - name: includeSubscriptions
+ *         description: boolean to include articles in categories user is subscribed to
+ *         in: query
+ *         type: boolean
  *       - name: keyword
  *         description: a search query for articles.
- *         in: body
+ *         in: query
  *         type: string
  *     responses:
  *       200:
@@ -184,7 +193,8 @@ router.delete(
  *       400:
  *         description: keyword cannot be used with title, author or tag
  */
-router.get('/', validator(createSearchSchema), asyncWrapper(searchArticle));
+router.get('/', validator(searchSchema), asyncWrapper(searchArticle));
+router.get('/', asyncWrapper(verifyToken), asyncWrapper(getSubscribedArticles));
 
 /**
  * @swagger
@@ -243,7 +253,11 @@ router.post(
  *       200:
  *         description: Comments retrieved successfully
  */
-router.get('/:articleId/comments', validator(getCommentSchema), asyncWrapper(getComments));
+router.get(
+  '/:articleId/comments',
+  validator(getCommentSchema),
+  asyncWrapper(getComments)
+);
 
 /**
  * @swagger
@@ -265,7 +279,7 @@ router.get('/:articleId/comments', validator(getCommentSchema), asyncWrapper(get
  *         required: true
  *         type: string
  *       - name: suspended
- *         description: Boolean to show if article is suspended or not.
+ *         description: boolean to show if article is suspended or not.
  *         in: body
  *         type: boolean
  *         required: false
@@ -275,7 +289,7 @@ router.get('/:articleId/comments', validator(getCommentSchema), asyncWrapper(get
  *         type: string
  *         required: false
  *       - name: tag
- *         description: Array of uuid's representing article categories.
+ *         description: array of uuid's representing article categories.
  *         in: body
  *         type: array
  *         required: false
@@ -291,7 +305,7 @@ router.get('/:articleId/comments', validator(getCommentSchema), asyncWrapper(get
 router.post(
   '/',
   upload.single('image'),
-  validator(articleCreateSchema),
+  validator(createArticleSchema),
   asyncWrapper(verifyToken),
   asyncWrapper(checkArticle),
   asyncWrapper(createArticle)
@@ -335,7 +349,7 @@ router.get('/:slug', asyncWrapper(verifyToken), asyncWrapper(getBySlug));
  *         required: true
  *         type: string
  *       - name: suspended
- *         description: Boolean to show if article is suspended or not.
+ *         description: boolean to show if article is suspended or not.
  *         in: body
  *         type: boolean
  *         required: false
@@ -345,7 +359,7 @@ router.get('/:slug', asyncWrapper(verifyToken), asyncWrapper(getBySlug));
  *         type: string
  *         required: false
  *       - name: tag
- *         description: Array of uuid's representing article categories.
+ *         description: array of uuid's representing article categories.
  *         in: body
  *         type: array
  *         required: false
@@ -364,7 +378,7 @@ router.get('/:slug', asyncWrapper(verifyToken), asyncWrapper(getBySlug));
 router.put(
   '/:slug',
   upload.single('image'),
-  validator(articleCreateSchema),
+  validator(createArticleSchema),
   asyncWrapper(verifyToken),
   asyncWrapper(isAuthor),
   asyncWrapper(checkArticleUpdate),
@@ -393,7 +407,6 @@ router.delete(
   asyncWrapper(isAuthor),
   asyncWrapper(deleteArticle)
 );
-
 
 /**
  * @swagger
@@ -498,7 +511,6 @@ router.put(
   asyncWrapper(updateInlineComment)
 );
 
-
 /**
  * @swagger
  *
@@ -523,7 +535,6 @@ router.delete(
   asyncWrapper(deleteInlineComment)
 );
 
-
 /**
  * @swagger
  *
@@ -546,47 +557,5 @@ router.get(
   asyncWrapper(verifyToken),
   asyncWrapper(getInlineComment)
 );
-
-
-/**
- * @swagger
- *
- * /articles/{articleId}/vote:
- *   post:
- *     description: up vote or down vote an article
- *     produces:
- *       - application/json
- *     parameters:
- *       - name: Authorization
- *         in: header
- *         required: true
- *         type: string
- *         default: Bearer {token}
- *       - name: Content-Type
- *         in: header
- *         required: true
- *         type: string
- *         default: application/json
- *       - name: articleId
- *         in: path
- *         required: true
- *         type: string
- *       - name: voteType
- *         description: Vote type. i.e upVote, downVote or nullVote
- *         in: formData
- *         required: true
- *         type: string
- *     responses:
- *       200:
- *         description: Success
- */
-router.post(
-  '/:articleId/vote',
-  asyncWrapper(verifyToken),
-  validator(voteSchema),
-  asyncWrapper(vote)
-);
-
-router.get('/subscriptions', asyncWrapper(verifyToken), asyncWrapper(getArticlesSubscribed));
 
 export default router;

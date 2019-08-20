@@ -113,11 +113,10 @@ class Notification extends EventEmitter {
    * @returns {Object} - sequelize object for inserted data
    */
   async newPublication({ authorId, articleId }) {
-    const { title, authors: { firstName, session } } = await Articles.getSingleArticle(articleId);
-
+    const article = await Articles.getSingleArticle(articleId);
+    const { title, author: { firstName, session } } = article;
     const { sessionId } = session || {};
     const event = 'newPublication';
-
     const followers = await queryPagination(Users.getUserFollowers, { user: authorId, attributes: ['email'] });
 
     const schedule = (followersData) => {
@@ -152,7 +151,7 @@ class Notification extends EventEmitter {
   async articleCommentedOn({ articleId, userId }) {
     const userName = await Users.getUserName(userId);
     const {
-      title, authorId, authors: { email, session }
+      title, authorId, author: { email, session }
     } = await Articles.getSingleArticle(articleId);
 
     const { sessionId } = session || {};
@@ -180,7 +179,7 @@ class Notification extends EventEmitter {
    */
   async articleVoted({ articleId, userId, upVote }) {
     const userName = await Users.getUserName(userId);
-    const { title, authorId, authors: { email, session } } = await Articles
+    const { title, authorId, author: { email, session } } = await Articles
       .getSingleArticle(articleId);
 
     const { sessionId } = session || {};
@@ -206,7 +205,7 @@ class Notification extends EventEmitter {
    * @returns {Object} - sequelize object for inserted data
    */
   async articleSuspended({ articleId }) {
-    const { title, authorId, authors: { email, session } } = await Articles
+    const { title, authorId, author: { email, session } } = await Articles
       .getSingleArticle(articleId);
 
     const { sessionId } = session || {};

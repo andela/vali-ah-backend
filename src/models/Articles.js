@@ -60,28 +60,28 @@ export default class Articles extends Model {
    * @returns {void} no return
    */
   static associate(models) {
-    Articles.belongsTo(models.Users, {
+    this.belongsTo(models.Users, {
       foreignKey: 'authorId',
-      as: 'authors',
+      as: 'author',
       onDelete: 'CASCADE'
     });
 
-    Articles.hasMany(models.Bookmarks, {
+    this.hasMany(models.Bookmarks, {
       foreignKey: 'articleId',
       onDelete: 'CASCADE'
     });
 
-    Articles.hasMany(models.Reports, {
+    this.hasMany(models.Reports, {
       foreignKey: 'articleId',
       onDelete: 'CASCADE'
     });
 
-    Articles.hasMany(models.Votes, {
+    this.hasMany(models.Votes, {
       foreignKey: 'articleId',
       onDelete: 'CASCADE'
     });
 
-    Articles.hasMany(models.Comments, {
+    this.hasMany(models.Comments, {
       foreignKey: 'articleId',
       onDelete: 'CASCADE'
     });
@@ -92,13 +92,13 @@ export default class Articles extends Model {
       onDelete: 'CASCADE'
     });
 
-    Articles.hasMany(models.ArticleCategories, {
+    this.hasMany(models.ArticleCategories, {
       foreignKey: 'articleId',
       as: 'category',
       onDelete: 'CASCADE'
     });
 
-    Articles.belongsToMany(models.Categories, {
+    this.belongsToMany(models.Categories, {
       as: 'categories',
       through: 'ArticleCategories',
       foreignKey: 'articleId',
@@ -106,12 +106,12 @@ export default class Articles extends Model {
       onDelete: 'CASCADE'
     });
 
-    Articles.hasMany(models.ReadStats, {
+    this.hasMany(models.ReadStats, {
       foreignKey: 'articleId',
       onDelete: 'CASCADE'
     });
 
-    Articles.hasMany(models.Articles, {
+    this.hasMany(models.Articles, {
       foreignKey: 'followUpId',
       as: 'followUp',
       onDelete: 'CASCADE'
@@ -153,7 +153,7 @@ export default class Articles extends Model {
       include: [
         {
           model: this.models.Users,
-          as: 'authors',
+          as: 'author',
           include: [{ model: this.models.Sessions, as: 'session' }]
         }
       ]

@@ -5,7 +5,9 @@ import database from '../models';
 import { ApplicationError, NotFoundError } from '../helpers/errors';
 
 const { SECRET_KEY } = process.env;
-const { BlacklistedTokens, Articles, InlineComments } = database;
+const {
+  BlacklistedTokens, Articles, InlineComments, Users
+} = database;
 
 config();
 
@@ -33,11 +35,17 @@ export default {
 
     if (blacklistedToken) throw new ApplicationError(403, 'Please login or signup to access this resource');
 
-    jwt.verify(token, SECRET_KEY, (error, decodedToken) => {
-      if (error) throw new ApplicationError(401, `${error.message}`);
-      request.user = decodedToken;
+    jwt.verify(token, SECRET_KEY, async (error, decodedToken) => {
+      if (error) return next(new ApplicationError(401, `${error.message}`));
 
-      next();
+      const { id: userId } = decodedToken;
+      const user = await Users.findByPk(userId);
+
+      if (!user) return next(new ApplicationError(403, 'Invalid credentials'));
+
+      request.user = user;
+
+      return next();
     });
   },
 

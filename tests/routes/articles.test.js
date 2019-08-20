@@ -62,11 +62,12 @@ describe('Articles API', () => {
   let userAuth1;
   let userAuth2;
   let slug1;
+
   before(async () => {
     users = await Users.bulkCreate(bulkUsers, { returning: true });
     articles = await Articles.bulkCreate(bulkArticles, { returning: true });
-
     tag = await Categories.bulkCreate(bulkTag, { returning: true });
+
     await ArticleCategories.bulkCreate(bulkArticleCategories, { returning: true });
     await Votes.bulkCreate(bulkVotes1, { returning: true });
     await Votes.bulkCreate(bulkVotes2, { returning: true });
@@ -96,18 +97,11 @@ describe('Articles API', () => {
     it('should throw error if user not found', async () => {
       const response = await chai.request(app)
         .get(`${baseRoute}/articles/feed`)
-        .set('Authorization', `Bearer ${userToken}`);
+        .set('Authorization', `Bearer ${randomUserToken}`);
 
       response.body.status.should.equal('error');
-      response.body.error.message.should.equal('User not found');
+      response.body.error.message.should.equal('Invalid credentials');
     });
-  });
-
-  after(async () => {
-    await Users.destroy({ where: {} });
-    await Articles.destroy({ where: {} });
-    await Categories.destroy({ where: {} });
-    await ArticleCategories.destroy({ where: {} });
   });
 
   describe('POST /articles/:articleId/comment', () => {
@@ -193,7 +187,7 @@ describe('Articles API', () => {
     });
   });
 
-  describe('Post to /articles/', () => {
+  describe('POST /articles', () => {
     before(async () => {
       const res = await chai.request(app)
         .post('/api/v1/auth/signup')
@@ -238,14 +232,14 @@ describe('Articles API', () => {
     it('should be able to create an article with image sent', async () => {
       const response = await chai.request(app)
         .post(`${baseRoute}/articles`)
-        .set('Authorization', `Bearer ${userToken}`)
+        .set('Authorization', `Bearer ${randomUserToken}`)
         .send(article1);
 
       response.body.status.should.eql('error');
     });
   });
 
-  describe('Get /articles/:slug', () => {
+  describe('GET /articles/:slug', () => {
     it('should be able to get articles', async () => {
       const response = await chai.request(app)
         .get(`${baseRoute}/articles/${slug1}`)
@@ -287,7 +281,7 @@ describe('Articles API', () => {
     });
   });
 
-  describe('Put /articles/:slug', () => {
+  describe('PUT /articles/:slug', () => {
     it('should be reject followupId not in articles table', async () => {
       const response = await chai.request(app)
         .put(`${baseRoute}/articles/${slug1}`)
@@ -352,7 +346,7 @@ describe('Articles API', () => {
     });
   });
 
-  describe('Delete /articles/:slug', () => {
+  describe('DELETE /articles/:slug', () => {
     it('should be return not found if slug not in database', async () => {
       const response = await chai.request(app)
         .delete(`${baseRoute}/articles/articlenotfound`)
@@ -370,7 +364,7 @@ describe('Articles API', () => {
     });
   });
 
-  describe('image upload in update route', async () => {
+  describe('Image upload in update route', async () => {
     it('should fake image upload', async () => {
       const req = {
         params: { slug: 'head-head' },
@@ -392,7 +386,7 @@ describe('Articles API', () => {
     });
   });
 
-  describe('image upload in create route', async () => {
+  describe('Image upload in create route', async () => {
     it('should fake image upload', async () => {
       const req = {
         file: { secure_url: 'image.png' },
@@ -413,530 +407,542 @@ describe('Articles API', () => {
       stub.restore();
     });
   });
-});
 
-describe('POST /articles/:articleId/vote', () => {
-  let emptyArticleId;
-  let articles;
-  let userResponseObject;
-  let token;
+  describe('POST /articles/:articleId/vote', () => {
+    let emptyArticleId;
+    let userResponseObject;
+    let token;
 
-  before(async () => {
-    await Users.destroy({ where: {}, });
-    await Articles.destroy({ where: {}, });
-    await Votes.destroy({ where: {}, });
-    await Users.bulkCreate(bulkUsers, { returning: true });
+    before(async () => {
+      await Users.destroy({ where: {}, });
+      await Articles.destroy({ where: {}, });
+      await Votes.destroy({ where: {}, });
+      await Users.bulkCreate(bulkUsers, { returning: true });
 
-    userResponseObject = await chai
-      .request(app)
-      .post('/api/v1/auth/signup')
-      .send(user);
+      userResponseObject = await chai
+        .request(app)
+        .post('/api/v1/auth/signup')
+        .send(user);
 
-    articles = await Articles.bulkCreate(bulkArticles, { returning: true });
-    await Votes.bulkCreate(bulkVotes, { returning: true });
-    await Votes.bulkCreate(bulkDownVotes, { returning: true });
+      articles = await Articles.bulkCreate(bulkArticles, { returning: true });
+      await Votes.bulkCreate(bulkVotes, { returning: true });
+      await Votes.bulkCreate(bulkDownVotes, { returning: true });
+    });
+
+    after(async () => {
+      await Users.destroy({ where: {}, });
+      await Articles.destroy({ where: {}, });
+      await Votes.destroy({ where: {}, });
+    });
+
+    it('should throw error if no Id is supplied', async () => {
+      ({ token } = userResponseObject.body.data);
+
+      const response = await chai
+        .request(app)
+        .post(`${baseRoute}/articles/${emptyArticleId}/vote`)
+        .send({ voteType: 'upvote' })
+        .set('authorization', `Bearer ${token}`);
+
+      response.should.have.status(400);
+      response.body.status.should.eql('error');
+    });
+
+    it('should throw error if no vote type is supplied', async () => {
+      const response = await chai
+        .request(app)
+        .post(`${baseRoute}/articles/${articles[0].dataValues.id}/vote`)
+        .set('authorization', `Bearer ${token}`);
+
+      response.should.have.status(400);
+      response.body.status.should.eql('error');
+      response.body.error.errors.voteType.should.eql(
+        'Vote type is required. e.g upVote, downVote or nullVote'
+      );
+    });
+
+    it('should throw error if wrong vote type is supplied', async () => {
+      const response = await chai
+        .request(app)
+        .post(`${baseRoute}/articles/${articles[0].dataValues.id}/vote`)
+        .send({ voteType: 'invalid' })
+        .set('authorization', `Bearer ${token}`);
+
+      response.should.have.status(400);
+      response.body.status.should.eql('error');
+      response.body.error.errors.voteType.should.eql('Enter a valid vote type');
+    });
+
+    it('should throw error if article ID is not a valid UUID', async () => {
+      const response = await chai
+        .request(app)
+        .post(`${baseRoute}/articles/invalid-article-id/vote`)
+        .send({ voteType: 'upVote' })
+        .set('authorization', `Bearer ${token}`);
+
+      response.should.have.status(400);
+      response.body.status.should.eql('error');
+      response.body.error.errors.articleId.should.eql('Article id is not a valid uuid');
+    });
+
+    it('should throw error if article does not exist or is suspended', async () => {
+      const response = await chai
+        .request(app)
+        .post(`${baseRoute}/articles/${invalidArticleId}/vote`)
+        .send({ voteType: 'upVote' })
+        .set('authorization', `Bearer ${token}`);
+
+      response.should.have.status(404);
+      response.body.status.should.eql('error');
+      response.body.error.message.should.eql('This article does not exist or has been suspended');
+    });
+
+    it('should up vote article', async () => {
+      const response = await chai
+        .request(app)
+        .post(`${baseRoute}/articles/${articles[0].dataValues.id}/vote`)
+        .send({ voteType: 'upVote' })
+        .set('authorization', `Bearer ${token}`);
+
+      response.should.have.status(201);
+      response.body.status.should.eql('success');
+      response.body.message.should.eql('Article successfully upvoted');
+      response.body.data.upVote.should.eql(true);
+    });
+
+    it('should change vote to down vote', async () => {
+      const response = await chai
+        .request(app)
+        .post(`${baseRoute}/articles/${articles[0].dataValues.id}/vote`)
+        .send({ voteType: 'downVote' })
+        .set('authorization', `Bearer ${token}`);
+
+      response.should.have.status(200);
+      response.body.status.should.eql('success');
+      response.body.message.should.eql('Article successfully downvoted');
+      response.body.data.upVote.should.eql(false);
+    });
+
+    it('should remove vote entry', async () => {
+      const response = await chai
+        .request(app)
+        .post(`${baseRoute}/articles/${bulkArticles[0].id}/vote`)
+        .send({ voteType: 'nullVote' })
+        .set('authorization', `Bearer ${token}`);
+
+      response.should.have.status(200);
+      response.body.message.should.eql('Vote successfully removed');
+    });
+
+    it('should down vote and suspend article', async () => {
+      const response = await chai
+        .request(app)
+        .post(`${baseRoute}/articles/${bulkArticles[1].id}/vote`)
+        .send({ voteType: 'downVote' })
+        .set('authorization', `Bearer ${token}`);
+
+      response.should.have.status(201);
+      response.body.message.should.eql('Article successfully downvoted');
+      response.body.data.upVote.should.eql(false);
+    });
+
+    it('should up vote article', async () => {
+      const response = await chai
+        .request(app)
+        .post(`${baseRoute}/articles/${articles[2].dataValues.id}/vote`)
+        .send({ voteType: 'upVote' })
+        .set('authorization', `Bearer ${token}`);
+
+      response.should.have.status(201);
+      response.body.status.should.eql('success');
+      response.body.message.should.eql('Article successfully upvoted');
+      response.body.data.upVote.should.eql(true);
+    });
+
+    it('should change vote and suspend article', async () => {
+      const response = await chai
+        .request(app)
+        .post(`${baseRoute}/articles/${articles[2].dataValues.id}/vote`)
+        .send({ voteType: 'downVote' })
+        .set('authorization', `Bearer ${token}`);
+
+      response.should.have.status(200);
+      response.body.message.should.eql('Article successfully downvoted');
+      response.body.data.upVote.should.eql(false);
+    });
+
+    it('should up vote article', async () => {
+      const response = await chai
+        .request(app)
+        .post(`${baseRoute}/articles/${articles[3].dataValues.id}/vote`)
+        .send({ voteType: 'upVote' })
+        .set('authorization', `Bearer ${token}`);
+
+      response.should.have.status(201);
+      response.body.status.should.eql('success');
+      response.body.message.should.eql('Article successfully upvoted');
+      response.body.data.upVote.should.eql(true);
+    });
+
+    it('should change vote and suspend article', async () => {
+      const response = await chai
+        .request(app)
+        .post(`${baseRoute}/articles/${articles[3].dataValues.id}/vote`)
+        .send({ voteType: 'nullVote' })
+        .set('authorization', `Bearer ${token}`);
+
+      response.should.have.status(200);
+      response.body.message.should.eql('Vote successfully removed');
+    });
   });
 
-  after(async () => {
-    await Users.destroy({ where: {}, });
-    await Articles.destroy({ where: {}, });
-    await Votes.destroy({ where: {}, });
+  describe('GET /articles/:articleId/comments', () => {
+    let articles2;
+
+    before(async () => {
+      articles2 = await Articles.bulkCreate(myArticles, { returning: true });
+      await Comments.bulkCreate(myComments, { returning: true });
+    });
+
+    it('should return 200 when an article has no comment', async () => {
+      const response = await chai.request(app)
+        .get(`${baseRoute}/articles/${articles2[0].id}/comments`)
+        .set('Authorization', `Bearer ${userToken}`);
+
+      response.status.should.eql(200);
+      response.body.data.should.be.an('array');
+      response.body.data.should.have.length(0);
+      response.body.message.should.eql('There is no comment for this article');
+    });
+
+    it('should return 200 when an article has only one comment', async () => {
+      const response = await chai.request(app)
+        .get(`${baseRoute}/articles/${articles2[1].id}/comments`)
+        .set('Authorization', `Bearer ${userToken}`);
+
+      response.status.should.eql(200);
+      response.body.data.should.be.a('array');
+      response.body.data.should.have.length(1);
+      response.body.message.should.eql('Comment retrieved successfully');
+    });
+
+    it('should return 200 when an article has more than one comments', async () => {
+      const response = await chai.request(app)
+        .get(`${baseRoute}/articles/${articles2[2].id}/comments`)
+        .set('Authorization', `Bearer ${userToken}`);
+
+      response.status.should.eql(200);
+      response.body.data.should.be.a('array');
+      response.body.data.should.have.length(2);
+      response.body.message.should.eql('Comments retrieved successfully');
+    });
+
+    it('should return 404 error if the articleId does not exist', async () => {
+      const nonexistingArticleId = uuid();
+      const response = await chai.request(app)
+        .get(`${baseRoute}/articles/${nonexistingArticleId}/comments`)
+        .set('Authorization', `Bearer ${userToken}`);
+
+      response.status.should.eql(404);
+      response.body.error.should.be.a('object');
+      response.body.error.message.should.eql('Non-existing articleId');
+    });
   });
 
-  it('should throw error if no Id is supplied', async () => {
-    ({ token } = userResponseObject.body.data);
+  describe('POST /articles/:articleId/inline_comment', () => {
+    const { startIndex, endIndex } = inlineComments[0];
+    const highlightedText = bulkArticles[0].body.substring(startIndex, endIndex);
+    const inlineCommentData = { ...inlineComments[0], highlightedText };
 
-    const response = await chai
-      .request(app)
-      .post(`${baseRoute}/articles/${emptyArticleId}/vote`)
-      .send({ voteType: 'upvote' })
-      .set('authorization', `Bearer ${token}`);
+    before(async () => {
+      await Articles.destroy({ where: {} });
+      await Users.bulkCreate(bulkUsers, { returning: true });
+      await Articles.bulkCreate(bulkArticles, { returning: true });
+    });
 
-    response.should.have.status(400);
-    response.body.status.should.eql('error');
+    after(async () => {
+      await Users.destroy({ where: {} });
+      await Articles.destroy({ where: {} });
+      await InlineComments.destroy({ where: {} });
+    });
+
+    it('should return 201', async () => {
+      const { status, body: { data } } = await chai
+        .request(app)
+        .post(`${baseRoute}/articles/${bulkArticles[0].id}/inline_comments`)
+        .set('Authorization', `Bearer ${userToken}`)
+        .send(inlineCommentData);
+
+      status.should.eql(201);
+      data.articleId.should.eql(bulkArticles[0].id);
+    });
+
+    it('should return 404 for non existing article', async () => {
+      const { status } = await chai
+        .request(app)
+        .post(`${baseRoute}/articles/${uuid()}/inline_comments`)
+        .set('Authorization', `Bearer ${userToken}`)
+        .send(inlineCommentData);
+
+      status.should.eql(404);
+    });
   });
 
-  it('should throw error if no vote type is supplied', async () => {
-    const response = await chai
-      .request(app)
-      .post(`${baseRoute}/articles/${articles[0].dataValues.id}/vote`)
-      .set('authorization', `Bearer ${token}`);
+  describe('PUT /articles/inline_comments/commentId', () => {
+    const { startIndex, endIndex } = inlineComments[0];
+    const highlightedText = bulkArticles[0].body.substring(startIndex, endIndex);
+    const inlineCommentData = { ...inlineComments[0], highlightedText };
 
-    response.should.have.status(400);
-    response.body.status.should.eql('error');
-    response.body.error.errors.voteType.should.eql(
-      'Vote type is required. e.g upVote, downVote or nullVote'
-    );
+    before(async () => {
+      await Articles.destroy({ where: {} });
+      await Users.bulkCreate(bulkUsers, { returning: true });
+      await Articles.bulkCreate(bulkArticles, { returning: true });
+    });
+
+    after(async () => {
+      await Users.destroy({ where: {} });
+      await Articles.destroy({ where: {} });
+      await InlineComments.destroy({ where: {} });
+    });
+
+    it('should return 201', async () => {
+      const { status, body: { data } } = await chai
+        .request(app)
+        .post(`${baseRoute}/articles/${bulkArticles[0].id}/inline_comments`)
+        .set('Authorization', `Bearer ${userToken}`)
+        .send(inlineCommentData);
+
+      status.should.eql(201);
+      data.articleId.should.eql(bulkArticles[0].id);
+    });
+
+    it('should return 403 for unauthorized update', async () => {
+      const { status } = await chai
+        .request(app)
+        .put(`${baseRoute}/articles/inline_comments/${inlineCommentData.id}`)
+        .set('Authorization', `Bearer ${randomUserToken}`)
+        .send(inlineCommentData);
+
+      status.should.eql(403);
+    });
+
+    it('should return 200 for updated comment', async () => {
+      const { status, body: { data } } = await chai
+        .request(app)
+        .put(`${baseRoute}/articles/inline_comments/${inlineCommentData.id}`)
+        .set('Authorization', `Bearer ${userToken}`)
+        .send(inlineCommentData);
+
+      status.should.eql(200);
+      data.id.should.eql(inlineCommentData.id);
+    });
+
+    it('should return 404 for non existing comment', async () => {
+      const { status } = await chai
+        .request(app)
+        .put(`${baseRoute}/articles/inline_comments/${uuid()}`)
+        .set('Authorization', `Bearer ${userToken}`)
+        .send(inlineCommentData);
+
+      status.should.eql(404);
+    });
   });
 
-  it('should throw error if wrong vote type is supplied', async () => {
-    const response = await chai
-      .request(app)
-      .post(`${baseRoute}/articles/${articles[0].dataValues.id}/vote`)
-      .send({ voteType: 'invalid' })
-      .set('authorization', `Bearer ${token}`);
+  describe('DELETE /articles/inline_comments/commentId', () => {
+    const { startIndex, endIndex } = inlineComments[0];
+    const highlightedText = bulkArticles[0].body.substring(startIndex, endIndex);
+    const inlineCommentData = { ...inlineComments[0], highlightedText };
 
-    response.should.have.status(400);
-    response.body.status.should.eql('error');
-    response.body.error.errors.voteType.should.eql('Enter a valid vote type');
+    before(async () => {
+      await Articles.destroy({ where: {} });
+      await Users.bulkCreate(bulkUsers, { returning: true });
+      await Articles.bulkCreate(bulkArticles, { returning: true });
+    });
+
+    after(async () => {
+      await Users.destroy({ where: {} });
+      await Articles.destroy({ where: {} });
+      await InlineComments.destroy({ where: {} });
+    });
+
+    it('should return 201', async () => {
+      const { status, body: { data } } = await chai
+        .request(app)
+        .post(`${baseRoute}/articles/${bulkArticles[0].id}/inline_comments`)
+        .set('Authorization', `Bearer ${userToken}`)
+        .send(inlineCommentData);
+
+      status.should.eql(201);
+      data.articleId.should.eql(bulkArticles[0].id);
+    });
+
+    it('should return 403 for unauthorized delete', async () => {
+      const { status } = await chai
+        .request(app)
+        .delete(`${baseRoute}/articles/inline_comments/${inlineCommentData.id}`)
+        .set('Authorization', `Bearer ${randomUserToken}`);
+
+      status.should.eql(403);
+    });
+
+    it('should return 200 for deleted comment', async () => {
+      const { status } = await chai
+        .request(app)
+        .delete(`${baseRoute}/articles/inline_comments/${inlineCommentData.id}`)
+        .set('Authorization', `Bearer ${userToken}`);
+
+      status.should.eql(200);
+    });
+
+    it('should return 404 for non existing comment', async () => {
+      const { status } = await chai
+        .request(app)
+        .delete(`${baseRoute}/articles/inline_comments/${uuid()}`)
+        .set('Authorization', `Bearer ${userToken}`);
+
+      status.should.eql(404);
+    });
   });
 
-  it('should throw error if article ID is not a valid UUID', async () => {
-    const response = await chai
-      .request(app)
-      .post(`${baseRoute}/articles/invalid-article-id/vote`)
-      .send({ voteType: 'upVote' })
-      .set('authorization', `Bearer ${token}`);
+  describe('GET /articles/inline_comments/commentId', () => {
+    const { startIndex, endIndex } = inlineComments[0];
+    const highlightedText = bulkArticles[0].body.substring(startIndex, endIndex);
+    const inlineCommentData = { ...inlineComments[0], highlightedText };
 
-    response.should.have.status(400);
-    response.body.status.should.eql('error');
-    response.body.error.errors.articleId.should.eql('Article id is not a valid uuid');
+    before(async () => {
+      await Articles.destroy({ where: {} });
+      await Users.bulkCreate(bulkUsers, { returning: true });
+      await Articles.bulkCreate(bulkArticles, { returning: true });
+    });
+
+    after(async () => {
+      await Users.destroy({ where: {} });
+      await Articles.destroy({ where: {} });
+      await InlineComments.destroy({ where: {} });
+    });
+
+    it('should return 201', async () => {
+      const { status, body: { data } } = await chai
+        .request(app)
+        .post(`${baseRoute}/articles/${bulkArticles[0].id}/inline_comments`)
+        .set('Authorization', `Bearer ${userToken}`)
+        .send(inlineCommentData);
+
+      status.should.eql(201);
+      data.articleId.should.eql(bulkArticles[0].id);
+    });
+
+    it('should return 200 for existing comment', async () => {
+      const { status } = await chai
+        .request(app)
+        .get(`${baseRoute}/articles/inline_comments/${inlineCommentData.id}`)
+        .set('Authorization', `Bearer ${userToken}`);
+
+      status.should.eql(200);
+    });
+
+    it('should return 404 for non existing comment', async () => {
+      const { status } = await chai
+        .request(app)
+        .get(`${baseRoute}/articles/inline_comments/${uuid()}`)
+        .set('Authorization', `Bearer ${userToken}`);
+
+      status.should.eql(404);
+    });
   });
 
-  it('should throw error if article does not exist or is suspended', async () => {
-    const response = await chai
-      .request(app)
-      .post(`${baseRoute}/articles/${invalidArticleId}/vote`)
-      .send({ voteType: 'upVote' })
-      .set('authorization', `Bearer ${token}`);
+  describe('GET /articles/articleId/inline_comments', () => {
+    const { startIndex, endIndex } = inlineComments[0];
+    const highlightedText = bulkArticles[0].body.substring(startIndex, endIndex);
+    const inlineCommentData = { ...inlineComments[0], highlightedText };
 
-    response.should.have.status(404);
-    response.body.status.should.eql('error');
-    response.body.error.message.should.eql('This article does not exist or has been suspended');
+    before(async () => {
+      await Articles.destroy({ where: {} });
+      await Users.bulkCreate(bulkUsers, { returning: true });
+      await Articles.bulkCreate(bulkArticles, { returning: true });
+    });
+
+    after(async () => {
+      await Users.destroy({ where: {} });
+      await Articles.destroy({ where: {} });
+      await InlineComments.destroy({ where: {} });
+    });
+
+    it('should return 201', async () => {
+      const { status, body: { data } } = await chai
+        .request(app)
+        .post(`${baseRoute}/articles/${bulkArticles[0].id}/inline_comments`)
+        .set('Authorization', `Bearer ${userToken}`)
+        .send(inlineCommentData);
+
+      status.should.eql(201);
+      data.articleId.should.eql(bulkArticles[0].id);
+    });
+
+    it('should return 200 for existing comment', async () => {
+      const { status, body: { data } } = await chai
+        .request(app)
+        .get(`${baseRoute}/articles/${bulkArticles[0].id}/inline_comments`)
+        .set('Authorization', `Bearer ${userToken}`);
+
+      status.should.eql(200);
+      data.should.be.an('array');
+    });
+
+    it('should return 404 for non existing comment', async () => {
+      const { status } = await chai
+        .request(app)
+        .get(`${baseRoute}/articles/${uuid()}/inline_comments`)
+        .set('Authorization', `Bearer ${userToken}`);
+
+      status.should.eql(404);
+    });
   });
 
-  it('should up vote article', async () => {
-    const response = await chai
-      .request(app)
-      .post(`${baseRoute}/articles/${articles[0].dataValues.id}/vote`)
-      .send({ voteType: 'upVote' })
-      .set('authorization', `Bearer ${token}`);
-
-    response.should.have.status(201);
-    response.body.status.should.eql('success');
-    response.body.message.should.eql('Article successfully upvoted');
-    response.body.data.upVote.should.eql(true);
-  });
-
-  it('should change vote to down vote', async () => {
-    const response = await chai
-      .request(app)
-      .post(`${baseRoute}/articles/${articles[0].dataValues.id}/vote`)
-      .send({ voteType: 'downVote' })
-      .set('authorization', `Bearer ${token}`);
-
-    response.should.have.status(200);
-    response.body.status.should.eql('success');
-    response.body.message.should.eql('Article successfully downvoted');
-    response.body.data.upVote.should.eql(false);
-  });
-
-  it('should remove vote entry', async () => {
-    const response = await chai
-      .request(app)
-      .post(`${baseRoute}/articles/${bulkArticles[0].id}/vote`)
-      .send({ voteType: 'nullVote' })
-      .set('authorization', `Bearer ${token}`);
-
-    response.should.have.status(200);
-    response.body.message.should.eql('Vote successfully removed');
-  });
-
-  it('should down vote and suspend article', async () => {
-    const response = await chai
-      .request(app)
-      .post(`${baseRoute}/articles/${bulkArticles[1].id}/vote`)
-      .send({ voteType: 'downVote' })
-      .set('authorization', `Bearer ${token}`);
-
-    response.should.have.status(201);
-    response.body.message.should.eql('Article successfully downvoted');
-    response.body.data.upVote.should.eql(false);
-  });
-
-  it('should up vote article', async () => {
-    const response = await chai
-      .request(app)
-      .post(`${baseRoute}/articles/${articles[2].dataValues.id}/vote`)
-      .send({ voteType: 'upVote' })
-      .set('authorization', `Bearer ${token}`);
-
-    response.should.have.status(201);
-    response.body.status.should.eql('success');
-    response.body.message.should.eql('Article successfully upvoted');
-    response.body.data.upVote.should.eql(true);
-  });
-
-  it('should change vote and suspend article', async () => {
-    const response = await chai
-      .request(app)
-      .post(`${baseRoute}/articles/${articles[2].dataValues.id}/vote`)
-      .send({ voteType: 'downVote' })
-      .set('authorization', `Bearer ${token}`);
-
-    response.should.have.status(200);
-    response.body.message.should.eql('Article successfully downvoted');
-    response.body.data.upVote.should.eql(false);
-  });
-
-  it('should up vote article', async () => {
-    const response = await chai
-      .request(app)
-      .post(`${baseRoute}/articles/${articles[3].dataValues.id}/vote`)
-      .send({ voteType: 'upVote' })
-      .set('authorization', `Bearer ${token}`);
-
-    response.should.have.status(201);
-    response.body.status.should.eql('success');
-    response.body.message.should.eql('Article successfully upvoted');
-    response.body.data.upVote.should.eql(true);
-  });
-
-  it('should change vote and suspend article', async () => {
-    const response = await chai
-      .request(app)
-      .post(`${baseRoute}/articles/${articles[3].dataValues.id}/vote`)
-      .send({ voteType: 'nullVote' })
-      .set('authorization', `Bearer ${token}`);
-
-    response.should.have.status(200);
-    response.body.message.should.eql('Vote successfully removed');
-  });
-});
-
-describe('GET /articles/:articleId/comments', () => {
-  let theArticles;
-  before(async () => {
-    theArticles = await Articles.bulkCreate(myArticles, { returning: true });
-    await Comments.bulkCreate(myComments, { returning: true });
-  });
-
-  it('should return 200 when an article has no comment', async () => {
-    const response = await chai.request(app)
-      .get(`${baseRoute}/articles/${theArticles[0].id}/comments`)
-      .set('Authorization', `Bearer ${userToken}`);
-
-    response.status.should.eql(200);
-    response.body.data.should.be.an('array');
-    response.body.data.should.have.length(0);
-    response.body.message.should.eql('There is no comment for this article');
-  });
-
-  it('should return 200 when an article has only one comment', async () => {
-    const response = await chai.request(app)
-      .get(`${baseRoute}/articles/${theArticles[1].id}/comments`)
-      .set('Authorization', `Bearer ${userToken}`);
-
-    response.status.should.eql(200);
-    response.body.data.should.be.a('array');
-    response.body.data.should.have.length(1);
-    response.body.message.should.eql('Comment retrieved successfully');
-  });
-
-  it('should return 200 when an article has more than one comments', async () => {
-    const response = await chai.request(app)
-      .get(`${baseRoute}/articles/${theArticles[2].id}/comments`)
-      .set('Authorization', `Bearer ${userToken}`);
-
-    response.status.should.eql(200);
-    response.body.data.should.be.a('array');
-    response.body.data.should.have.length(2);
-    response.body.message.should.eql('Comments retrieved successfully');
-  });
-
-  it('should return 404 error if the articleId does not exist', async () => {
-    const nonexistingArticleId = uuid();
-    const response = await chai.request(app)
-      .get(`${baseRoute}/articles/${nonexistingArticleId}/comments`)
-      .set('Authorization', `Bearer ${userToken}`);
-
-    response.status.should.eql(404);
-    response.body.error.should.be.a('object');
-    response.body.error.message.should.eql('Non-existing articleId');
-  });
-});
-
-describe('POST /articles/:articleId/inline_comment', () => {
-  const { startIndex, endIndex } = inlineComments[0];
-  const highlightedText = bulkArticles[0].body.substring(startIndex, endIndex);
-  const inlineCommentData = { ...inlineComments[0], highlightedText };
-
-  before(async () => {
-    await Articles.destroy({ where: {} });
-    await Articles.bulkCreate(bulkArticles, { returning: true });
-  });
-
-  after(async () => {
-    await Articles.destroy({ where: {} });
-    await InlineComments.destroy({ where: {} });
-  });
-
-  it('should return 201', async () => {
-    const { status, body: { data } } = await chai
-      .request(app)
-      .post(`${baseRoute}/articles/${bulkArticles[0].id}/inline_comments`)
-      .set('Authorization', `Bearer ${userToken}`)
-      .send(inlineCommentData);
-
-    status.should.eql(201);
-    data.articleId.should.eql(bulkArticles[0].id);
-  });
-
-  it('should return 404 for non existing article', async () => {
-    const { status } = await chai
-      .request(app)
-      .post(`${baseRoute}/articles/${uuid()}/inline_comments`)
-      .set('Authorization', `Bearer ${userToken}`)
-      .send(inlineCommentData);
-
-    status.should.eql(404);
-  });
-});
-
-describe('PUT /articles/inline_comments/commentId', () => {
-  const { startIndex, endIndex } = inlineComments[0];
-  const highlightedText = bulkArticles[0].body.substring(startIndex, endIndex);
-  const inlineCommentData = { ...inlineComments[0], highlightedText };
-
-  before(async () => {
-    await Articles.destroy({ where: {} });
-    await Articles.bulkCreate(bulkArticles, { returning: true });
-  });
-
-  after(async () => {
-    await Articles.destroy({ where: {} });
-    await InlineComments.destroy({ where: {} });
-  });
-
-  it('should return 201', async () => {
-    const { status, body: { data } } = await chai
-      .request(app)
-      .post(`${baseRoute}/articles/${bulkArticles[0].id}/inline_comments`)
-      .set('Authorization', `Bearer ${userToken}`)
-      .send(inlineCommentData);
-
-    status.should.eql(201);
-    data.articleId.should.eql(bulkArticles[0].id);
-  });
-
-  it('should return 403 for unauthorized update', async () => {
-    const { status } = await chai
-      .request(app)
-      .put(`${baseRoute}/articles/inline_comments/${inlineCommentData.id}`)
-      .set('Authorization', `Bearer ${randomUserToken}`)
-      .send(inlineCommentData);
-
-    status.should.eql(403);
-  });
-
-  it('should return 200 for updated comment', async () => {
-    const { status, body: { data } } = await chai
-      .request(app)
-      .put(`${baseRoute}/articles/inline_comments/${inlineCommentData.id}`)
-      .set('Authorization', `Bearer ${userToken}`)
-      .send(inlineCommentData);
-
-    status.should.eql(200);
-    data.id.should.eql(inlineCommentData.id);
-  });
-
-  it('should return 404 for non existing comment', async () => {
-    const { status } = await chai
-      .request(app)
-      .put(`${baseRoute}/articles/inline_comments/${uuid()}`)
-      .set('Authorization', `Bearer ${userToken}`)
-      .send(inlineCommentData);
-
-    status.should.eql(404);
-  });
-});
-
-describe('DELETE /articles/inline_comments/commentId', () => {
-  const { startIndex, endIndex } = inlineComments[0];
-  const highlightedText = bulkArticles[0].body.substring(startIndex, endIndex);
-  const inlineCommentData = { ...inlineComments[0], highlightedText };
-
-  before(async () => {
-    await Articles.destroy({ where: {} });
-    await Articles.bulkCreate(bulkArticles, { returning: true });
-  });
-
-  after(async () => {
-    await Articles.destroy({ where: {} });
-    await InlineComments.destroy({ where: {} });
-  });
-
-  it('should return 201', async () => {
-    const { status, body: { data } } = await chai
-      .request(app)
-      .post(`${baseRoute}/articles/${bulkArticles[0].id}/inline_comments`)
-      .set('Authorization', `Bearer ${userToken}`)
-      .send(inlineCommentData);
-
-    status.should.eql(201);
-    data.articleId.should.eql(bulkArticles[0].id);
-  });
-
-  it('should return 403 for unauthorized delete', async () => {
-    const { status } = await chai
-      .request(app)
-      .delete(`${baseRoute}/articles/inline_comments/${inlineCommentData.id}`)
-      .set('Authorization', `Bearer ${randomUserToken}`);
-
-    status.should.eql(403);
-  });
-
-  it('should return 200 for deleted comment', async () => {
-    const { status } = await chai
-      .request(app)
-      .delete(`${baseRoute}/articles/inline_comments/${inlineCommentData.id}`)
-      .set('Authorization', `Bearer ${userToken}`);
-
-    status.should.eql(200);
-  });
-
-  it('should return 404 for non existing comment', async () => {
-    const { status } = await chai
-      .request(app)
-      .delete(`${baseRoute}/articles/inline_comments/${uuid()}`)
-      .set('Authorization', `Bearer ${userToken}`);
-
-    status.should.eql(404);
-  });
-});
-
-describe('GET /articles/inline_comments/commentId', () => {
-  const { startIndex, endIndex } = inlineComments[0];
-  const highlightedText = bulkArticles[0].body.substring(startIndex, endIndex);
-  const inlineCommentData = { ...inlineComments[0], highlightedText };
-
-  before(async () => {
-    await Articles.destroy({ where: {} });
-    await Articles.bulkCreate(bulkArticles, { returning: true });
-  });
-
-  after(async () => {
-    await Articles.destroy({ where: {} });
-    await InlineComments.destroy({ where: {} });
-  });
-
-  it('should return 201', async () => {
-    const { status, body: { data } } = await chai
-      .request(app)
-      .post(`${baseRoute}/articles/${bulkArticles[0].id}/inline_comments`)
-      .set('Authorization', `Bearer ${userToken}`)
-      .send(inlineCommentData);
-
-    status.should.eql(201);
-    data.articleId.should.eql(bulkArticles[0].id);
-  });
-
-  it('should return 200 for existing comment', async () => {
-    const { status } = await chai
-      .request(app)
-      .get(`${baseRoute}/articles/inline_comments/${inlineCommentData.id}`)
-      .set('Authorization', `Bearer ${userToken}`);
-
-    status.should.eql(200);
-  });
-
-  it('should return 404 for non existing comment', async () => {
-    const { status } = await chai
-      .request(app)
-      .get(`${baseRoute}/articles/inline_comments/${uuid()}`)
-      .set('Authorization', `Bearer ${userToken}`);
-
-    status.should.eql(404);
-  });
-});
-
-describe('GET /articles/articleId/inline_comments', () => {
-  const { startIndex, endIndex } = inlineComments[0];
-  const highlightedText = bulkArticles[0].body.substring(startIndex, endIndex);
-  const inlineCommentData = { ...inlineComments[0], highlightedText };
-
-  before(async () => {
-    await Articles.destroy({ where: {} });
-    await Articles.bulkCreate(bulkArticles, { returning: true });
-  });
-
-  after(async () => {
-    await Articles.destroy({ where: {} });
-    await InlineComments.destroy({ where: {} });
-  });
-
-  it('should return 201', async () => {
-    const { status, body: { data } } = await chai
-      .request(app)
-      .post(`${baseRoute}/articles/${bulkArticles[0].id}/inline_comments`)
-      .set('Authorization', `Bearer ${userToken}`)
-      .send(inlineCommentData);
-
-    status.should.eql(201);
-    data.articleId.should.eql(bulkArticles[0].id);
-  });
-
-  it('should return 200 for existing comment', async () => {
-    const { status, body: { data } } = await chai
-      .request(app)
-      .get(`${baseRoute}/articles/${bulkArticles[0].id}/inline_comments`)
-      .set('Authorization', `Bearer ${userToken}`);
-
-    status.should.eql(200);
-    data.should.be.an('array');
-  });
-
-  it('should return 404 for non existing comment', async () => {
-    const { status } = await chai
-      .request(app)
-      .get(`${baseRoute}/articles/${uuid()}/inline_comments`)
-      .set('Authorization', `Bearer ${userToken}`);
-
-    status.should.eql(404);
-  });
-});
-
-describe.only('GET /articles/subscriptions', () => {
-  let userResponseObject;
-
-  before(async () => {
-    userResponseObject = await chai
-      .request(app)
-      .post('/api/v1/auth/signup')
-      .send(subscriptionUser);
-
-    userResponseObject = userResponseObject.body.data;
-
-    await Articles.bulkCreate(subscriptionArticles, { returning: true });
-    await ArticleCategories.bulkCreate(subscriptionCategories, { returning: true });
-    await Subscriptions.bulkCreate(subscriptions, { returning: true });
-  });
-
-  after(async () => {
-    await Users.destroy({ where: {} });
-    await Articles.destroy({ where: {} });
-    await ArticleCategories.destroy({ where: {} });
-    await Subscriptions.destroy({ where: {} });
-  });
-  it('should return 404 Resource not found', async () => {
-    const { status } = await chai
-      .request(app)
-      .get(`${baseRoute}/articles/subscriptions`)
-      .set('Authorization', `Bearer ${userToken}`);
-
-    status.should.eql(404);
-  });
-
-  it('should return 200', async () => {
-    const { token } = userResponseObject;
-
-    const { status, body: { data } } = await chai
-      .request(app)
-      .get(`${baseRoute}/articles/subscriptions`)
-      .set('Authorization', `Bearer ${token}`);
-
-    status.should.eql(200);
-    data.should.be.an('array');
-    data[0].should.have.property('title');
+  describe('GET /articles?includeSubscriptions=true', () => {
+    let userResponseObject;
+
+    before(async () => {
+      const { ...subscriptionUserDetails } = subscriptionUser;
+      userResponseObject = await chai
+        .request(app)
+        .post('/api/v1/auth/signup')
+        .send(subscriptionUserDetails);
+      userResponseObject = userResponseObject.body.data;
+
+      await Articles.bulkCreate(subscriptionArticles, { returning: true });
+      await ArticleCategories.bulkCreate(subscriptionCategories, { returning: true });
+      await Subscriptions.bulkCreate(subscriptions, { returning: true });
+    });
+
+    after(async () => {
+      await Users.destroy({ where: {} });
+      await Articles.destroy({ where: {} });
+      await ArticleCategories.destroy({ where: {} });
+      await Subscriptions.destroy({ where: {} });
+    });
+
+    it('should return invalid credentials error for a user with an unregistered token', async () => {
+      const { status, body } = await chai
+        .request(app)
+        .get(`${baseRoute}/articles?includeSubscriptions=true`)
+        .set('Authorization', `Bearer ${randomUserToken}`);
+
+      body.error.message.should.eql('Invalid credentials');
+      status.should.eql(403);
+    });
+
+    it('should return only articles in the categories the user has subscribed to', async () => {
+      const { token } = userResponseObject;
+
+      const { status, body: { data } } = await chai
+        .request(app)
+        .get(`${baseRoute}/articles?includeSubscriptions=true`)
+        .set('Authorization', `Bearer ${token}`);
+
+      status.should.eql(200);
+      data.should.be.an('array');
+      data[0].should.have.property('title');
+    });
   });
 });

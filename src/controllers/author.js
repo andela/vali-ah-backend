@@ -19,13 +19,13 @@ export default {
     const { limit = 10, page = 1 } = request.query;
     const fields = ['firstName', 'email', 'lastName', 'avatarUrl'];
     const queryObject = {
-      attributes: ['authorId', ...modelFieldsToLiteral({ alias: 'authors', fields })],
+      attributes: ['authorId', ...modelFieldsToLiteral({ alias: 'author', fields })],
       nest: false,
-      group: ['authorId', 'authors.id'],
+      group: ['authorId', 'author.id'],
       include: [
         {
           model: Users,
-          as: 'authors',
+          as: 'author',
           attributes: []
         }
       ],
@@ -33,8 +33,10 @@ export default {
       page
     };
 
-    const authors = await paginator(Articles, queryObject);
+    const { data, count } = await paginator(Articles, queryObject);
 
-    return response.status(200).json({ status: 'success', ...authors });
+    return response.status(200).json({
+      status: 'success', data, count, page
+    });
   }
 };

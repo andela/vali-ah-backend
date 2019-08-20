@@ -128,7 +128,7 @@ export default {
       params: { userId },
     } = request;
 
-    const allFollowers = await paginator(null, {
+    const { data, count } = await paginator(null, {
       page,
       limit,
       dataSource: Users.getUserFollowers,
@@ -138,8 +138,9 @@ export default {
     return response.status(200).json({
       status: 'success',
       message: 'Request successful',
-      current: +page,
-      allFollowers
+      data,
+      count,
+      page
     });
   },
 
@@ -158,7 +159,7 @@ export default {
       params: { userId },
     } = request;
 
-    const allFollowings = await paginator(null, {
+    const { data, count } = await paginator(null, {
       page,
       limit,
       dataSource: Users.getUserFollowings,
@@ -167,9 +168,10 @@ export default {
 
     return response.status(200).json({
       status: 'success',
+      data,
+      count,
+      page,
       message: 'Request successful',
-      current: +page,
-      allFollowings
     });
   }
 };

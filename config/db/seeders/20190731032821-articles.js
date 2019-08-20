@@ -71,9 +71,10 @@ export default {
           content: faker.lorem.sentence(15),
           userId: authorId,
           articleId
-        })));
+        }))
+      );
 
-        const Subscriptions = await queryInterface.bulkInsert(
+      const Subscriptions = await queryInterface.bulkInsert(
         'Subscriptions',
         category.map(() => ({
           id: uuid(),
