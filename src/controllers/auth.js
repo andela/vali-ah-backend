@@ -21,8 +21,10 @@ export default {
    */
   signup: async (request, response) => {
     const existingUser = await Users.getExistingUser(request.body.email);
+    const existingUserName = await Users.getExistingUser(request.body.userName, 'userName');
 
     if (existingUser) throw new ApplicationError(409, 'You are already registered');
+    if (existingUserName) throw new ApplicationError(409, 'UserName already in use');
 
     const newUser = await Users.create(request.body);
 
