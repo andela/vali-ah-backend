@@ -55,13 +55,6 @@ describe('Pagination support for articles', () => {
     response.body.message.should.eql('Articles retrieved successfully');
   });
 
-  it('should return page number does not exist', async () => {
-    const response = await chai.request(app).get('/api/v1/articles?page=10000&limit=5');
-
-    response.should.have.status(404);
-    response.body.error.message.should.eql('Page does not exist');
-  });
-
   it('should return no articles found', async () => {
     await Articles.destroy({ where: {} });
     await ArticleCategories.destroy({ where: {} });

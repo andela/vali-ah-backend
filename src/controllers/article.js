@@ -517,7 +517,7 @@ export default {
     });
 
     return response.status(200).json({
-      status: 'success', data: articles, count, page, message: 'Articles fetch was succesfully'
+      status: 'success', data: articles, count, page, message: 'Articles fetched succesfully'
     });
   },
 
