@@ -1,5 +1,6 @@
 import { check } from 'express-validator/check';
 import makeCapitalize from '../helpers/makeCapitalize';
+import validateSubscriptions from '../helpers/subscription';
 
 const profileSchemas = {
   profileUpdateSchema: [
@@ -65,6 +66,15 @@ const profileSchemas = {
       .trim()
       .isUUID()
       .withMessage('Id does not exist')
+  ],
+  subscriptions: [
+    check('categories')
+      .trim()
+      .exists({ checkFalsy: true })
+      .withMessage('Categories cannot be empty')
+      .isArray()
+      .withMessage('Categories should be an array')
+      .custom(value => validateSubscriptions(value))
   ]
 };
 

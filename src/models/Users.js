@@ -139,7 +139,7 @@ export default class Users extends Model {
    *
    * @returns {Object} user to create or update
    */
-  static beforeHook = async user => this.encryptPassword(user)
+  static beforeHook = async user => this.encryptPassword(user);
 
   /**
    * BeforeUpdateHook for the User model
@@ -151,7 +151,7 @@ export default class Users extends Model {
    *
    * @returns {Object} user to update
    */
-  static beforeUpdateHook = async user => this.encryptPassword(user)
+  static beforeUpdateHook = async user => this.encryptPassword(user);
 
   /**
    * Encrypts user password
@@ -210,7 +210,9 @@ export default class Users extends Model {
       order: ['id'],
       include: [
         {
-          model: Users, as: 'followers', attributes: ['id', 'firstName', 'lastName', 'userName', ...attributes]
+          model: Users,
+          as: 'followers',
+          attributes: ['id', 'firstName', 'lastName', 'userName', ...attributes]
         }
       ],
       ...options
@@ -242,7 +244,9 @@ export default class Users extends Model {
       order: ['id'],
       include: [
         {
-          model: Users, as: 'following', attributes: ['id', 'firstName', 'lastName', 'userName', ...attributes]
+          model: Users,
+          as: 'following',
+          attributes: ['id', 'firstName', 'lastName', 'userName', ...attributes]
         }
       ],
       ...options
@@ -297,11 +301,7 @@ export default class Users extends Model {
    */
   async generateVerificationToken() {
     const secret = `${this.password}!${this.createdAt.toISOString()}`;
-    return jwt.sign(
-      { id: this.id },
-      secret,
-      { expiresIn: '10m' }
-    );
+    return jwt.sign({ id: this.id }, secret, { expiresIn: '10m' });
   }
 
   /**
@@ -316,5 +316,32 @@ export default class Users extends Model {
   async decodeVerificationToken(token) {
     const secret = `${this.password}!${this.createdAt.toISOString()}`;
     return jwt.verify(token, secret);
+  }
+
+  /**
+   * method to upsert subscription
+   *
+   * @static
+   * @memberof Users
+   *
+   * @param {Array} subscribedCategories Array of categories to be subscribed to
+   *
+   * @returns {Object} Subscription data
+   */
+  async bulkUpsertSubscriptions(subscribedCategories) {
+    const data = subscribedCategories.reduce(async (sum, { category, id: categoryId }) => {
+      sum = sum.then ? await sum : sum;
+
+      const isExists = await this.getSubscriptions({
+        where: { categoryId },
+        raw: true
+      });
+      if (isExists.length) return [...sum, { category, ...isExists[0] }];
+
+      const { dataValues } = await this.createSubscription({ categoryId });
+      return [...sum, { category, ...dataValues }];
+    }, []);
+
+    return data;
   }
 }
