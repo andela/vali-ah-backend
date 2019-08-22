@@ -55,16 +55,16 @@ const router = express.Router();
  *     produces:
  *       - application/json
  *     parameters:
+ *       - name: Authorization
+ *         in: header
+ *         required: true
+ *         type: string
+ *         default: Bearer {token}
  *       - in: path
  *         name: articleId
  *         required: true
  *       - name: content
  *         description: content of the comment.
- *         in: body
- *         required: true
- *         type: string
- *       - name: userId
- *         description: The id of user posting the comment.
  *         in: body
  *         required: true
  *         type: string
@@ -417,6 +417,11 @@ router.delete(
  *     produces:
  *       - application/json
  *     parameters:
+ *       - name: Authorization
+ *         in: header
+ *         required: true
+ *         type: string
+ *         default: Bearer {token}
  *       - in: path
  *         name: articleId
  *         required: true
@@ -458,11 +463,6 @@ router.post(
  *       - in: path
  *         name: articleId
  *         required: true
- *       - name: content
- *         description: content of the comment.
- *         in: body
- *         required: true
- *         type: string
  *     responses:
  *       201:
  *         description: comments successfully retrieved
@@ -470,7 +470,6 @@ router.post(
 router.get(
   '/:articleId/inline_comments',
   validator(articlePathSchema),
-  asyncWrapper(verifyToken),
   asyncWrapper(getArticleInlineComment)
 );
 
@@ -479,10 +478,15 @@ router.get(
  *
  * /articles/inline_comments/commentId:
  *   put:
- *     description: Edit an articles inline comment
+ *     description: Edit an inline comment
  *     produces:
  *       - application/json
  *     parameters:
+ *       - name: Authorization
+ *         in: header
+ *         required: true
+ *         type: string
+ *         default: Bearer {token}
  *       - in: path
  *         name: commentId
  *         required: true
@@ -520,6 +524,11 @@ router.put(
  *     produces:
  *       - application/json
  *     parameters:
+ *       - name: Authorization
+ *         in: header
+ *         required: true
+ *         type: string
+ *         default: Bearer {token}
  *       - in: path
  *         name: commentId
  *         required: true
@@ -554,7 +563,6 @@ router.delete(
 router.get(
   '/inline_comments/:commentId',
   validator(inlineCommentSchema),
-  asyncWrapper(verifyToken),
   asyncWrapper(getInlineComment)
 );
 

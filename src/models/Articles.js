@@ -45,6 +45,7 @@ export default class Articles extends Model {
     const model = super.init(Articles.modelFields, { sequelize });
 
     model.afterUpdate(Articles.normalizeInlineComments);
+    model.afterBulkUpdate(Articles.normalizeInlineComments);
 
     return model;
   }
@@ -339,11 +340,13 @@ export default class Articles extends Model {
    *
    * @function
    *
-   * @param {Object} article
+   * @param {Object} articleData
    *
    * @returns {void} - return nothing
    */
-  static async normalizeInlineComments(article) {
+  static async normalizeInlineComments(articleData) {
+    const searchCondition = articleData.where;
+    const article = await this.findOne({ where: searchCondition });
     const comments = await article.getInlineComments();
 
     const normalizedComments = comments.map(async (comment) => {
@@ -367,7 +370,7 @@ export default class Articles extends Model {
     const [contextStartIndex, contextEndIndex] = comment.contextIndex.split(':');
     const { body } = this;
     const contextInArticle = body.substring(contextStartIndex, contextEndIndex);
-    const contextInComment = body.substring(contextStartIndex, contextEndIndex);
+    const { context: contextInComment } = comment;
 
     const similarity = Similarity(contextInArticle, contextInComment);
 

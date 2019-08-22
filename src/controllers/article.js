@@ -456,7 +456,7 @@ export default {
 
     const commentData = comment.toJSON();
 
-    return response.status(200).json({ status: 'success', data: commentData, message: 'Inline comment updated succesfully' });
+    return response.status(200).json({ status: 'success', data: commentData, message: 'Inline comment retrieved succesfully' });
   },
 
   /**
