@@ -36,13 +36,16 @@ describe('Bookmark Endpoint', () => {
         user: `${bulkUsers[0].id}`
       };
 
-      const { status } = await chai
+      const response = await chai
         .request(app)
         .post(`${baseRoute}/articles/${bulkArticles[0].id}/bookmarks`)
         .set('Authorization', `Bearer ${userToken}`)
         .send(validBookmarkData);
 
-      status.should.eql(201);
+      response.should.have.status(201);
+      response.body.data.should.be.a('Object');
+      response.body.should.have.property('data');
+      response.body.should.have.property('message').eql('Bookmark added succesfully');
     });
 
     it('should return 409 - bookmark already added', async () => {
@@ -50,13 +53,14 @@ describe('Bookmark Endpoint', () => {
         articleId: `${bulkArticles[0].id}`,
         user: `${bulkUsers[0].id}`
       };
-      const { status } = await chai
+      const response = await chai
         .request(app)
         .post(`${baseRoute}/articles/${bulkArticles[0].id}/bookmarks`)
         .set('Authorization', `Bearer ${userToken}`)
         .send(validBookmarkData);
 
-      status.should.eql(409);
+      response.should.have.status(409);
+      response.body.should.have.property('error');
     });
 
     it('should return 404 - article not found', async () => {
@@ -64,13 +68,14 @@ describe('Bookmark Endpoint', () => {
         articleId: '88c0bd9a-b83d-11e9-a2a3-2a2ae2dbcce4',
         user: `${bulkUsers[0].id}`
       };
-      const { status } = await chai
+      const response = await chai
         .request(app)
         .post(`${baseRoute}/articles/${validBookmarkData.articleId}/bookmarks`)
         .set('Authorization', `Bearer ${userToken}`)
         .send(validBookmarkData);
 
-      status.should.eql(404);
+      response.should.have.status(404);
+      response.body.should.have.property('error');
     });
   });
   describe('user removes article from bookmark - DELETE request to /:articleId/bookmarks/', () => {
@@ -80,13 +85,14 @@ describe('Bookmark Endpoint', () => {
         user: `${bulkUsers[0].id}`
       };
 
-      const { status } = await chai
+      const response = await chai
         .request(app)
         .delete(`${baseRoute}/articles/${bulkArticles[0].id}/bookmarks`)
         .set('Authorization', `Bearer ${userToken}`)
         .send(validBookmarkData);
 
-      status.should.eql(200);
+      response.should.have.status(200);
+      response.body.should.have.property('message').eql('Article removed from bookmark');
     });
 
     it('should return 404 - article not found', async () => {
@@ -94,13 +100,14 @@ describe('Bookmark Endpoint', () => {
         articleId: '88c0bd9a-b83d-11e9-a2a3-2a2ae2dbcce4',
         user: `${bulkUsers[0].id}`
       };
-      const { status } = await chai
+      const response = await chai
         .request(app)
         .delete(`${baseRoute}/articles/${invalidBookmarkData.articleId}/bookmarks`)
         .set('Authorization', `Bearer ${userToken}`)
         .send(invalidBookmarkData);
 
-      status.should.eql(404);
+      response.should.have.status(404);
+      response.body.should.have.property('error');
     });
   });
 });

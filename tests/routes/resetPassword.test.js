@@ -45,35 +45,42 @@ describe('Reset and Update Password Endpoint', () => {
   });
 
   it('should return 404 for non existing user - Reset Password', async () => {
-    const { status } = await chai.request(app)
+    const response = await chai.request(app)
       .post(`${baseRoute}/auth/reset_password`)
       .send({ email: 'notfound@gmail.com' });
 
-    status.should.eql(404);
+    response.should.have.status(404);
+    response.body.should.be.a('Object');
+    response.body.should.have.property('error');
   });
 
   it('should return 200 for existing user - Reset Password', async () => {
-    const { status } = await chai.request(app)
+    const response = await chai.request(app)
       .post('/api/v1/auth/reset_password')
       .send({ email: sampleUser.email });
 
-    status.should.eql(200);
+    response.should.have.status(200);
+    response.body.should.have.property('data');
   });
 
   it('should return 404 for non existing user - Update Password', async () => {
-    const { status } = await chai.request(app)
+    const response = await chai.request(app)
       .patch(`${baseRoute}/auth/update_password/${invalidUserId}/${validToken}`)
       .send({ password: 'newpassword' });
 
-    status.should.eql(404);
+    response.should.have.status(404);
+    response.body.should.be.a('Object');
+    response.body.should.have.property('error');
   });
 
   it('should return 400 if user is found, token is valid but new password is empty', async () => {
-    const { status } = await chai.request(app)
+    const response = await chai.request(app)
       .patch(`${baseRoute}/auth/update_password/${validId}/${tokens.validToken}`)
       .send({ password: '' });
 
-    status.should.eql(400);
+    response.should.have.status(400);
+    response.body.should.be.a('Object');
+    response.body.should.have.property('error');
   });
 
   it('should return success if user is found, password and token is valid', async () => {
@@ -82,6 +89,7 @@ describe('Reset and Update Password Endpoint', () => {
       .send({ password: 'newPassword' });
 
     response.status.should.eql(200);
+    response.body.should.be.a('Object');
     response.body.message.should.equal('Your password was successfully updated');
   });
 });
