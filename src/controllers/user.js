@@ -140,7 +140,12 @@ export default {
 
     return response.status(200).json({
       status: 'success',
-      data,
+      data: data.map((item) => {
+        const followers = {
+          ...item.followers.dataValues,
+        };
+        return followers;
+      }),
       count,
       page: +page,
       limit: +limit,
@@ -172,7 +177,13 @@ export default {
 
     return response.status(200).json({
       status: 'success',
-      data,
+      data: data.map((item) => {
+        const followings = {
+          ...item.following.dataValues,
+        };
+
+        return followings;
+      }),
       count,
       page: +page,
       limit: +limit,

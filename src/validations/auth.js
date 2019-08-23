@@ -1,5 +1,4 @@
 import { check } from 'express-validator/check';
-import makeUpperCase from '../helpers/makeCapitalize';
 
 export default {
   signupSchema: [
@@ -10,7 +9,7 @@ export default {
       .withMessage('First name should be between 2 to 15 characters')
       .isAlpha()
       .withMessage('First name should only contain alphabets')
-      .customSanitizer(value => makeUpperCase(value)),
+      .customSanitizer(firstName => firstName.toLowerCase()),
     check('lastName')
       .trim()
       .exists().withMessage('Last name is required')
@@ -18,19 +17,19 @@ export default {
       .withMessage('Last name should be between 2 to 15 characters')
       .isAlpha()
       .withMessage('Last name should only contain alphabets')
-      .customSanitizer(value => makeUpperCase(value)),
+      .customSanitizer(lastName => lastName.toLowerCase()),
     check('userName')
       .trim()
       .exists().withMessage('Username is required')
       .isLength({ min: 2, max: 20 })
       .withMessage('Username should be between 2 to 20 characters')
-      .customSanitizer(value => makeUpperCase(value)),
+      .customSanitizer(userName => userName.toLowerCase()),
     check('email')
       .trim()
       .exists().withMessage('Email address is required')
       .isEmail()
       .withMessage('Enter a valid email address')
-      .customSanitizer(value => makeUpperCase(value)),
+      .customSanitizer(email => email.toLowerCase()),
     check('password')
       .trim()
       .exists().withMessage('Password is required')
@@ -43,7 +42,7 @@ export default {
       .exists().withMessage('Email address is required')
       .isEmail()
       .withMessage('Enter a valid email address')
-      .customSanitizer(value => makeUpperCase(value)),
+      .customSanitizer(email => email.toLowerCase()),
     check('password')
       .trim()
       .exists()
@@ -70,7 +69,7 @@ export default {
       .withMessage('Email address is required')
       .isEmail()
       .withMessage('Enter a valid email address')
-      .customSanitizer(value => makeUpperCase(value))
+      .customSanitizer(email => email.toLowerCase())
   ],
   passwordSchema: [
     check('password')

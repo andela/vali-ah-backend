@@ -1,5 +1,4 @@
 import { check } from 'express-validator/check';
-import makeCapitalize from '../helpers/makeCapitalize';
 import validateSubscriptions from '../helpers/subscription';
 
 const profileSchemas = {
@@ -11,7 +10,7 @@ const profileSchemas = {
       .withMessage('User name is required')
       .isLength({ min: 2, max: 20 })
       .withMessage('User name should be between 2 to 20 characters')
-      .customSanitizer(value => makeCapitalize(value)),
+      .customSanitizer(userName => userName.toLowerCase()),
     check('firstName')
       .optional()
       .trim()
@@ -22,7 +21,7 @@ const profileSchemas = {
       .withMessage('First name should be between 2 to 15 characters')
       .isAlpha()
       .withMessage('First name should only contain alphabets')
-      .customSanitizer(value => makeCapitalize(value)),
+      .customSanitizer(firstName => firstName.toLowerCase()),
     check('lastName')
       .optional()
       .trim()
@@ -33,7 +32,7 @@ const profileSchemas = {
       .withMessage('Last name should be between 2 to 15 characters')
       .isAlpha()
       .withMessage('Last name should only contain alphabets')
-      .customSanitizer(value => makeCapitalize(value)),
+      .customSanitizer(lastName => lastName.toLowerCase()),
     check('email')
       .optional()
       .trim()
@@ -42,7 +41,7 @@ const profileSchemas = {
       .withMessage('Email cannot be blank')
       .isEmail()
       .withMessage('Email is not valid')
-      .customSanitizer(value => value.toLowerCase()),
+      .customSanitizer(email => email.toLowerCase()),
     check('avatarUrl')
       .optional()
       .not()

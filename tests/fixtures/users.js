@@ -7,7 +7,7 @@ const user = {
   lastName: 'erick',
   userName: 'erickBlaze',
   email: 'gillberto5@gmail.com',
-  password: 'gillberto5'
+  password: 'gillberto5',
 };
 
 const sameUserName = {
@@ -15,7 +15,7 @@ const sameUserName = {
   lastName: 'erick',
   userName: 'erickBlaze',
   email: 'gillberto55@gmail.com',
-  password: 'gillberto5'
+  password: 'gillberto5',
 };
 
 const user2 = {
@@ -23,7 +23,7 @@ const user2 = {
   lastName: 'erick',
   userName: 'erickBlazee',
   email: 'gillberto55@gmail.com',
-  password: 'gillberto5'
+  password: 'gillberto5',
 };
 
 const anotherUser = {
@@ -31,7 +31,7 @@ const anotherUser = {
   lastName: 'Baz',
   userName: 'foofoo',
   email: 'foobar@fakemail.com',
-  password: 'foobarjdb34'
+  password: 'foobarjdb34',
 };
 
 const invalidFirstName = {
@@ -39,7 +39,7 @@ const invalidFirstName = {
   lastName: 'v',
   userName: 'teamVali',
   email: 'vali@gandela.com',
-  password: 'password123'
+  password: 'password123',
 };
 
 const undefinedFirstName = {
@@ -47,14 +47,14 @@ const undefinedFirstName = {
   lastName: 'v',
   userName: 'teamVali',
   email: 'vali@gandela.com',
-  password: 'password123'
+  password: 'password123',
 };
 
 const undefinedLastName = {
   firstName: 'vali',
   userName: 'teamVali',
   email: 'vali@gandela.com',
-  password: 'password123'
+  password: 'password123',
 };
 
 const shortLastName = {
@@ -62,7 +62,7 @@ const shortLastName = {
   lastName: 'v',
   userName: 'teamVali',
   email: 'vali@gandela.com',
-  password: 'password123'
+  password: 'password123',
 };
 
 const invalidLastName = {
@@ -70,7 +70,7 @@ const invalidLastName = {
   lastName: 'v@',
   userName: 'teamVali',
   email: 'vali@gandela.com',
-  password: 'password123'
+  password: 'password123',
 };
 
 const shortUsername = {
@@ -78,7 +78,7 @@ const shortUsername = {
   lastName: 'vali',
   userName: 'v',
   email: 'vali@gandela.com',
-  password: 'password123'
+  password: 'password123',
 };
 
 const invalidEmail = {
@@ -86,7 +86,7 @@ const invalidEmail = {
   lastName: 'vali',
   userName: 'vali',
   email: 'vali.com',
-  password: 'password123'
+  password: 'password123',
 };
 
 const shortPassword = {
@@ -94,7 +94,7 @@ const shortPassword = {
   lastName: 'vali',
   userName: 'teamVali',
   email: 'vali@gandela.com',
-  password: 'pa'
+  password: 'pa',
 };
 
 const invalidPassword = {
@@ -102,7 +102,7 @@ const invalidPassword = {
   lastName: 'vali',
   userName: 'teamVali',
   email: 'vali@gandela.com',
-  password: 'passwordui'
+  password: 'passwordui',
 };
 
 const users = Array(10)
@@ -113,7 +113,7 @@ const users = Array(10)
     lastName: faker.name.lastName(),
     userName: faker.internet.userName({ min: 2, max: 10 }).slice(0, 19),
     email: faker.internet.email(),
-    password: faker.internet.password()
+    password: faker.internet.password(),
   }));
 
 const userToken = generateAuthToken({ id: users[0].id });
@@ -123,7 +123,7 @@ const randomUserToken = generateAuthToken({ id: uuid() });
 const usersWithFollowing = users.map(({ id }) => ({
   followeeId: users[0].id,
   followerId: id,
-  active: true
+  active: true,
 }));
 const profileId = '94189e3d-0379-4dd2-b03d-73fa8c14b3ab';
 
@@ -132,7 +132,7 @@ const profileData = {
   lastName: faker.name.lastName(),
   userName: faker.internet.userName({ min: 2, max: 10 }).slice(0, 19),
   email: faker.internet.email(),
-  password: faker.internet.password()
+  password: faker.internet.password(),
 };
 
 const usersignUpdetail = {
@@ -140,9 +140,23 @@ const usersignUpdetail = {
   lastName: faker.name.lastName(),
   userName: faker.internet.userName({ min: 2, max: 10 }).slice(0, 19),
   email: faker.internet.email(),
-  password: faker.internet.password()
+  password: faker.internet.password(),
 };
 
+const usersignUpdetail2 = {
+  firstName: faker.name.firstName(),
+  lastName: faker.name.lastName(),
+  userName: faker.internet.userName({ min: 2, max: 10 }).slice(0, 19),
+  email: faker.internet.email(),
+  password: faker.internet.password(),
+};
+const usersignUpdetail3 = {
+  firstName: faker.name.firstName(),
+  lastName: faker.name.lastName(),
+  userName: faker.internet.userName({ min: 2, max: 10 }).slice(0, 19),
+  email: faker.internet.email(),
+  password: faker.internet.password(),
+};
 const profiledataForLowerCase = {
   firstName: 'hearT',
   email: 'PETERchuKS@gmail.com',
@@ -174,5 +188,7 @@ export {
   profiledataForLowerCase,
   invalidUserId,
   sameUserName,
-  userOneToken
+  userOneToken,
+  usersignUpdetail2,
+  usersignUpdetail3,
 };

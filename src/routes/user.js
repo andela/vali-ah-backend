@@ -97,8 +97,8 @@ router.get(
  * @swagger
  *
  * /profile/:userId/following:
- *   post:
- *     description: follower a user
+ *   patch:
+ *     description: following a user
  *     produces:
  *       - application/json
  *     parameters:
@@ -109,7 +109,7 @@ router.get(
  *         type: UUID
  *     responses:
  *       200:
- *         description: Successfully followed a user
+ *         description: Successfully followed  or unfollowed a user
  *       404:
  *         description: User does not exist.
  *       409:
@@ -127,7 +127,7 @@ router.patch(
  *
  * /profile/:userId/followers:
  *   get:
- *     description: get allfollowers
+ *     description: get all followers
  *     produces:
  *       - application/json
  *     parameters:

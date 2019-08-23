@@ -151,7 +151,7 @@ export default {
       count,
       page: +page,
       limit: +limit,
-      message: 'Articles retrieved successfully'
+      message: 'Articles retrieved successfully',
     });
   },
 

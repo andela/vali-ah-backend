@@ -9,7 +9,9 @@ import {
   profileData,
   profileId,
   usersignUpdetail,
-  profiledataForLowerCase
+  usersignUpdetail2,
+  usersignUpdetail3,
+  profiledataForLowerCase,
 } from '../fixtures/users';
 import { bulkCategories } from '../fixtures/subscriptions';
 
@@ -25,9 +27,14 @@ const getFollowersUrl = '/followers/';
 const getFollowingsUrl = '/following/';
 const fakeId = profileId;
 let validToken;
+let validTokenTwo;
+let validTokenThree;
 let responseToken;
+let responseToken2;
+let responseToken3;
 let newUser;
 let currentUserId;
+let currentUserIdTwo;
 
 describe('Profile', () => {
   before(async () => {
@@ -37,6 +44,16 @@ describe('Profile', () => {
       .request(app)
       .post(signUrl)
       .send(usersignUpdetail);
+
+    responseToken2 = await chai
+      .request(app)
+      .post(signUrl)
+      .send(usersignUpdetail2);
+
+    responseToken3 = await chai
+      .request(app)
+      .post(signUrl)
+      .send(usersignUpdetail3);
   });
 
   after(async () => {
@@ -49,6 +66,9 @@ describe('Profile', () => {
       newUser = await Users.create(profileData);
       validToken = responseToken.body.data.token;
       currentUserId = responseToken.body.data.user.id;
+      validTokenTwo = responseToken2.body.data.token;
+      currentUserIdTwo = responseToken2.body.data.user.id;
+      validTokenThree = responseToken3.body.data.token;
 
       const response = await chai
         .request(app)
@@ -126,6 +146,28 @@ describe('Profile', () => {
         .request(app)
         .patch(`${profileUrl}${newUser.dataValues.id}${followUnfollowUrl}`)
         .set('authorization', `Bearer ${validToken}`);
+
+      response.should.have.status(200);
+      response.body.should.have.a.property('data');
+      response.body.status.should.eql('success');
+    });
+
+    it('should follow if a user exists (user two)', async () => {
+      const response = await chai
+        .request(app)
+        .patch(`${profileUrl}${newUser.dataValues.id}${followUnfollowUrl}`)
+        .set('authorization', `Bearer ${validTokenTwo}`);
+
+      response.should.have.status(200);
+      response.body.should.have.a.property('data');
+      response.body.status.should.eql('success');
+    });
+
+    it('should follow if a user exists (user three)', async () => {
+      const response = await chai
+        .request(app)
+        .patch(`${profileUrl}${currentUserIdTwo}${followUnfollowUrl}`)
+        .set('authorization', `Bearer ${validTokenThree}`);
 
       response.should.have.status(200);
       response.body.should.have.a.property('data');
@@ -214,8 +256,8 @@ describe('Profile', () => {
     it('should get all followers if user exist', async () => {
       const response = await chai
         .request(app)
-        .get(`${profileUrl}${newUser.dataValues.id}${getFollowersUrl}`)
-        .set('authorization', `Bearer ${validToken}`);
+        .get(`${profileUrl}${currentUserIdTwo}${getFollowersUrl}`)
+        .set('authorization', `Bearer ${validTokenTwo}`);
 
       response.should.have.status(200);
       response.body.should.have.a.property('data');
@@ -238,8 +280,8 @@ describe('Profile', () => {
     it('should get followings if a user exists', async () => {
       const response = await chai
         .request(app)
-        .get(`${profileUrl}${newUser.dataValues.id}${getFollowingsUrl}`)
-        .set('authorization', `Bearer ${validToken}`);
+        .get(`${profileUrl}${currentUserIdTwo}${getFollowingsUrl}`)
+        .set('authorization', `Bearer ${validTokenTwo}`);
 
       response.should.have.status(200);
       response.body.should.have.a.property('data');

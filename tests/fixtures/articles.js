@@ -4,20 +4,16 @@ import randomBool from 'random-bool';
 import { generateAuthToken } from '../../src/helpers/auth';
 import slugify from '../../src/helpers/slugify';
 
-import {
-  users
-} from './users';
+import { users } from './users';
 
 const comment = {
   content: faker.lorem.sentence(),
-  userId: faker.random.uuid()
+  userId: faker.random.uuid(),
 };
 
 const tag = ['motivation', 'health', 'emotion'];
 
-const articles = users.map(({
-  id
-}) => ({
+const articles = users.map(({ id }) => ({
   id: uuid(),
   authorId: id,
   tag: faker.random.arrayElement(tag),
@@ -25,13 +21,13 @@ const articles = users.map(({
   summary: faker.lorem.sentence(),
   slug: slugify(faker.lorem.sentence() + uuid()),
   body: faker.lorem.text(),
-  status: 'published'
+  status: 'published',
 }));
 
 const followers = users.map(({ id }) => ({
   id: uuid(),
   followeeId: articles[0].authorId,
-  followerId: id
+  followerId: id,
 }));
 
 const userAuth = generateAuthToken({ id: users[0].id });
@@ -41,13 +37,13 @@ const profileData = {
   lastName: faker.name.lastName(),
   userName: faker.internet.userName({ min: 2, max: 10 }).slice(0, 19),
   email: faker.internet.email(),
-  password: faker.internet.password()
+  password: faker.internet.password(),
 };
 
 const category = tag.map(() => ({
   id: uuid(),
   category: faker.random.arrayElement(tag),
-  description: faker.lorem.sentence()
+  description: faker.lorem.sentence(),
 }));
 
 const categoriesId = category.map(categoriesTab => categoriesTab.id);
@@ -58,50 +54,42 @@ const duplicatedCategoriesId = Array(10)
 const usersId = users.map(user => user.id);
 const articleIds = articles.map(article => article.id);
 
-const votes1 = articles.map(({
-  id
-}, index) => ({
+const votes1 = articles.map(({ id }, index) => ({
   id: uuid(),
   articleId: articleIds[index],
   userId: usersId[Math.floor(Math.random() * 5)],
   upVote: randomBool(),
-  num: id
+  num: id,
 }));
 
-const votes2 = articles.map(({
-  id
-}, index) => ({
+const votes2 = articles.map(({ id }, index) => ({
   id: uuid(),
   articleId: articleIds[index],
   userId: usersId[Math.floor(Math.random() * 5)],
   upVote: randomBool(),
-  num: id
+  num: id,
 }));
 
-const votes3 = articles.map(({
-  id
-}, index) => ({
+const votes3 = articles.map(({ id }, index) => ({
   id: uuid(),
   articleId: articleIds[index],
   userId: usersId[Math.floor(Math.random() * 5)],
   upVote: randomBool(),
-  num: id
+  num: id,
 }));
 
-const articleCategories = articles.map(({
-  id
-}, index) => ({
+const articleCategories = articles.map(({ id }, index) => ({
   id: uuid(),
   authorId: usersId[index],
   articleId: id,
-  categoryId: faker.random.arrayElement(duplicatedCategoriesId)
+  categoryId: faker.random.arrayElement(duplicatedCategoriesId),
 }));
 const article1 = {
   title: 'summarysummary',
   summary: 'summarysummary',
   body: faker.lorem.sentences(),
   tag: ['842b0c1e-bd2b-4a4a-82e9-610869f02fd5'],
-  authorId: '842b0c1e-bd2b-4a4a-82e9-610869f02fd5'
+  authorId: '842b0c1e-bd2b-4a4a-82e9-610869f02fd5',
 };
 
 const articleSlug = {
@@ -136,50 +124,72 @@ const article2 = {
   tag: [
     '842b0c1e-bd2b-4a4a-82e9-610869f02fd4',
     '842b0c1e-bd2b-4a4a-82e9-610869f02fd5',
-    '842b0c1e-bd2b-4a4a-82e9-610869f02fd6'
-  ]
+    '842b0c1e-bd2b-4a4a-82e9-610869f02fd6',
+  ],
 };
 
 const article3 = {
   title: 'summarysummary',
   summary: 'summarysummary',
   body: faker.lorem.sentences(),
-  tag: ['842b0c1e-bd2b-4a4a-82e9-610869f02fd4', '']
+  tag: ['842b0c1e-bd2b-4a4a-82e9-610869f02fd4', ''],
 };
 
 const article4 = {
   title: 'summarysummary',
   summary: 'summarysummary',
   body: faker.lorem.sentences(),
-  tag: ['842b0c1e-bd2b-4a4a-82e9-610869f02fd4', '842b0c1e-bd2b-4a4a-82e9-610869f02fd9']
+  tag: [
+    '842b0c1e-bd2b-4a4a-82e9-610869f02fd4',
+    '842b0c1e-bd2b-4a4a-82e9-610869f02fd9',
+  ],
 };
 const badFollowupIdArticle = {
   title: 'summarysummary',
   summary: 'summarysummary',
   body: faker.lorem.sentences(),
   tag: ['842b0c1e-bd2b-4a4a-82e9-610869f02fd4'],
-  followUpId: '842b0c1e-bd2b-4a4a-82e9-610869f02fd5'
+  followUpId: '842b0c1e-bd2b-4a4a-82e9-610869f02fd5',
 };
 
 const votes = articles.map(({ authorId }, i, array) => ({
   id: uuid(),
   userId: authorId,
   articleId: i > 3 ? array[array.length - 1].id : array[1].id,
-  upVote: i > 3
+  upVote: i > 3,
 }));
 
-const downVotes = articles.map(({
-  authorId
-}, i, array) => ({
+const downVotes = articles.map(({ authorId }, i, array) => ({
   id: uuid(),
   userId: authorId,
   articleId: i > 4 ? array[3].id : array[2].id,
-  upVote: false
+  upVote: false,
 }));
 
 const invalidArticleId = '00000000-0000-1000-a000-000000000000';
 
+const duplicateArticleCategories = [
+  {
+    id: uuid(),
+    articleId: articles[0].id,
+    authorId: users[0].id,
+    categoryId: category[0].id,
+  },
+  {
+    id: uuid(),
+    articleId: articles[0].id,
+    authorId: users[0].id,
+    categoryId: category[1].id,
+  },
+  {
+    id: uuid(),
+    articleId: articles[0].id,
+    authorId: users[0].id,
+    categoryId: category[1].id,
+  },
+];
 export {
+  duplicateArticleCategories,
   comment,
   articles,
   votes,
