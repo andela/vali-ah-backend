@@ -9,7 +9,8 @@ const {
   followAndUnfollow,
   getAllFollowers,
   getAllFollowings,
-  createSubscriptions
+  createSubscriptions,
+  getAllBookmark
 } = profile;
 const {
   validator, emptybody, asyncWrapper, verifyToken
@@ -213,6 +214,24 @@ router.post(
   asyncWrapper(verifyToken),
   validator(subscriptions),
   asyncWrapper(createSubscriptions)
+);
+
+/**
+ * @swagger
+ *
+ * /bookmarks:
+ *   get:
+ *     description: Get all bookmarked articles
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Success
+ */
+router.get(
+  '/bookmarks',
+  asyncWrapper(verifyToken),
+  asyncWrapper(getAllBookmark)
 );
 
 export default router;

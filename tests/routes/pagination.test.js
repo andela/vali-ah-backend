@@ -62,6 +62,6 @@ describe('Pagination support for articles', () => {
     const response = await chai.request(app).get('/api/v1/articles?page=1&limit=5');
 
     response.should.have.status(404);
-    response.body.error.message.should.eql('No articles found');
+    response.body.should.be.a('Object');
   });
 });

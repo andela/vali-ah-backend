@@ -1,5 +1,3 @@
-import { NotFoundError } from './errors';
-
 /**
  * Implements pagination support
  *
@@ -24,9 +22,9 @@ const paginator = async (Source, options) => {
   }
 
   const countResult = await Source.findAndCountAll({ ...otherOptions });
-  const { count } = countResult;
+  const { count, rows } = countResult;
 
-  if (!count) throw new NotFoundError('No articles found');
+  if (!count) return { data: rows, count };
 
   const offset = limit * (+page - 1);
 

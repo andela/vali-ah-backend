@@ -1,7 +1,9 @@
 import Model from '../models';
 import * as helpers from '../helpers';
 
-const { Users, Followers, Categories } = Model;
+const {
+  Users, Followers, Categories, Bookmarks
+} = Model;
 const { ApplicationError, NotFoundError, paginator } = helpers;
 
 export default {
@@ -204,6 +206,29 @@ export default {
       status: 'success',
       data,
       message: `Successfully subscribed to ${categories.join(', ')}`
+    });
+  },
+
+  /**
+   * Controller for getting all bookmarks for a user
+   *
+   * @function
+   *
+   * @param {Object} request - express request object
+   * @param {Object} response - express response object
+   *
+   * @returns {Object} - all bookmark for a user
+   */
+  getAllBookmark: async (request, response) => {
+    const { id: userId, limit = 10, page = 1 } = request.user;
+
+    const { data, count } = await paginator(Bookmarks, { where: { userId }, page, limit });
+
+    return response.status(200).json({
+      status: 'success',
+      data,
+      page,
+      count
     });
   }
 };

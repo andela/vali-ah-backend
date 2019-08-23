@@ -25,10 +25,12 @@ describe('Bookmark Endpoint', () => {
 
     await Articles.bulkCreate(bulkArticles, { returning: true });
   });
+
   after(async () => {
     await Users.destroy({ where: {} });
     await Articles.destroy({ where: {} });
   });
+
   describe('user adds article to bookmark - POST request to /:articleId/bookmarks/', () => {
     it('should return 201 when user adds a bookmark', async () => {
       const validBookmarkData = {
@@ -77,7 +79,19 @@ describe('Bookmark Endpoint', () => {
       response.should.have.status(404);
       response.body.should.have.property('error');
     });
+
+    it('should get all bookmarks for a user', async () => {
+      const response = await chai
+        .request(app)
+        .get(`${baseRoute}/users/bookmarks`)
+        .set('Authorization', `Bearer ${userToken}`);
+
+      response.should.have.status(200);
+      response.body.should.have.property('data');
+      response.body.should.have.property('count');
+    });
   });
+
   describe('user removes article from bookmark - DELETE request to /:articleId/bookmarks/', () => {
     it('should return 200 if article exists', async () => {
       const validBookmarkData = {
