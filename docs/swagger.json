@@ -969,6 +969,52 @@
           }
         }
       }
+    },
+    "/users/subscriptions": {
+      "post": {
+        "description": "subscribe to categories",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "default": "Bearer {token}"
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "default": "application/json"
+          },
+          {
+            "name": "categories",
+            "description": "A stringified version of an array of categories",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/subscription"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "definitions": {
+          "subscription": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
     }
   },
   "definitions": {},

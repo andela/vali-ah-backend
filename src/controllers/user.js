@@ -1,31 +1,28 @@
 import Model from '../models';
 import * as helpers from '../helpers';
 
-const { Users, Followers } = Model;
-const {
-  ApplicationError,
-  NotFoundError,
-  paginator
-} = helpers;
-
+const { Users, Followers, Categories } = Model;
+const { ApplicationError, NotFoundError, paginator } = helpers;
 
 export default {
   /**
-* Generic update profile
-* @function
-*
-* @param {Object} request - express request object
-* @param {Object} response - express response object
-*
-* @returns {Object} - callback that execute the controller
-*/
+   * Controller to update a users profile
+   * @function
+   *
+   * @param {Object} request - express request object
+   * @param {Object} response - express response object
+   *
+   * @returns {Object} - response after executing the controller
+   */
   updateProfile: async (request, response) => {
     const {
       params: { id },
       body: payload
     } = request;
 
-    if (request.user.id !== id) return response.status(401).json({ status: 'error', message: ' Unauthorized update' });
+    if (request.user.id !== id) {
+      return response.status(401).json({ status: 'error', message: ' Unauthorized update' });
+    }
 
     const [, affectedRows] = await Users.update(
       { ...payload },
@@ -34,18 +31,20 @@ export default {
 
     delete affectedRows[0].password;
 
-    return response.status(200).json({ status: 'success', message: 'Successfully updated', data: affectedRows[0] });
+    return response
+      .status(200)
+      .json({ status: 'success', message: 'Successfully updated', data: affectedRows[0] });
   },
 
   /**
-   * Generic update profile
+   * Controller to view a user profile
    *
    * @function
    *
    * @param {Object} request - express request object
    * @param {Object} response - express response object
    *
-   * @returns {Object} - callback that execute the controller
+   * @returns {Object} - response after executing the controller
    */
   viewProfile: async (request, response) => {
     const {
@@ -60,18 +59,20 @@ export default {
 
     delete existingUser.password;
 
-    return response.status(200).json({ status: 'success', message: 'Request was successful', data: existingUser });
+    return response
+      .status(200)
+      .json({ status: 'success', message: 'Request was successful', data: existingUser });
   },
 
   /**
-    * A user can follow and unfollow a user
-    * @function
-    *
-    * @param {Object} request - express request object
-    * @param {Object} response - express response object
-    *
-    * @returns {Object} - callback that execute the controller
-    */
+   * Controller that enables a user to follow and unfollow another user
+   * @function
+   *
+   * @param {Object} request - express request object
+   * @param {Object} response - express response object
+   *
+   * @returns {Object} - response after executing the controller
+   */
   followAndUnfollow: async (request, response) => {
     const {
       params: { userId },
@@ -91,41 +92,41 @@ export default {
     let followerData = await Followers.findOne({
       where: {
         followeeId: userToBeFollowedOrUnfollowed.id,
-        followerId: userThatWantsToFollowOrUnfollow,
+        followerId: userThatWantsToFollowOrUnfollow
       }
     });
 
     if (!followerData) {
-      followerData = await Followers
-        .create({
-          followerId: userThatWantsToFollowOrUnfollow,
-          followeeId: userToBeFollowedOrUnfollowed.id,
-        });
+      followerData = await Followers.create({
+        followerId: userThatWantsToFollowOrUnfollow,
+        followeeId: userToBeFollowedOrUnfollowed.id
+      });
     } else {
       followerData = await followerData.update({ active: !followerData.active, returning: true });
     }
 
     return response.status(200).json({
       status: 'success',
-      message: `Successfully ${followerData.active ? 'unfollowed'
-        : 'followed'} ${firstName} ${lastName}`,
+      message: `Successfully ${
+        followerData.active ? 'unfollowed' : 'followed'
+      } ${firstName} ${lastName}`,
       data: followerData.toJSON()
     });
   },
 
   /**
-    *  Get all followers of a user
-    * @function
-    *
-    * @param {Object} request - express request object
-    * @param {Object} response - express response object
-    *
-    * @returns {Object} - callback that execute the controller
-    */
+   * Controller to get all followers of a user
+   * @function
+   *
+   * @param {Object} request - express request object
+   * @param {Object} response - express response object
+   *
+   * @returns {Object} - response after executing the controller
+   */
   getAllFollowers: async (request, response) => {
     const {
       query: { page = 1, limit = 10 },
-      params: { userId },
+      params: { userId }
     } = request;
 
     const { data, count } = await paginator(null, {
@@ -145,18 +146,18 @@ export default {
   },
 
   /**
-    * Get all following of a user
-    * @function
-    *
-    * @param {Object} request - express request object
-    * @param {Object} response - express response object
-    *
-    * @returns {Object} - callback that execute the controller
-    */
+   * Get all following of a user
+   * @function
+   *
+   * @param {Object} request - express request object
+   * @param {Object} response - express response object
+   *
+   * @returns {Object} - response after executing the controller
+   */
   getAllFollowings: async (request, response) => {
     const {
       query: { page = 1, limit = 10 },
-      params: { userId },
+      params: { userId }
     } = request;
 
     const { data, count } = await paginator(null, {
@@ -171,7 +172,38 @@ export default {
       data,
       count,
       page,
-      message: 'Request successful',
+      message: 'Request successful'
+    });
+  },
+
+  /**
+   * Controller to create subscriptions for a user
+   * A user can subscribe to different categories
+   *
+   * @function
+   *
+   * @param {Object} request - express request object
+   * @param {Object} response - express response object
+   *
+   * @returns {Object} - response object after executing the controller
+   */
+  createSubscriptions: async (request, response) => {
+    const { categories } = request.body;
+    const { id: userId } = request.user;
+    const currentUser = await Users.findByPk(userId);
+
+    const subscribedCategories = await Categories.findAll({
+      where: { category: categories },
+      attributes: ['id', 'category'],
+      raw: true
+    });
+
+    const data = await currentUser.bulkUpsertSubscriptions(subscribedCategories);
+
+    return response.status(200).json({
+      status: 'success',
+      data,
+      message: `Successfully subscribed to ${categories.join(', ')}`
     });
   }
 };

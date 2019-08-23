@@ -9,11 +9,14 @@ const {
   followAndUnfollow,
   getAllFollowers,
   getAllFollowings,
+  createSubscriptions
 } = profile;
 const {
   validator, emptybody, asyncWrapper, verifyToken
 } = middlewares;
-const { profileUpdateSchema, profileViewSchema, followerSchema } = profileSchema;
+const {
+  profileUpdateSchema, profileViewSchema, followerSchema, subscriptions
+} = profileSchema;
 const router = express.Router();
 
 /**
@@ -84,7 +87,12 @@ router.patch(
  *       404:
  *         description: user does not exist.
  */
-router.get('/profile/:id', validator(profileViewSchema), asyncWrapper(verifyToken), asyncWrapper(viewProfile));
+router.get(
+  '/profile/:id',
+  validator(profileViewSchema),
+  asyncWrapper(verifyToken),
+  asyncWrapper(viewProfile)
+);
 
 /**
  * @swagger
@@ -164,6 +172,47 @@ router.get(
   validator(followerSchema),
   asyncWrapper(verifyToken),
   asyncWrapper(getAllFollowings)
+);
+
+/**
+ * @swagger
+ *
+ * /users/subscriptions:
+ *   post:
+ *     description: subscribe to categories
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: Authorization
+ *         in: header
+ *         required: true
+ *         type: string
+ *         default: Bearer {token}
+ *       - name: Content-Type
+ *         in: header
+ *         required: true
+ *         type: string
+ *         default: application/json
+ *       - name: categories
+ *         description: A stringified version of an array of categories
+ *         in: body
+ *         required: true
+ *         schema:
+ *             $ref: '#/definitions/subscription'
+ *     responses:
+ *       200:
+ *         description: Success
+ *     definitions:
+ *         subscription:
+ *           type: array
+ *           items:
+ *             type: string
+ */
+router.post(
+  '/subscriptions',
+  asyncWrapper(verifyToken),
+  validator(subscriptions),
+  asyncWrapper(createSubscriptions)
 );
 
 export default router;
