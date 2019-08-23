@@ -33,7 +33,7 @@ const wordOccurenceInString = (string, listOfWords) => listOfWords
  * @return {number} - sequelize object for inserted data
  */
 export default (stringOne, stringTwo) => {
-  const words = Array.from(new Set([...stringOne.split(' '), ...stringTwo.split(' ')]));
+  const words = Array.from(new Set([...stringOne.trim().split(' '), ...stringTwo.trim().split(' ')])).filter(word => word !== '');
   const stringOneVector = wordOccurenceInString(stringOne, words);
   const stringTwoVector = wordOccurenceInString(stringTwo, words);
 
