@@ -207,14 +207,15 @@ export default class Articles extends Model {
    * @static
    * @memberof Articles
    *
-   * @param {string} title - title of the article to be sort
+   * @param {string} queryString - string to sort
+   * @param {string} column - database column to search in
    *
    * @returns {Array} - array or undefined
    */
-  static async getArticles(title) {
+  static async getArticles(queryString, column = 'title') {
     const article = await Articles.findAll({
       where: {
-        title
+        [column]: { [Sequelize.Op.iLike]: queryString }
       }
     });
     return article;
@@ -234,7 +235,7 @@ export default class Articles extends Model {
     await Articles.destroy({
       returning: true,
       where: {
-        slug
+        slug: { [Sequelize.Op.iLike]: slug }
       }
     });
   }
@@ -375,5 +376,41 @@ export default class Articles extends Model {
     const similarity = Similarity(contextInArticle, contextInComment);
 
     return similarity >= 0.6;
+  }
+
+  /** Get one article by slug
+   *
+   * @static
+   * @memberof Articles
+   *
+   * @param {string} slug - slug of the article to be gotten
+   * @param {Object} options - optional object for database query option
+   *
+   * @returns {Array} - array
+   */
+  static async findOneArticle(slug, options = {}) {
+    const article = await Articles.findOne({
+      where: {
+        slug: { [Sequelize.Op.iLike]: slug }, ...options
+      }
+    });
+    return article;
+  }
+
+  /** Update article
+   *
+   * @static
+   * @memberof Articles
+   *
+   * @param {Object} articleInstance - an instance of the article's model
+   * @param {Object} article - article object
+   *
+   * @returns {Array} - array
+   */
+  static async updateArticle(articleInstance, article) {
+    article = await articleInstance.update(article, {
+      returning: true
+    });
+    return article;
   }
 }

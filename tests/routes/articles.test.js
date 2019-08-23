@@ -13,7 +13,7 @@ import {
   userToken,
   user,
   user2,
-  randomUserToken
+  randomUserToken, userOneToken
 } from '../fixtures/users';
 import {
   articles as bulkArticles,
@@ -33,6 +33,7 @@ import {
   votes2 as bulkVotes2,
   votes3 as bulkVotes3,
   category as bulkTag,
+  articleSlug,
   articleCategories as bulkArticleCategories
 } from '../fixtures/articles';
 import {
@@ -231,9 +232,19 @@ describe('Articles API', () => {
         .post(`${baseRoute}/articles`)
         .set('Authorization', `Bearer ${userAuth1}`)
         .send(articleNoTag);
-      slug1 = response.body.data.slug;
 
       response.body.status.should.eql('success');
+    });
+
+    it('should be able to create articles with followupId', async () => {
+      const response = await chai.request(app)
+        .post(`${baseRoute}/articles`)
+        .set('Authorization', `Bearer ${userAuth1}`)
+        .send(articleSlug);
+
+      response.body.status.should.eql('success');
+      response.body.should.have.property('data');
+      response.body.message.should.eql('Article successfully created');
     });
 
     it('should be reject followupId not in articles table', async () => {
@@ -305,9 +316,8 @@ describe('Articles API', () => {
   });
 
   describe('PUT /articles/:slug', () => {
-    it('should be reject followupId not in articles table', async () => {
-      const response = await chai
-        .request(app)
+    it('should reject if followupId not in articles table', async () => {
+      const response = await chai.request(app)
         .put(`${baseRoute}/articles/${slug1}`)
         .set('Authorization', `Bearer ${userAuth1}`)
         .send(badFollowupIdArticle);
@@ -407,16 +417,17 @@ describe('Articles API', () => {
         status() {},
         json() {}
       };
-      const stub = sinon
-        .stub(Articles, 'update')
-        .callsFake(() => [1, [{ id: 'someiD' }]]);
+      const stub = sinon.stub(Articles, 'updateArticle').callsFake(() => ([1, [{ id: 'someiD' }]]));
+      const stub2 = sinon.stub(ArticleCategories, 'findTags').callsFake(() => ([]));
 
       sinon.stub(res, 'status').returnsThis();
+
       await updateArticle(req, res);
 
       res.status.should.be.calledWith(200);
 
       stub.restore();
+      stub2.restore();
     });
   });
 
@@ -424,7 +435,7 @@ describe('Articles API', () => {
     it('should fake image upload', async () => {
       const req = {
         file: { secure_url: 'image.png' },
-        body: { title: 'some fake article' },
+        body: { title: 'some fake article', body: 'some dummy data some dummy data some dummy data' },
         user: { id: '152788' }
       };
       const res = {
@@ -775,6 +786,18 @@ describe('Articles API', () => {
         .set('Authorization', `Bearer ${randomUserToken}`)
         .send(inlineCommentData);
 
+      status.should.eql(403);
+    });
+
+    it('should return 403 if comment desnt belong to user', async () => {
+      const { status, body } = await chai
+        .request(app)
+        .put(`${baseRoute}/articles/inline_comments/${inlineCommentData.id}`)
+        .set('Authorization', `Bearer ${userOneToken}`)
+        .send(inlineCommentData);
+
+      body.status.should.equal('error');
+      body.error.message.should.equal('You are not authorized');
       status.should.eql(403);
     });
 
