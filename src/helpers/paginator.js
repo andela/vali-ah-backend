@@ -23,15 +23,12 @@ const paginator = async (Source, options) => {
     return { data: await dataSource({ data: dataToSource, options: otherOptions }) };
   }
 
-  const countResult = await Source.findAndCountAll({});
+  const countResult = await Source.findAndCountAll({ ...otherOptions });
   const { count } = countResult;
 
   if (!count) throw new NotFoundError('No articles found');
 
-  const pages = Math.ceil(count / limit);
   const offset = limit * (+page - 1);
-
-  if (page > pages) throw new NotFoundError('Page does not exist');
 
   const data = await Source.findAll({ ...otherOptions, limit, offset });
 

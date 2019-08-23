@@ -10,7 +10,10 @@ import app from '../../src';
 import models from '../../src/models';
 import {
   users as bulkUsers,
-  userToken, user, user2, randomUserToken
+  userToken,
+  user,
+  user2,
+  randomUserToken
 } from '../fixtures/users';
 import {
   articles as bulkArticles,
@@ -49,7 +52,14 @@ chai.use(chaiHttp);
 should();
 
 const {
-  Articles, Users, Categories, ArticleCategories, Votes, Comments, InlineComments, Subscriptions
+  Articles,
+  Users,
+  Categories,
+  ArticleCategories,
+  Votes,
+  Comments,
+  InlineComments,
+  Subscriptions
 } = models;
 
 const baseRoute = '/api/v1';
@@ -68,7 +78,9 @@ describe('Articles API', () => {
     articles = await Articles.bulkCreate(bulkArticles, { returning: true });
     tag = await Categories.bulkCreate(bulkTag, { returning: true });
 
-    await ArticleCategories.bulkCreate(bulkArticleCategories, { returning: true });
+    await ArticleCategories.bulkCreate(bulkArticleCategories, {
+      returning: true
+    });
     await Votes.bulkCreate(bulkVotes1, { returning: true });
     await Votes.bulkCreate(bulkVotes2, { returning: true });
     await Votes.bulkCreate(bulkVotes3, { returning: true });
@@ -76,26 +88,28 @@ describe('Articles API', () => {
   });
 
   after(async () => {
-    await Users.destroy({ where: {}, });
-    await Articles.destroy({ where: {}, });
-    await Categories.destroy({ where: {}, });
-    await ArticleCategories.destroy({ where: {}, });
+    await Users.destroy({ where: {} });
+    await Articles.destroy({ where: {} });
+    await Categories.destroy({ where: {} });
+    await ArticleCategories.destroy({ where: {} });
   });
 
   describe('GET /articles/feed', () => {
     it('should get all articles followed by user', async () => {
-      const response = await chai.request(app)
+      const response = await chai
+        .request(app)
         .get(`${baseRoute}/articles/feed`)
         .set('Authorization', `Bearer ${userAuth}`);
 
       response.body.status.should.equal('success');
       response.body.should.have.property('data');
       response.body.data[0].status.should.equal('published');
-      response.body.message.should.equal('Articles fetch was succesfully');
+      response.body.message.should.equal('Articles fetched succesfully');
     });
 
     it('should throw error if user not found', async () => {
-      const response = await chai.request(app)
+      const response = await chai
+        .request(app)
         .get(`${baseRoute}/articles/feed`)
         .set('Authorization', `Bearer ${randomUserToken}`);
 
@@ -132,9 +146,10 @@ describe('Articles API', () => {
       response.should.have.status(200);
     });
 
-
     it('should get users search if tag strings are valid ', async () => {
-      const response = await chai.request(app).get(`${baseRoute}/articles?tag=${tag[0].category}`);
+      const response = await chai
+        .request(app)
+        .get(`${baseRoute}/articles?tag=${tag[0].category}`);
       response.should.have.status(200);
     });
 
@@ -153,21 +168,18 @@ describe('Articles API', () => {
     });
 
     it('should get users search if keyword strings are valid ', async () => {
-      const response = await chai.request(app).get(`${baseRoute}/articles?keyword=l`);
+      const response = await chai
+        .request(app)
+        .get(`${baseRoute}/articles?keyword=l`);
       response.should.have.status(200);
     });
 
     it('should not get user search when tag is not in the database', async () => {
-      const response = await chai.request(app).get(`${baseRoute}/articles?tag=Lagos`);
+      const response = await chai
+        .request(app)
+        .get(`${baseRoute}/articles?tag=Lagos`);
 
       response.should.have.status(404);
-    });
-
-    it('should not get user search when author is not in the database', async () => {
-      const response = await chai.request(app).get(`${baseRoute}/articles?author=Lagosplk`);
-
-      response.should.have.status(404);
-      response.body.message.should.equal('Lagosplk Not found');
     });
 
     it('should not get user search when its value is invalid', async () => {
@@ -189,19 +201,22 @@ describe('Articles API', () => {
 
   describe('POST /articles', () => {
     before(async () => {
-      const res = await chai.request(app)
+      const res = await chai
+        .request(app)
         .post('/api/v1/auth/signup')
         .send(user);
 
       userAuth1 = res.body.data.token;
-      const res2 = await chai.request(app)
+      const res2 = await chai
+        .request(app)
         .post('/api/v1/auth/signup')
         .send(user2);
       userAuth2 = res2.body.data.token;
     });
 
     it('should be able to create article', async () => {
-      const response = await chai.request(app)
+      const response = await chai
+        .request(app)
         .post(`${baseRoute}/articles`)
         .set('Authorization', `Bearer ${userAuth1}`)
         .send(article1);
@@ -211,7 +226,8 @@ describe('Articles API', () => {
     });
 
     it('should be able to create articles with no tag', async () => {
-      const response = await chai.request(app)
+      const response = await chai
+        .request(app)
         .post(`${baseRoute}/articles`)
         .set('Authorization', `Bearer ${userAuth1}`)
         .send(articleNoTag);
@@ -221,7 +237,8 @@ describe('Articles API', () => {
     });
 
     it('should be reject followupId not in articles table', async () => {
-      const response = await chai.request(app)
+      const response = await chai
+        .request(app)
         .post(`${baseRoute}/articles`)
         .set('Authorization', `Bearer ${userAuth1}`)
         .send(badFollowupIdArticle);
@@ -230,7 +247,8 @@ describe('Articles API', () => {
     });
 
     it('should be able to create an article with image sent', async () => {
-      const response = await chai.request(app)
+      const response = await chai
+        .request(app)
         .post(`${baseRoute}/articles`)
         .set('Authorization', `Bearer ${randomUserToken}`)
         .send(article1);
@@ -241,7 +259,8 @@ describe('Articles API', () => {
 
   describe('GET /articles/:slug', () => {
     it('should be able to get articles', async () => {
-      const response = await chai.request(app)
+      const response = await chai
+        .request(app)
         .get(`${baseRoute}/articles/${slug1}`)
         .set('Authorization', `Bearer ${userAuth1}`);
 
@@ -249,7 +268,8 @@ describe('Articles API', () => {
     });
 
     it('should be able to get articles with votes', async () => {
-      const response = await chai.request(app)
+      const response = await chai
+        .request(app)
         .get(`${baseRoute}/articles/${articles[0].slug}`)
         .set('Authorization', `Bearer ${userAuth1}`);
 
@@ -257,7 +277,8 @@ describe('Articles API', () => {
     });
 
     it('should be able to get articles with votes', async () => {
-      const response = await chai.request(app)
+      const response = await chai
+        .request(app)
         .get(`${baseRoute}/articles/${articles[1].slug}`)
         .set('Authorization', `Bearer ${userAuth1}`);
 
@@ -265,7 +286,8 @@ describe('Articles API', () => {
     });
 
     it('should be able to get articles with votes', async () => {
-      const response = await chai.request(app)
+      const response = await chai
+        .request(app)
         .get(`${baseRoute}/articles/${articles[2].slug}`)
         .set('Authorization', `Bearer ${userAuth1}`);
 
@@ -273,7 +295,8 @@ describe('Articles API', () => {
     });
 
     it('should not found if slug not in database', async () => {
-      const response = await chai.request(app)
+      const response = await chai
+        .request(app)
         .get(`${baseRoute}/articles/slugnotfound`)
         .set('Authorization', `Bearer ${userAuth1}`);
 
@@ -283,7 +306,8 @@ describe('Articles API', () => {
 
   describe('PUT /articles/:slug', () => {
     it('should be reject followupId not in articles table', async () => {
-      const response = await chai.request(app)
+      const response = await chai
+        .request(app)
         .put(`${baseRoute}/articles/${slug1}`)
         .set('Authorization', `Bearer ${userAuth1}`)
         .send(badFollowupIdArticle);
@@ -292,7 +316,8 @@ describe('Articles API', () => {
     });
 
     it('should reject more than 2 tags', async () => {
-      const response = await chai.request(app)
+      const response = await chai
+        .request(app)
         .put(`${baseRoute}/articles/${slug1}`)
         .set('Authorization', `Bearer ${userAuth1}`)
         .send(article2);
@@ -301,7 +326,8 @@ describe('Articles API', () => {
     });
 
     it('should reject invalid tag', async () => {
-      const response = await chai.request(app)
+      const response = await chai
+        .request(app)
         .put(`${baseRoute}/articles/${slug1}`)
         .set('Authorization', `Bearer ${userAuth1}`)
         .send(article3);
@@ -310,7 +336,8 @@ describe('Articles API', () => {
     });
 
     it('should reject tag not yet in category table', async () => {
-      const response = await chai.request(app)
+      const response = await chai
+        .request(app)
         .put(`${baseRoute}/articles/${slug1}`)
         .set('Authorization', `Bearer ${userAuth1}`)
         .send(article4);
@@ -319,7 +346,8 @@ describe('Articles API', () => {
     });
 
     it('should be able to update their articles', async () => {
-      const response = await chai.request(app)
+      const response = await chai
+        .request(app)
         .put(`${baseRoute}/articles/${slug1}`)
         .set('Authorization', `Bearer ${userAuth1}`)
         .send(article1);
@@ -328,7 +356,8 @@ describe('Articles API', () => {
     });
 
     it('should be able to update their articles with no tags', async () => {
-      const response = await chai.request(app)
+      const response = await chai
+        .request(app)
         .put(`${baseRoute}/articles/${slug1}`)
         .set('Authorization', `Bearer ${userAuth1}`)
         .send(articleNoTag);
@@ -337,7 +366,8 @@ describe('Articles API', () => {
     });
 
     it('should be prevent another author from editing other author article', async () => {
-      const response = await chai.request(app)
+      const response = await chai
+        .request(app)
         .put(`${baseRoute}/articles/${slug1}`)
         .set('Authorization', `Bearer ${userAuth2}`)
         .send(article1);
@@ -348,7 +378,8 @@ describe('Articles API', () => {
 
   describe('DELETE /articles/:slug', () => {
     it('should be return not found if slug not in database', async () => {
-      const response = await chai.request(app)
+      const response = await chai
+        .request(app)
         .delete(`${baseRoute}/articles/articlenotfound`)
         .set('Authorization', `Bearer ${userAuth1}`);
 
@@ -356,7 +387,8 @@ describe('Articles API', () => {
     });
 
     it('should be able to delete their articles', async () => {
-      const response = await chai.request(app)
+      const response = await chai
+        .request(app)
         .delete(`${baseRoute}/articles/${slug1}`)
         .set('Authorization', `Bearer ${userAuth1}`);
 
@@ -375,12 +407,14 @@ describe('Articles API', () => {
         status() {},
         json() {}
       };
-      const stub = sinon.stub(Articles, 'update').callsFake(() => ([1, [{ id: 'someiD' }]]));
+      const stub = sinon
+        .stub(Articles, 'update')
+        .callsFake(() => [1, [{ id: 'someiD' }]]);
 
       sinon.stub(res, 'status').returnsThis();
       await updateArticle(req, res);
 
-      (res.status).should.be.calledWith(200);
+      res.status.should.be.calledWith(200);
 
       stub.restore();
     });
@@ -402,7 +436,7 @@ describe('Articles API', () => {
       sinon.stub(res, 'status').returnsThis();
       await createArticle(req, res);
 
-      (res.status).should.be.calledWith(201);
+      res.status.should.be.calledWith(201);
 
       stub.restore();
     });
@@ -414,9 +448,9 @@ describe('Articles API', () => {
     let token;
 
     before(async () => {
-      await Users.destroy({ where: {}, });
-      await Articles.destroy({ where: {}, });
-      await Votes.destroy({ where: {}, });
+      await Users.destroy({ where: {} });
+      await Articles.destroy({ where: {} });
+      await Votes.destroy({ where: {} });
       await Users.bulkCreate(bulkUsers, { returning: true });
 
       userResponseObject = await chai
@@ -430,9 +464,9 @@ describe('Articles API', () => {
     });
 
     after(async () => {
-      await Users.destroy({ where: {}, });
-      await Articles.destroy({ where: {}, });
-      await Votes.destroy({ where: {}, });
+      await Users.destroy({ where: {} });
+      await Articles.destroy({ where: {} });
+      await Votes.destroy({ where: {} });
     });
 
     it('should throw error if no Id is supplied', async () => {
@@ -456,9 +490,7 @@ describe('Articles API', () => {
 
       response.should.have.status(400);
       response.body.status.should.eql('error');
-      response.body.error.errors.voteType.should.eql(
-        'Vote type is required. e.g upVote, downVote or nullVote'
-      );
+      response.body.error.errors.voteType.should.eql('Vote type is required. e.g upVote, downVote or nullVote');
     });
 
     it('should throw error if wrong vote type is supplied', async () => {
@@ -482,7 +514,9 @@ describe('Articles API', () => {
 
       response.should.have.status(400);
       response.body.status.should.eql('error');
-      response.body.error.errors.articleId.should.eql('Article id is not a valid uuid');
+      response.body.error.errors.articleId.should.eql(
+        'Article id is not a valid uuid'
+      );
     });
 
     it('should throw error if article does not exist or is suspended', async () => {
@@ -494,7 +528,9 @@ describe('Articles API', () => {
 
       response.should.have.status(404);
       response.body.status.should.eql('error');
-      response.body.error.message.should.eql('This article does not exist or has been suspended');
+      response.body.error.message.should.eql(
+        'This article does not exist or has been suspended'
+      );
     });
 
     it('should up vote article', async () => {
@@ -605,7 +641,8 @@ describe('Articles API', () => {
     });
 
     it('should return 200 when an article has no comment', async () => {
-      const response = await chai.request(app)
+      const response = await chai
+        .request(app)
         .get(`${baseRoute}/articles/${articles2[0].id}/comments`)
         .set('Authorization', `Bearer ${userToken}`);
 
@@ -616,7 +653,8 @@ describe('Articles API', () => {
     });
 
     it('should return 200 when an article has only one comment', async () => {
-      const response = await chai.request(app)
+      const response = await chai
+        .request(app)
         .get(`${baseRoute}/articles/${articles2[1].id}/comments`)
         .set('Authorization', `Bearer ${userToken}`);
 
@@ -627,7 +665,8 @@ describe('Articles API', () => {
     });
 
     it('should return 200 when an article has more than one comments', async () => {
-      const response = await chai.request(app)
+      const response = await chai
+        .request(app)
         .get(`${baseRoute}/articles/${articles2[2].id}/comments`)
         .set('Authorization', `Bearer ${userToken}`);
 
@@ -639,7 +678,8 @@ describe('Articles API', () => {
 
     it('should return 404 error if the articleId does not exist', async () => {
       const nonexistingArticleId = uuid();
-      const response = await chai.request(app)
+      const response = await chai
+        .request(app)
         .get(`${baseRoute}/articles/${nonexistingArticleId}/comments`)
         .set('Authorization', `Bearer ${userToken}`);
 
@@ -651,7 +691,10 @@ describe('Articles API', () => {
 
   describe('POST /articles/:articleId/inline_comment', () => {
     const { startIndex, endIndex } = inlineComments[0];
-    const highlightedText = bulkArticles[0].body.substring(startIndex, endIndex);
+    const highlightedText = bulkArticles[0].body.substring(
+      startIndex,
+      endIndex
+    );
     const inlineCommentData = { ...inlineComments[0], highlightedText };
 
     before(async () => {
@@ -667,7 +710,10 @@ describe('Articles API', () => {
     });
 
     it('should return 201', async () => {
-      const { status, body: { data } } = await chai
+      const {
+        status,
+        body: { data }
+      } = await chai
         .request(app)
         .post(`${baseRoute}/articles/${bulkArticles[0].id}/inline_comments`)
         .set('Authorization', `Bearer ${userToken}`)
@@ -690,7 +736,10 @@ describe('Articles API', () => {
 
   describe('PUT /articles/inline_comments/commentId', () => {
     const { startIndex, endIndex } = inlineComments[0];
-    const highlightedText = bulkArticles[0].body.substring(startIndex, endIndex);
+    const highlightedText = bulkArticles[0].body.substring(
+      startIndex,
+      endIndex
+    );
     const inlineCommentData = { ...inlineComments[0], highlightedText };
 
     before(async () => {
@@ -706,7 +755,10 @@ describe('Articles API', () => {
     });
 
     it('should return 201', async () => {
-      const { status, body: { data } } = await chai
+      const {
+        status,
+        body: { data }
+      } = await chai
         .request(app)
         .post(`${baseRoute}/articles/${bulkArticles[0].id}/inline_comments`)
         .set('Authorization', `Bearer ${userToken}`)
@@ -727,7 +779,10 @@ describe('Articles API', () => {
     });
 
     it('should return 200 for updated comment', async () => {
-      const { status, body: { data } } = await chai
+      const {
+        status,
+        body: { data }
+      } = await chai
         .request(app)
         .put(`${baseRoute}/articles/inline_comments/${inlineCommentData.id}`)
         .set('Authorization', `Bearer ${userToken}`)
@@ -750,7 +805,10 @@ describe('Articles API', () => {
 
   describe('DELETE /articles/inline_comments/commentId', () => {
     const { startIndex, endIndex } = inlineComments[0];
-    const highlightedText = bulkArticles[0].body.substring(startIndex, endIndex);
+    const highlightedText = bulkArticles[0].body.substring(
+      startIndex,
+      endIndex
+    );
     const inlineCommentData = { ...inlineComments[0], highlightedText };
 
     before(async () => {
@@ -766,7 +824,10 @@ describe('Articles API', () => {
     });
 
     it('should return 201', async () => {
-      const { status, body: { data } } = await chai
+      const {
+        status,
+        body: { data }
+      } = await chai
         .request(app)
         .post(`${baseRoute}/articles/${bulkArticles[0].id}/inline_comments`)
         .set('Authorization', `Bearer ${userToken}`)
@@ -806,7 +867,10 @@ describe('Articles API', () => {
 
   describe('GET /articles/inline_comments/commentId', () => {
     const { startIndex, endIndex } = inlineComments[0];
-    const highlightedText = bulkArticles[0].body.substring(startIndex, endIndex);
+    const highlightedText = bulkArticles[0].body.substring(
+      startIndex,
+      endIndex
+    );
     const inlineCommentData = { ...inlineComments[0], highlightedText };
 
     before(async () => {
@@ -822,7 +886,10 @@ describe('Articles API', () => {
     });
 
     it('should return 201', async () => {
-      const { status, body: { data } } = await chai
+      const {
+        status,
+        body: { data }
+      } = await chai
         .request(app)
         .post(`${baseRoute}/articles/${bulkArticles[0].id}/inline_comments`)
         .set('Authorization', `Bearer ${userToken}`)
@@ -853,7 +920,10 @@ describe('Articles API', () => {
 
   describe('GET /articles/articleId/inline_comments', () => {
     const { startIndex, endIndex } = inlineComments[0];
-    const highlightedText = bulkArticles[0].body.substring(startIndex, endIndex);
+    const highlightedText = bulkArticles[0].body.substring(
+      startIndex,
+      endIndex
+    );
     const inlineCommentData = { ...inlineComments[0], highlightedText };
 
     before(async () => {
@@ -869,7 +939,10 @@ describe('Articles API', () => {
     });
 
     it('should return 201', async () => {
-      const { status, body: { data } } = await chai
+      const {
+        status,
+        body: { data }
+      } = await chai
         .request(app)
         .post(`${baseRoute}/articles/${bulkArticles[0].id}/inline_comments`)
         .set('Authorization', `Bearer ${userToken}`)
@@ -880,7 +953,10 @@ describe('Articles API', () => {
     });
 
     it('should return 200 for existing comment', async () => {
-      const { status, body: { data } } = await chai
+      const {
+        status,
+        body: { data }
+      } = await chai
         .request(app)
         .get(`${baseRoute}/articles/${bulkArticles[0].id}/inline_comments`)
         .set('Authorization', `Bearer ${userToken}`);
@@ -911,7 +987,9 @@ describe('Articles API', () => {
       userResponseObject = userResponseObject.body.data;
 
       await Articles.bulkCreate(subscriptionArticles, { returning: true });
-      await ArticleCategories.bulkCreate(subscriptionCategories, { returning: true });
+      await ArticleCategories.bulkCreate(subscriptionCategories, {
+        returning: true
+      });
       await Subscriptions.bulkCreate(subscriptions, { returning: true });
     });
 
@@ -935,7 +1013,10 @@ describe('Articles API', () => {
     it('should return only articles in the categories the user has subscribed to', async () => {
       const { token } = userResponseObject;
 
-      const { status, body: { data } } = await chai
+      const {
+        status,
+        body: { data }
+      } = await chai
         .request(app)
         .get(`${baseRoute}/articles?includeSubscriptions=true`)
         .set('Authorization', `Bearer ${token}`);

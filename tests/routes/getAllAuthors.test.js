@@ -38,16 +38,16 @@ describe('Authors Endpoint', () => {
       response.body.data[0].should.have.property('authorId');
     });
 
-    it('should return 404 - Not found', async () => {
+    it('should return an empty array', async () => {
       await Articles.destroy({ where: {} });
       const response = await chai
         .request(app)
         .get(`${baseRoute}/authors/`)
         .set('Authorization', `Bearer ${userToken}`);
 
-      response.should.have.status(404);
-      response.body.should.be.a('Object');
-      response.body.should.have.property('error');
+      response.should.have.status(200);
+      response.body.data.should.be.a('Array');
+      response.body.data.length.should.eql(0);
     });
   });
 });
