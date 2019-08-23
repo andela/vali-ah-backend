@@ -72,7 +72,6 @@ const commentDownVotes = sampleComments.map(({ userId: usersId }, i, array) => (
   vote: false
 }));
 
-
 const inlineComments = Array(5).fill(0).map(() => ({
   id: uuid(),
   userId,

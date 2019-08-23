@@ -6,7 +6,7 @@ import paginator from '../helpers/paginator';
 import { ApplicationError, NotFoundError } from '../helpers/errors';
 import notification from '../services/notification';
 import * as helpers from '../helpers';
-import { getTagName } from '../helpers/article';
+import { getTagName, getVoteCount } from '../helpers/article';
 import slugify from '../helpers/slugify';
 
 const { filter, extractArticles } = helpers;
@@ -21,7 +21,8 @@ const {
   Followers,
   Bookmarks,
   InlineComments,
-  Categories
+  Categories,
+  CommentVotes
 } = Models;
 
 export default {
@@ -224,13 +225,20 @@ export default {
     if (!existingArticleId) throw new ApplicationError(404, 'Non-existing articleId');
 
     const comments = await Comments.findAll({
-      where: { articleId }
+      where: { articleId },
+      include: [
+        {
+          model: CommentVotes
+        }
+      ],
     });
+
+    const commentsWithVoteCount = getVoteCount(comments);
 
     const message = comments.length ? `Comment${comments.length > 1 ? 's' : ''} retrieved successfully`
       : 'There is no comment for this article';
 
-    return response.status(200).json({ status: 'success', data: comments, message });
+    return response.status(200).json({ status: 'success', data: commentsWithVoteCount, message });
   },
 
   /** controller for creating articles
