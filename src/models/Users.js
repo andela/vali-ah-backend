@@ -209,7 +209,7 @@ export default class Users extends Model {
     });
 
     if (totalFollowers) {
-      result = userObject.getFollowers({
+      result = await userObject.getFollowers({
         where: { active: true },
         attributes: ['id'],
         order: ['id'],
@@ -249,7 +249,7 @@ export default class Users extends Model {
     const totalFollowing = await userObject.countFollowing({ where: { active: true } });
 
     if (totalFollowing) {
-      result = userObject.getFollowing({
+      result = await userObject.getFollowing({
         where: { active: true },
         attributes: ['id'],
         order: ['id'],

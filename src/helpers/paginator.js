@@ -20,7 +20,7 @@ const paginator = async (Source, options) => {
   const offset = limit * (+page - 1);
 
   if (!Source) {
-    const { result, count } = await dataSource({
+    const { data: result, count } = await dataSource({
       data: dataToSource,
       options: {
         limit,
