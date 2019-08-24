@@ -33,7 +33,7 @@ export const queryPagination = async (sourceFunction, dataToFunction = {}, size 
       return this;
     },
     data() {
-      return dataFromSource;
+      return dataFromSource.data || dataFromSource;
     }
   };
 };

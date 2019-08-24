@@ -26,17 +26,4 @@ describe('async validator', () => {
     wrapped(request, response, next);
     next.should.be.calledOnce;
   });
-
-  // it('should return status and data', async () => {
-  //   const response = { status() {}, json() {} };
-
-  //   const functionToWrap = sinon.stub().returns({ status: 201, data: {} });
-  //   const next = sinon.spy();
-  //   const wrapped = asyncWrapper(functionToWrap);
-  //   const statusStub = sinon.stub(response, 'status').callsFake(next);
-
-  //   await wrapped(request, response, next);
-
-  //   statusStub.should.be.calledOnce;
-  // });
 });

@@ -34,7 +34,8 @@ import {
   votes3 as bulkVotes3,
   category as bulkTag,
   articleSlug,
-  articleCategories as bulkArticleCategories
+  articleCategories as bulkArticleCategories,
+  duplicateArticleCategories
 } from '../fixtures/articles';
 import {
   articles as subscriptionArticles,
@@ -74,14 +75,17 @@ describe('Articles API', () => {
   let userAuth2;
   let slug1;
 
+
   before(async () => {
     users = await Users.bulkCreate(bulkUsers, { returning: true });
     articles = await Articles.bulkCreate(bulkArticles, { returning: true });
     tag = await Categories.bulkCreate(bulkTag, { returning: true });
 
-    await ArticleCategories.bulkCreate(bulkArticleCategories, {
-      returning: true
-    });
+    // await ArticleCategories.bulkCreate(bulkArticleCategories, {
+    //   returning: true
+    // });
+    await ArticleCategories.bulkCreate(duplicateArticleCategories, { returning: true });
+    await ArticleCategories.bulkCreate(bulkArticleCategories, { returning: true });
     await Votes.bulkCreate(bulkVotes1, { returning: true });
     await Votes.bulkCreate(bulkVotes2, { returning: true });
     await Votes.bulkCreate(bulkVotes3, { returning: true });
@@ -144,35 +148,50 @@ describe('Articles API', () => {
   describe('Search article', () => {
     it('should get all articles', async () => {
       const response = await chai.request(app).get(`${baseRoute}/articles`);
+
       response.should.have.status(200);
+      response.body.should.have.a.property('data');
     });
 
     it('should get users search if tag strings are valid ', async () => {
-      const response = await chai
-        .request(app)
-        .get(`${baseRoute}/articles?tag=${tag[0].category}`);
+      const response = await chai.request(app).get(`${baseRoute}/articles?tag=${tag[0].category}`);
+
       response.should.have.status(200);
+      response.body.should.have.a.property('data');
     });
 
-    it('should get users search if author for first name strings are valid ', async () => {
+    it('should get users search if authors first name is strings are valid ', async () => {
       const response = await chai
         .request(app)
         .get(`${baseRoute}/articles?author=${users[0].firstName}`);
+
       response.should.have.status(200);
+      response.body.should.have.a.property('data');
+    });
+
+    it('should get duplicate as one if author are valid ', async () => {
+      const response = await chai
+        .request(app)
+        .get(`${baseRoute}/articles?author=${users[0].firstName}`);
+
+      response.should.have.status(200);
+      response.body.should.have.a.property('data');
     });
 
     it('should get users search if title strings are valid ', async () => {
       const response = await chai
         .request(app)
         .get(`${baseRoute}/articles?title=${articles[0].title}`);
+
       response.should.have.status(200);
+      response.body.should.have.a.property('data');
     });
 
     it('should get users search if keyword strings are valid ', async () => {
-      const response = await chai
-        .request(app)
-        .get(`${baseRoute}/articles?keyword=l`);
+      const response = await chai.request(app).get(`${baseRoute}/articles?keyword=l`);
+
       response.should.have.status(200);
+      response.body.should.have.a.property('data');
     });
 
     it('should not get user search when its value is invalid', async () => {
@@ -181,6 +200,7 @@ describe('Articles API', () => {
         .get(`${baseRoute}/articles?tag=6566`);
 
       response.should.have.status(400);
+      response.body.status.should.eql('error');
     });
 
     it('should not get users search if two query strings are provided at the same time ', async () => {
@@ -189,6 +209,7 @@ describe('Articles API', () => {
         .get(`${baseRoute}/articles?tag=health&keyword=emotion`);
 
       response.should.have.status(400);
+      response.body.status.should.eql('error');
     });
   });
 

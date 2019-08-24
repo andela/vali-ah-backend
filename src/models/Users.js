@@ -204,12 +204,12 @@ export default class Users extends Model {
 
     if (!userObject) throw new NotFoundError('User does not exist');
 
-    const totalResult = await userObject.getFollowers({
-      where: { active: true },
+    const totalFollowers = await userObject.countFollowers({
+      where: { active: true }
     });
 
-    if (totalResult) {
-      result = userObject.getFollowers({
+    if (totalFollowers) {
+      result = await userObject.getFollowers({
         where: { active: true },
         attributes: ['id'],
         order: ['id'],
@@ -224,7 +224,7 @@ export default class Users extends Model {
       });
     }
 
-    return { result, count: totalResult.length };
+    return { data: result, count: totalFollowers };
   }
 
   /**
@@ -246,12 +246,10 @@ export default class Users extends Model {
 
     if (!userObject) throw new NotFoundError('User does not exist');
 
-    const totalResult = await userObject.getFollowing({
-      where: { active: true },
-    });
+    const totalFollowing = await userObject.countFollowing({ where: { active: true } });
 
-    if (totalResult) {
-      result = userObject.getFollowing({
+    if (totalFollowing) {
+      result = await userObject.getFollowing({
         where: { active: true },
         attributes: ['id'],
         order: ['id'],
@@ -266,7 +264,7 @@ export default class Users extends Model {
       });
     }
 
-    return { result, count: totalResult.length };
+    return { data: result, count: totalFollowing };
   }
 
   /**

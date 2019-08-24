@@ -16,7 +16,7 @@ const should = importedShould();
 describe('Notification System', () => {
   before(async () => {
     sinon.stub(sendgrid, 'send').resolves();
-
+    articles[0].authorId = usersWithFollowing[0].followeeId;
     await Articles.destroy({ where: {} });
     await Users.bulkCreate(users);
     await Followers.bulkCreate(usersWithFollowing);
