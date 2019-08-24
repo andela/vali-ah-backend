@@ -6,8 +6,9 @@ const uuidRegularExpression = new RegExp(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]
 export default {
   createArticleSchema: [
     check('summary')
-      .isLength({ min: 5, max: 20 })
-      .withMessage('Summary should be between 5 to 20 characters'),
+      .optional()
+      .isLength({ min: 5, max: 128 })
+      .withMessage('Summary should be between 5 to 128 characters'),
     check('body')
       .trim()
       .exists()
@@ -18,13 +19,51 @@ export default {
       .exists()
       .trim()
       .withMessage('Title is required')
+      .matches(/[a-zA-Z]{3}/)
+      .withMessage('Title must contain atleast a 3 letter word')
       .isLength({ min: 5, max: 50 })
-      .withMessage('Article title should be between 5 to 20 characters'),
+      .withMessage('Article title should be between 5 to 50 characters'),
     check('followUpId')
       .optional()
       .trim()
       .isUUID()
       .withMessage('FollowUpId must be of type uuid'),
+    check('tag')
+      .optional()
+      .isArray()
+      .withMessage('Tag must be an array'),
+    check('suspended')
+      .optional()
+      .isBoolean()
+      .withMessage('Suspended must be a boolean'),
+    check('status')
+      .optional()
+      .matches(statusRegEx)
+      .withMessage('Status must be either "draft" or "published"'),
+  ],
+  updateArticleSchema: [
+    check('summary')
+      .optional()
+      .trim()
+      .isLength({ min: 5, max: 128 })
+      .withMessage('Summary should be between 5 to 128 characters if you want to update it'),
+    check('body')
+      .optional()
+      .trim()
+      .isLength({ min: 50, max: 1024 })
+      .withMessage('Article body should be between 50 to 1024 characters if you want to update it'),
+    check('title')
+      .optional()
+      .trim()
+      .matches(/[a-zA-Z]{3}/)
+      .withMessage('Title must contain atleast a 3 letter word if you want to update it')
+      .isLength({ min: 5, max: 50 })
+      .withMessage('Article title should be between 5 to 50 characters if you want to update it'),
+    check('followUpId')
+      .optional()
+      .trim()
+      .isUUID()
+      .withMessage('FollowUpId must be of type uuid if you want to update it'),
     check('tag')
       .optional()
       .isArray()

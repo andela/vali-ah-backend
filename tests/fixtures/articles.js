@@ -1,7 +1,8 @@
 import faker from 'faker';
-import uuid from 'uuid';
+import uuid from 'uuid/v4';
 import randomBool from 'random-bool';
 import { generateAuthToken } from '../../src/helpers/auth';
+import slugify from '../../src/helpers/slugify';
 
 import {
   users
@@ -22,7 +23,7 @@ const articles = users.map(({
   tag: faker.random.arrayElement(tag),
   title: faker.lorem.sentence(),
   summary: faker.lorem.sentence(),
-  slug: faker.lorem.sentence(),
+  slug: slugify(faker.lorem.sentence() + uuid()),
   body: faker.lorem.text(),
   status: 'published'
 }));
@@ -103,8 +104,27 @@ const article1 = {
   authorId: '842b0c1e-bd2b-4a4a-82e9-610869f02fd5'
 };
 
-const articleNoTag = {
+const articleSlug = {
   title: 'summarysummary',
+  summary: 'summarysummary',
+  body: faker.lorem.sentences() + faker.lorem.sentences(),
+  followUpId: articles[0].id,
+  slug: slugify('-'),
+  tag: ['842b0c1e-bd2b-4a4a-82e9-610869f02fd5'],
+  authorId: '842b0c1e-bd2b-4a4a-82e9-610869f02fd5'
+};
+
+const articleSlug2 = {
+  title: 'summarysummary',
+  summary: 'summarysummary',
+  body: faker.lorem.sentences(),
+  slug: slugify('-believe'),
+  tag: ['842b0c1e-bd2b-4a4a-82e9-610869f02fd5'],
+  authorId: '842b0c1e-bd2b-4a4a-82e9-610869f02fd5'
+};
+
+const articleNoTag = {
+  title: 'summarysummarysummary',
   summary: 'summarysummary',
   body: faker.lorem.sentences()
 };
@@ -178,5 +198,7 @@ export {
   votes2,
   votes3,
   followers,
-  userAuth
+  userAuth,
+  articleSlug,
+  articleSlug2
 };

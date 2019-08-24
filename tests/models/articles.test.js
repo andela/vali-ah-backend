@@ -148,4 +148,13 @@ describe('Articles model', () => {
         .should.be.rejected;
     }));
   });
+
+  describe('Query article with title', () => {
+    it('should return an array of articles if existing', test(async () => {
+      const articleArray = await Articles.getArticles(articles[0].title);
+
+      articleArray[0].title.should.eql(articles[0].title);
+      articleArray[0].body.should.have.length.of.at.most(1024);
+    }));
+  });
 });

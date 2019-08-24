@@ -78,16 +78,12 @@ export default {
     const { id } = request.user;
     const { slug } = request.params;
 
-    const articleResponse = await Articles.findOne({
-      where: { slug }
-    });
+    const articleResponse = await Articles.findOneArticle(slug);
+    request.articleInstance = articleResponse;
 
     if (!articleResponse) throw new ApplicationError(404, 'Article not found');
-    const article = await Articles.findOne({
-      where: { authorId: id, slug }
-    });
+    if (articleResponse.authorId !== id) throw new ApplicationError(403, 'Unauthorized Access. For author only');
 
-    if (!article) throw new ApplicationError(403, 'Unauthorized Access. For author only');
     next();
   },
 

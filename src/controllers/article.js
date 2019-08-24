@@ -1,4 +1,5 @@
-import slugify from 'slugify';
+import uuid from 'uuid/v4';
+import { Sequelize } from 'sequelize';
 
 import Models from '../models';
 import paginator from '../helpers/paginator';
@@ -6,6 +7,7 @@ import { ApplicationError, NotFoundError } from '../helpers/errors';
 import notification from '../services/notification';
 import * as helpers from '../helpers';
 import { getTagName } from '../helpers/article';
+import slugify from '../helpers/slugify';
 
 const { filter, extractArticles } = helpers;
 const {
@@ -120,7 +122,6 @@ export default {
       author, title, tag, keyword, includeSubscriptions, page = 1, limit = 10
     } = request.query;
 
-    const queriesValues = title || tag || author || keyword;
     const standardQueries = title || author || tag;
     const queryFilter = filter(title, tag, author, keyword);
 
@@ -134,13 +135,12 @@ export default {
         .json({ status: 'error', message: 'Keyword cannot be used with title, author or tag' });
     }
 
-    const { data: results, count, currentCount } = await paginator(ArticleCategories, {
+    const { data: results, count } = await paginator(ArticleCategories, {
       ...queryFilter,
       raw: true,
       page,
       limit
     });
-    if (!currentCount) return response.status(404).json({ status: 'error', message: `${queriesValues} Not found` });
 
     const data = extractArticles(results);
 
@@ -245,14 +245,13 @@ export default {
 
     const article = {
       ...request.body,
+      id: uuid(),
       authorId: request.user.id,
       coverImageUrl: (request.file) ? request.file.secure_url : null,
-      slug: slugify(request.body.title)
     };
 
-    const titlePresent = await Articles.getArticles(request.body.title);
-
-    if (titlePresent.length) article.slug = slugify(`${request.body.title} ${titlePresent.length}`);
+    if (!article.summary) article.summary = article.body.substring(0, 20);
+    article.slug = slugify(`${request.body.title} ${article.id}`);
 
     const articleResponse = await Articles.create(article);
 
@@ -261,7 +260,7 @@ export default {
     ) : [];
     const tagName = await getTagName(tagResponse);
 
-    return response.status(201).json({ status: 'success', data: { ...articleResponse.dataValues, Tags: tagName }, message: 'Article successfully created' });
+    return response.status(201).json({ status: 'success', data: { ...articleResponse.dataValues, tags: tagName }, message: 'Article successfully created' });
   },
 
   /**
@@ -279,7 +278,7 @@ export default {
 
     let articleResponse = await Articles.findOne({
       where: {
-        slug
+        slug: { [Sequelize.Op.iLike]: slug }
       },
       include: [{
         model: ArticleCategories,
@@ -317,7 +316,7 @@ export default {
 
     articleResponse = {
       ...newArticleResponse,
-      Tags: tagName,
+      tags: tagName,
       Votes: voteCount,
       Author: author
     };
@@ -336,33 +335,33 @@ export default {
     * @returns {Object} - callback that execute the controller
     */
   updateArticle: async (request, response) => {
-    const { slug } = request.params;
     const { tag } = request.body;
     const {
       articleId,
       authorId,
-      slug: invalidSlug,
+      slug,
+      id,
       ...article
     } = request.body;
 
     if (request.file) article.coverImageUrl = request.file.secure_url;
 
-    const articleResponse = await Articles.update(article,
-      {
-        returning: true,
-        where: { slug }
-      });
-
+    const articleResponse = await Articles.updateArticle(request.articleInstance, article);
     let tagName = [];
+
     if (tag) {
-      await ArticleCategories.deleteTags(articleResponse[1][0].id);
+      await ArticleCategories.deleteTags(articleResponse.id);
       const tagResponse = await ArticleCategories.createTags(
-        tag, articleResponse[1][0].id, request.user.id
+        tag, articleResponse.id, request.user.id
       );
       tagName = await getTagName(tagResponse);
+    } else {
+      const val = await ArticleCategories.findTags(articleResponse.id);
+      const createdTags = val.map(eachTag => eachTag.dataValues.categoryId);
+      tagName = await getTagName(createdTags);
     }
 
-    return response.status(200).json({ status: 'success', data: { ...articleResponse[1][0].dataValues, Tags: tagName }, message: 'Article succesfully updated' });
+    return response.status(200).json({ status: 'success', data: { ...articleResponse.dataValues, tags: tagName }, message: 'Article succesfully updated' });
   },
 
   /**
@@ -378,7 +377,8 @@ export default {
   deleteArticle: async (request, response) => {
     const { slug } = request.params;
     await Articles.deleteArticle(slug);
-    return response.status(200).json({ status: 'success', data: {}, message: 'Article deleted succesfully' });
+
+    return response.status(200).json({ status: 'success', message: 'Article deleted succesfully' });
   },
 
   /**

@@ -104,4 +104,20 @@ export default class ArticleCategories extends Model {
     const createdTags = response.map(eachTag => eachTag.dataValues.categoryId);
     return createdTags;
   }
+
+  /**
+   * Finds all tags belonging to an article
+   *
+   * @function
+   *
+   * @param {string} articleId - id of the article to which tags belong
+   *
+   * @returns {Array} - array
+   */
+  static async findTags(articleId) {
+    const tags = await ArticleCategories.findAll({
+      where: { articleId }
+    });
+    return tags;
+  }
 }

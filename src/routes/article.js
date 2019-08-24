@@ -41,7 +41,8 @@ const { createBookmarkSchema } = bookmarkSchema;
 const { checkArticle, checkArticleUpdate } = articleValidator;
 
 const {
-  createArticleSchema, voteSchema, articlePathSchema, searchSchema
+  createArticleSchema, voteSchema, articlePathSchema, searchSchema,
+  updateArticleSchema
 } = articleSchema;
 
 const router = express.Router();
@@ -378,7 +379,7 @@ router.get('/:slug', asyncWrapper(verifyToken), asyncWrapper(getBySlug));
 router.put(
   '/:slug',
   upload.single('image'),
-  validator(createArticleSchema),
+  validator(updateArticleSchema),
   asyncWrapper(verifyToken),
   asyncWrapper(isAuthor),
   asyncWrapper(checkArticleUpdate),
