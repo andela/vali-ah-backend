@@ -1,11 +1,11 @@
-import Models from '../models/index';
+import Sequelize from 'sequelize';
+import models from '../models';
 import { ApplicationError } from './errors';
 
 const uuidRegularExpression = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
 
-const {
-  Categories,
-} = Models;
+const { Op } = Sequelize;
+const { Users, Categories, Articles } = models;
 
 /**
  * find id in given table and returns article array or undefined
@@ -65,8 +65,91 @@ export const getTagName = async (tags) => {
   return tagNames;
 };
 
+/**
+   * filter for search article
+   *
+   * @function
+   *
+   * @param {title} title - express request object
+   * @param {tag} tag - express request object
+   * @param {author} author - express request object
+   * @param {keyword} keyword - express request object
+   *
+   * @returns {Object} - sequlize Object
+   */
+const filter = (title, tag, author, keyword) => {
+  const queryParams = {
+    query: {
+      '$article.title$': { [Op.iLike]: `%${title}%` },
+      '$tag.category$': { [Op.iLike]: `%${tag}%` },
+    },
+    author: {
+      [Op.or]: {
+        '$author.firstName$': { [Op.iLike]: `%${author}%` },
+        '$author.lastName$': { [Op.iLike]: `%${author}%` },
+        '$author.userName$': { [Op.iLike]: `%${author}%` }
+      }
+    },
+    keyword: {
+      [Op.or]: {
+        '$article.title$': { [Op.iLike]: `%${keyword}%` },
+        '$tag.category$': { [Op.iLike]: `${keyword}` },
+        '$author.firstName$': { [Op.iLike]: `%${keyword}%` },
+        '$author.lastName$': { [Op.iLike]: `%${keyword}%` },
+        '$author.userName$': { [Op.iLike]: `%${keyword}%` },
+      }
+    }
+  };
+
+  if (!title) delete queryParams.query['$article.title$'];
+  if (!tag) delete queryParams.query['$tag.category$'];
+
+  // eslint-disable-next-line no-nested-ternary
+  const filterQuery = (keyword) ? { ...queryParams.keyword } : author ? { ...queryParams.author }
+    : { ...queryParams.query };
+
+  return {
+    include: [{ model: Users, as: 'author' }, { model: Articles, as: 'article' }, { model: Categories, as: 'tag' }],
+    where: (keyword || title || tag || author) ? {
+      ...filterQuery
+    } : {}
+  };
+};
+
+/**
+     * function for extract article
+     *
+     * @function
+     *
+     * @param {result} result - array of object
+     *
+     * @returns {Object} - callback that execute the controller
+     */
+const extractArticles = result => result.map((entry) => {
+  const firstName = entry['author.firstName'];
+  const lastName = entry['author.lastName'];
+  const userName = entry['author.userName'];
+  const createdAt = entry['author.createdAt'];
+  return {
+    ArticleId: entry['article.id'],
+    title: entry['article.title'],
+    tag: entry['tag.category'],
+    summary: entry['article.summary'],
+    body: entry['article.body'],
+    suspended: entry['article.suspended'],
+    status: entry['article.status'],
+    coverImageUrl: entry['article.coverImageUrl'],
+    followUpId: entry['article.followUpId'],
+    createdAt: entry['article.createdAt'],
+    author: { name: `${firstName} ${lastName}`, userName, createdAt },
+    tags: entry.tag,
+  };
+});
+
 export default {
   idPresent,
   checkTags,
-  getTagName
+  getTagName,
+  filter,
+  extractArticles
 };

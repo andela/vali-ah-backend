@@ -67,7 +67,7 @@ export default {
 
     const token = generateAuthToken(user);
 
-    return response.status(200).json({ status: 'success', data: { user, token } });
+    return response.status(200).json({ status: 'success', data: { user, token }, message: 'User signed in successfully' });
   },
 
   /**
@@ -85,7 +85,7 @@ export default {
 
     await BlacklistedTokens.create({ token, userId: id });
 
-    return response.status(200).json({ status: 'success', message: 'User successfully logged out' });
+    return response.status(200).json({ status: 'success', message: 'User logged out successfully' });
   },
 
   /**
@@ -189,6 +189,6 @@ export default {
       }]
     });
 
-    return response.status(200).json({ status: 'success', message: 'Your password was successfully updated' });
+    return response.status(200).json({ status: 'success', message: 'Password updated successfully' });
   }
 };

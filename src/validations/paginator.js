@@ -5,12 +5,14 @@ export default {
     check('page')
       .optional()
       .trim()
+      .toInt()
       .isInt()
       .withMessage('Page must be a number'),
     check('limit')
       .optional()
       .trim()
-      .isNumeric()
+      .toInt()
+      .isInt()
       .withMessage('Limit must be a number')
   ]
 };

@@ -36,7 +36,12 @@ export default {
     const { data, count } = await paginator(Articles, queryObject);
 
     return response.status(200).json({
-      status: 'success', data, count, page: +page
+      status: 'success',
+      data,
+      count,
+      page: +page,
+      limit: +limit,
+      message: 'Authors fetched successfully'
     });
   }
 };

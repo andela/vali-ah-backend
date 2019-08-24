@@ -4,7 +4,7 @@ import { matchedData } from 'express-validator/filter';
 import { ApplicationError } from '../helpers/errors';
 
 /**
- * Generic schema validator
+ * Schema validator
  *
  * @param {Array} schema
  * @param {number} status

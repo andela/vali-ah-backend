@@ -102,15 +102,15 @@ export default {
     check('page')
       .optional()
       .trim()
+      .toInt()
       .isInt()
-      .withMessage('Page must be a number')
-      .customSanitizer(page => page.toLowerCase()),
+      .withMessage('Page must be a number'),
     check('limit')
       .optional()
       .trim()
-      .isNumeric()
+      .toInt()
+      .isInt()
       .withMessage('Limit must be a number')
-      .customSanitizer(page => page.toLowerCase())
   ],
   voteSchema: [
     check('articleId')
@@ -124,7 +124,7 @@ export default {
       .exists()
       .withMessage('Vote type is required. e.g upVote, downVote or nullVote')
       .isIn(['upVote', 'downVote', 'nullVote'])
-      .withMessage('Enter a valid vote type')
+      .withMessage('Vote type must be one of upVote, downVote or nullVote')
   ],
   articlePathSchema: [
     check('articleId')

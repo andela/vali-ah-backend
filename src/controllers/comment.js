@@ -25,11 +25,11 @@ export default {
 
     const comment = await Comments.findOne({ where: { id: commentId, suspended: false } });
 
-    if (!comment) throw new NotFoundError('This comment does not exist or has been suspended');
+    if (!comment) throw new NotFoundError('Comment does not exist or has been suspended');
 
     if (voteType === 'nullVote') {
       await CommentVotes.destroy({ where: { userId, commentId } });
-      responseData = { data: {}, message: 'Vote successfully removed' };
+      responseData = { data: {}, message: 'Vote removed successfully' };
     } else {
       let data;
       const vote = voteType === 'upVote';
@@ -40,7 +40,7 @@ export default {
 
       responseData = {
         data,
-        message: `Comment successfully ${vote ? 'upvoted' : 'downvoted'}`
+        message: `Comment ${vote ? 'upvoted' : 'downvoted'} successfully`
       };
     }
 

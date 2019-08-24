@@ -116,7 +116,7 @@ describe('Comments API', () => {
 
       response.should.have.status(404);
       response.body.status.should.eql('error');
-      response.body.error.message.should.eql('This comment does not exist or has been suspended');
+      response.body.error.message.should.eql('Comment does not exist or has been suspended');
     });
 
     it('should up vote comment', async () => {
@@ -128,7 +128,7 @@ describe('Comments API', () => {
 
       response.should.have.status(201);
       response.body.status.should.eql('success');
-      response.body.message.should.eql('Comment successfully upvoted');
+      response.body.message.should.eql('Comment upvoted successfully');
       response.body.data.vote.should.eql(true);
     });
 
@@ -141,7 +141,7 @@ describe('Comments API', () => {
 
       response.should.have.status(200);
       response.body.status.should.eql('success');
-      response.body.message.should.eql('Comment successfully downvoted');
+      response.body.message.should.eql('Comment downvoted successfully');
       response.body.data.vote.should.eql(false);
     });
 
@@ -153,7 +153,7 @@ describe('Comments API', () => {
         .set('authorization', `Bearer ${token}`);
 
       response.should.have.status(200);
-      response.body.message.should.eql('Vote successfully removed');
+      response.body.message.should.eql('Vote removed successfully');
     });
 
     it('should down vote and suspend comment', async () => {
@@ -164,7 +164,7 @@ describe('Comments API', () => {
         .set('authorization', `Bearer ${token}`);
 
       response.should.have.status(201);
-      response.body.message.should.eql('Comment successfully downvoted');
+      response.body.message.should.eql('Comment downvoted successfully');
       response.body.data.vote.should.eql(false);
     });
 
@@ -177,7 +177,7 @@ describe('Comments API', () => {
 
       response.should.have.status(201);
       response.body.status.should.eql('success');
-      response.body.message.should.eql('Comment successfully upvoted');
+      response.body.message.should.eql('Comment upvoted successfully');
       response.body.data.vote.should.eql(true);
     });
 
@@ -189,7 +189,7 @@ describe('Comments API', () => {
         .set('authorization', `Bearer ${token}`);
 
       response.should.have.status(200);
-      response.body.message.should.eql('Comment successfully downvoted');
+      response.body.message.should.eql('Comment downvoted successfully');
       response.body.data.vote.should.eql(false);
     });
 
@@ -202,7 +202,7 @@ describe('Comments API', () => {
 
       response.should.have.status(201);
       response.body.status.should.eql('success');
-      response.body.message.should.eql('Comment successfully upvoted');
+      response.body.message.should.eql('Comment upvoted successfully');
       response.body.data.vote.should.eql(true);
     });
 
@@ -214,7 +214,7 @@ describe('Comments API', () => {
         .set('authorization', `Bearer ${token}`);
 
       response.should.have.status(200);
-      response.body.message.should.eql('Vote successfully removed');
+      response.body.message.should.eql('Vote removed successfully');
     });
   });
 });

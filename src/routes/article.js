@@ -27,7 +27,8 @@ const {
   getInlineComment,
   getArticleInlineComment,
   getUserFeed,
-  getSubscribedArticles
+  getSubscribedArticles,
+  getAllBookmark
 } = articleController;
 const {
   createCommentSchema,
@@ -98,10 +99,29 @@ router.post(
  */
 router.get('/feed', asyncWrapper(verifyToken), asyncWrapper(getUserFeed));
 
+
 /**
  * @swagger
  *
- * /bookmarks:
+ * /articles/bookmarks:
+ *   get:
+ *     description: Get all bookmarked articles
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Success
+ */
+router.get(
+  '/bookmarks',
+  asyncWrapper(verifyToken),
+  asyncWrapper(getAllBookmark)
+);
+
+/**
+ * @swagger
+ *
+ * /articles/bookmarks:
  *   post:
  *     description: Bookmark an article
  *     produces:

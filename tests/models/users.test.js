@@ -26,16 +26,16 @@ describe('Users Model', () => {
     (Users.getSingleUser(faker.random.uuid())).should.eventually.rejected;
   });
 
-  it('should get users follower for existing users', async () => {
+  it('should get the followers for an existing user', async () => {
     const searchData = { data: { user: users[0].id } };
     const followers = await Users.getUserFollowers(searchData);
 
     followers.should.not.empty;
   });
 
-  it('should get users follower for existing users', async () => {
+  it('should get the users an existing user is following', async () => {
     const searchData = { data: { user: users[0].id } };
-    const followers = await Users.getUserFollowings(searchData);
+    const followers = await Users.getUserFollowing(searchData);
 
     followers.should.not.empty;
   });

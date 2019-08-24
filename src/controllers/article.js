@@ -118,6 +118,7 @@ export default {
    * @returns {Object} - callback that execute the controller
    */
   searchArticle: async (request, response, next) => {
+    let data = [];
     const {
       author, title, tag, keyword, includeSubscriptions, page = 1, limit = 10
     } = request.query;
@@ -130,9 +131,7 @@ export default {
     }
 
     if (keyword && standardQueries) {
-      return response
-        .status(400)
-        .json({ status: 'error', message: 'Keyword cannot be used with title, author or tag' });
+      throw new ApplicationError(400, 'Keyword cannot be used with title, author or tag');
     }
 
     const { data: results, count } = await paginator(ArticleCategories, {
@@ -142,13 +141,16 @@ export default {
       limit
     });
 
-    const data = extractArticles(results);
+    if (count) {
+      data = extractArticles(results);
+    }
 
     return response.status(200).json({
       status: 'success',
       data,
       count,
-      page,
+      page: +page,
+      limit: +limit,
       message: 'Articles retrieved successfully'
     });
   },
@@ -173,7 +175,7 @@ export default {
 
     const article = await Articles.findOne({ where: { id: articleId, suspended: false } });
 
-    if (!article) throw new ApplicationError(404, 'This article does not exist or has been suspended');
+    if (!article) throw new ApplicationError(404, 'Article does not exist or has been suspended');
 
     if (voteType === 'nullVote') {
       await Votes.destroy({ where: { userId, articleId } });
@@ -517,7 +519,12 @@ export default {
     });
 
     return response.status(200).json({
-      status: 'success', data: articles, count, page, message: 'Articles fetched succesfully'
+      status: 'success',
+      data: articles,
+      count,
+      page: +page,
+      limit: +limit,
+      message: 'Articles fetched succesfully'
     });
   },
 
@@ -573,8 +580,34 @@ export default {
       status: 'success',
       data: articles,
       count,
-      page,
+      page: +page,
+      limit: +limit,
       message: 'Subscribed articles retrieved successfully'
+    });
+  },
+
+  /**
+   * Controller for getting all bookmarks for a user
+   *
+   * @function
+   *
+   * @param {Object} request - express request object
+   * @param {Object} response - express response object
+   *
+   * @returns {Object} - all bookmark for a user
+   */
+  getAllBookmark: async (request, response) => {
+    const { id: userId, limit = 10, page = 1 } = request.user;
+
+    const { data, count } = await paginator(Bookmarks, { where: { userId }, page, limit });
+
+    return response.status(200).json({
+      status: 'success',
+      data,
+      count,
+      page: +page,
+      limit: +limit,
+      message: 'Bookmarks fetched successfully',
     });
   }
 };
