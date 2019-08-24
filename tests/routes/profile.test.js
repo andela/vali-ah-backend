@@ -22,7 +22,7 @@ const profileUrl = '/api/v1/users/profile/';
 const signUrl = '/api/v1/auth/signup';
 const followUnfollowUrl = '/following/';
 const getFollowersUrl = '/followers/';
-const getFollowingsUrl = '/followings/';
+const getFollowingsUrl = '/following/';
 const fakeId = profileId;
 let validToken;
 let responseToken;
@@ -82,7 +82,7 @@ describe('Profile', () => {
         .set('authorization', `Bearer ${validToken}`)
         .send({ lastName: 'nOMmy' });
 
-      response.should.have.status(401);
+      response.should.have.status(403);
       response.body.status.should.eql('error');
     });
 
@@ -132,7 +132,7 @@ describe('Profile', () => {
       response.body.status.should.eql('success');
     });
 
-    it('should not follow if a user wants to follow its self', async () => {
+    it('should not follow if a user wants to follow himself', async () => {
       const response = await chai
         .request(app)
         .patch(`${profileUrl}${currentUserId}${followUnfollowUrl}`)
@@ -151,7 +151,7 @@ describe('Profile', () => {
 
       response.should.have.status(404);
       response.body.status.should.eql('error');
-      response.body.error.message.should.eql('User not found');
+      response.body.error.message.should.eql('User does not exist');
     });
 
     it('should not follow user if UUID is provided', async () => {
@@ -195,7 +195,7 @@ describe('Profile', () => {
 
       response.should.have.status(404);
       response.body.status.should.eql('error');
-      response.body.error.message.should.eql('User not found');
+      response.body.error.message.should.eql('User does not exist');
     });
 
     it('should not unfollow user if an invalid  UUID is provided', async () => {
@@ -234,8 +234,8 @@ describe('Profile', () => {
     });
   });
 
-  describe('GET users/profile/:userId/followings', () => {
-    it('should get followings if a user exist', async () => {
+  describe('GET users/profile/:userId/following', () => {
+    it('should get followings if a user exists', async () => {
       const response = await chai
         .request(app)
         .get(`${profileUrl}${newUser.dataValues.id}${getFollowingsUrl}`)
@@ -265,7 +265,7 @@ describe('Profile', () => {
 
       response.should.have.status(404);
       response.body.status.should.eql('error');
-      response.body.error.message.should.eql('Resource not found');
+      response.body.error.message.should.eql('User does not exist');
     });
   });
 
@@ -342,7 +342,7 @@ describe('Profile', () => {
 
       response.should.have.status(200);
       response.body.status.should.eql('success');
-      response.body.message.should.eql('Successfully subscribed to motivation');
+      response.body.message.should.eql('motivation subscribed to successfully');
     });
 
     it('should successfully subscribe to articles', async () => {
@@ -354,7 +354,7 @@ describe('Profile', () => {
 
       response.should.have.status(200);
       response.body.status.should.eql('success');
-      response.body.message.should.eql('Successfully subscribed to motivation, time management');
+      response.body.message.should.eql('motivation, time management subscribed to successfully');
     });
   });
 });

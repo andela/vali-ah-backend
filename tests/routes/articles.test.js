@@ -175,14 +175,6 @@ describe('Articles API', () => {
       response.should.have.status(200);
     });
 
-    it('should not get user search when tag is not in the database', async () => {
-      const response = await chai
-        .request(app)
-        .get(`${baseRoute}/articles?tag=Lagos`);
-
-      response.should.have.status(404);
-    });
-
     it('should not get user search when its value is invalid', async () => {
       const response = await chai
         .request(app)
@@ -191,7 +183,7 @@ describe('Articles API', () => {
       response.should.have.status(400);
     });
 
-    it('should not get users search if two query strings are provided at thesame time ', async () => {
+    it('should not get users search if two query strings are provided at the same time ', async () => {
       const response = await chai
         .request(app)
         .get(`${baseRoute}/articles?tag=health&keyword=emotion`);
@@ -513,7 +505,7 @@ describe('Articles API', () => {
 
       response.should.have.status(400);
       response.body.status.should.eql('error');
-      response.body.error.errors.voteType.should.eql('Enter a valid vote type');
+      response.body.error.errors.voteType.should.eql('Vote type must be one of upVote, downVote or nullVote');
     });
 
     it('should throw error if article ID is not a valid UUID', async () => {
@@ -540,7 +532,7 @@ describe('Articles API', () => {
       response.should.have.status(404);
       response.body.status.should.eql('error');
       response.body.error.message.should.eql(
-        'This article does not exist or has been suspended'
+        'Article does not exist or has been suspended'
       );
     });
 

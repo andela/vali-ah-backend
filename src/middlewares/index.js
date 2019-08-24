@@ -1,4 +1,4 @@
-import emptybody from './emptyBodyValidator';
+import emptybody from '../helpers/isEmptyObject';
 import validator from './validator';
 import asyncWrapper from './asyncWrapper';
 import auth from './authentication';

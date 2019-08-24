@@ -1,19 +1,18 @@
 import express from 'express';
 import profile from '../controllers/user';
-import profileSchema from '../validations/profileSchema';
+import profileSchema from '../validations/profile';
 import middlewares from '../middlewares';
 
 const {
-  viewProfile,
+  getProfile,
   updateProfile,
   followAndUnfollow,
   getAllFollowers,
   getAllFollowings,
   createSubscriptions,
-  getAllBookmark
 } = profile;
 const {
-  validator, emptybody, asyncWrapper, verifyToken
+  validator, asyncWrapper, verifyToken
 } = middlewares;
 const {
   profileUpdateSchema, profileViewSchema, followerSchema, subscriptions
@@ -62,7 +61,6 @@ const router = express.Router();
  */
 router.patch(
   '/profile/:id',
-  emptybody,
   validator(profileUpdateSchema),
   asyncWrapper(verifyToken),
   asyncWrapper(updateProfile)
@@ -92,7 +90,7 @@ router.get(
   '/profile/:id',
   validator(profileViewSchema),
   asyncWrapper(verifyToken),
-  asyncWrapper(viewProfile)
+  asyncWrapper(getProfile)
 );
 
 /**
@@ -118,7 +116,7 @@ router.get(
  *         description: User cannot perform this action.
  */
 router.patch(
-  '/profile/:userId/following/',
+  '/profile/:userId/following',
   validator(followerSchema),
   asyncWrapper(verifyToken),
   asyncWrapper(followAndUnfollow)
@@ -169,7 +167,7 @@ router.get(
  *         description: Request was successful.
  */
 router.get(
-  '/profile/:userId/followings/',
+  '/profile/:userId/following/',
   validator(followerSchema),
   asyncWrapper(verifyToken),
   asyncWrapper(getAllFollowings)
@@ -214,24 +212,6 @@ router.post(
   asyncWrapper(verifyToken),
   validator(subscriptions),
   asyncWrapper(createSubscriptions)
-);
-
-/**
- * @swagger
- *
- * /bookmarks:
- *   get:
- *     description: Get all bookmarked articles
- *     produces:
- *       - application/json
- *     responses:
- *       200:
- *         description: Success
- */
-router.get(
-  '/bookmarks',
-  asyncWrapper(verifyToken),
-  asyncWrapper(getAllBookmark)
 );
 
 export default router;

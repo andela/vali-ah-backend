@@ -1,10 +1,10 @@
 import makeCapitalize from './makeCapitalize';
 import { ApplicationError, NotFoundError } from './errors';
-import genericArticle from './genericArticleHelper';
+import article from './article';
 import paginator from './paginator';
+import isEmptyObject from './isEmptyObject';
 
-const { filter, extractArticles } = genericArticle;
-
+const { filter, extractArticles } = article;
 
 export {
   makeCapitalize,
@@ -12,5 +12,6 @@ export {
   NotFoundError,
   filter,
   extractArticles,
-  paginator
+  paginator,
+  isEmptyObject
 };

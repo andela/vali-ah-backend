@@ -90,6 +90,6 @@ describe('Reset and Update Password Endpoint', () => {
 
     response.status.should.eql(200);
     response.body.should.be.a('Object');
-    response.body.message.should.equal('Your password was successfully updated');
+    response.body.message.should.equal('Password updated successfully');
   });
 });

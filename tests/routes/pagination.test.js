@@ -54,14 +54,4 @@ describe('Pagination support for articles', () => {
     response.should.have.status(200);
     response.body.message.should.eql('Articles retrieved successfully');
   });
-
-  it('should return no articles found', async () => {
-    await Articles.destroy({ where: {} });
-    await ArticleCategories.destroy({ where: {} });
-
-    const response = await chai.request(app).get('/api/v1/articles?page=1&limit=5');
-
-    response.should.have.status(404);
-    response.body.should.be.a('Object');
-  });
 });

@@ -9,6 +9,7 @@
  * @returns {Object} returns object
  */
 const paginator = async (Source, options) => {
+  let data = [];
   const {
     page,
     limit,
@@ -16,21 +17,28 @@ const paginator = async (Source, options) => {
     dataToSource,
     ...otherOptions
   } = options;
-
-  if (!Source) {
-    return { data: await dataSource({ data: dataToSource, options: otherOptions }) };
-  }
-
-  const countResult = await Source.findAndCountAll({ ...otherOptions });
-  const { count, rows } = countResult;
-
-  if (!count) return { data: rows, count };
-
   const offset = limit * (+page - 1);
 
-  const data = await Source.findAll({ ...otherOptions, limit, offset });
+  if (!Source) {
+    const { result, count } = await dataSource({
+      data: dataToSource,
+      options: {
+        limit,
+        offset,
+        ...otherOptions
+      }
+    });
 
-  return { data, count, currentCount: data.length };
+    return { data: result, count };
+  }
+
+  const { count } = await Source.findAndCountAll({ ...otherOptions });
+
+  if (count) {
+    data = await Source.findAll({ ...otherOptions, limit, offset });
+  }
+
+  return { data, count };
 };
 
 export default paginator;

@@ -1,10 +1,10 @@
 import Model from '../models';
 import * as helpers from '../helpers';
 
+const { Users, Followers, Categories } = Model;
 const {
-  Users, Followers, Categories, Bookmarks
-} = Model;
-const { ApplicationError, NotFoundError, paginator } = helpers;
+  ApplicationError, NotFoundError, paginator, isEmptyObject
+} = helpers;
 
 export default {
   /**
@@ -22,8 +22,12 @@ export default {
       body: payload
     } = request;
 
+    if (isEmptyObject(payload)) {
+      throw new ApplicationError(400, 'Request body cannot be empty');
+    }
+
     if (request.user.id !== id) {
-      return response.status(401).json({ status: 'error', message: ' Unauthorized update' });
+      throw new ApplicationError(403, 'Unauthorized update');
     }
 
     const [, affectedRows] = await Users.update(
@@ -35,7 +39,7 @@ export default {
 
     return response
       .status(200)
-      .json({ status: 'success', message: 'Successfully updated', data: affectedRows[0] });
+      .json({ status: 'success', data: affectedRows[0], message: 'Profile updated successfully' });
   },
 
   /**
@@ -48,22 +52,19 @@ export default {
    *
    * @returns {Object} - response after executing the controller
    */
-  viewProfile: async (request, response) => {
-    const {
-      params: { id }
-    } = request;
-
+  getProfile: async (request, response) => {
+    const { params: { id } } = request;
     const existingUser = await Users.findOne({ where: { id }, raw: true });
 
     if (!existingUser) {
-      return response.status(404).json({ status: 'error', message: 'User does not exist' });
+      throw new NotFoundError('User does not exist');
     }
 
     delete existingUser.password;
 
     return response
       .status(200)
-      .json({ status: 'success', message: 'Request was successful', data: existingUser });
+      .json({ status: 'success', data: existingUser, message: 'Profile fetched successfully' });
   },
 
   /**
@@ -77,15 +78,14 @@ export default {
    */
   followAndUnfollow: async (request, response) => {
     const {
-      params: { userId },
-      user: { id }
+      params: { userId: followerId },
+      user: { id: userId }
     } = request;
 
-    const userThatWantsToFollowOrUnfollow = id;
-    const userToBeFollowedOrUnfollowed = await Users.findOne({ where: { id: userId } });
+    const userToBeFollowedOrUnfollowed = await Users.findOne({ where: { id: followerId } });
 
-    if (!userToBeFollowedOrUnfollowed) throw new NotFoundError('User not found');
-    if (userThatWantsToFollowOrUnfollow === userToBeFollowedOrUnfollowed.id) {
+    if (!userToBeFollowedOrUnfollowed) throw new NotFoundError('User does not exist');
+    if (userId === userToBeFollowedOrUnfollowed.id) {
       throw new ApplicationError(409, 'User cannot perform this action');
     }
 
@@ -94,13 +94,13 @@ export default {
     let followerData = await Followers.findOne({
       where: {
         followeeId: userToBeFollowedOrUnfollowed.id,
-        followerId: userThatWantsToFollowOrUnfollow
+        followerId: userId
       }
     });
 
     if (!followerData) {
       followerData = await Followers.create({
-        followerId: userThatWantsToFollowOrUnfollow,
+        followerId: userId,
         followeeId: userToBeFollowedOrUnfollowed.id
       });
     } else {
@@ -109,10 +109,10 @@ export default {
 
     return response.status(200).json({
       status: 'success',
-      message: `Successfully ${
+      data: followerData.toJSON(),
+      message: `${firstName} ${lastName} ${
         followerData.active ? 'unfollowed' : 'followed'
-      } ${firstName} ${lastName}`,
-      data: followerData.toJSON()
+      } successfully`,
     });
   },
 
@@ -140,10 +140,11 @@ export default {
 
     return response.status(200).json({
       status: 'success',
-      message: 'Request successful',
       data,
       count,
-      page
+      page: +page,
+      limit: +limit,
+      message: 'Followers fetched succesfully',
     });
   },
 
@@ -165,7 +166,7 @@ export default {
     const { data, count } = await paginator(null, {
       page,
       limit,
-      dataSource: Users.getUserFollowings,
+      dataSource: Users.getUserFollowing,
       dataToSource: { user: userId }
     });
 
@@ -173,8 +174,9 @@ export default {
       status: 'success',
       data,
       count,
-      page,
-      message: 'Request successful'
+      page: +page,
+      limit: +limit,
+      message: 'Followings fetched successfully'
     });
   },
 
@@ -205,30 +207,7 @@ export default {
     return response.status(200).json({
       status: 'success',
       data,
-      message: `Successfully subscribed to ${categories.join(', ')}`
+      message: `${categories.join(', ')} subscribed to successfully`
     });
   },
-
-  /**
-   * Controller for getting all bookmarks for a user
-   *
-   * @function
-   *
-   * @param {Object} request - express request object
-   * @param {Object} response - express response object
-   *
-   * @returns {Object} - all bookmark for a user
-   */
-  getAllBookmark: async (request, response) => {
-    const { id: userId, limit = 10, page = 1 } = request.user;
-
-    const { data, count } = await paginator(Bookmarks, { where: { userId }, page, limit });
-
-    return response.status(200).json({
-      status: 'success',
-      data,
-      page,
-      count
-    });
-  }
 };

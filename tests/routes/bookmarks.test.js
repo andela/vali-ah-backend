@@ -31,7 +31,7 @@ describe('Bookmark Endpoint', () => {
     await Articles.destroy({ where: {} });
   });
 
-  describe('user adds article to bookmark - POST request to /:articleId/bookmarks/', () => {
+  describe('POST /:articleId/bookmarks/', () => {
     it('should return 201 when user adds a bookmark', async () => {
       const validBookmarkData = {
         articleId: `${bulkArticles[0].id}`,
@@ -79,11 +79,13 @@ describe('Bookmark Endpoint', () => {
       response.should.have.status(404);
       response.body.should.have.property('error');
     });
+  });
 
+  describe('GET /:articles/bookmarks/', () => {
     it('should get all bookmarks for a user', async () => {
       const response = await chai
         .request(app)
-        .get(`${baseRoute}/users/bookmarks`)
+        .get(`${baseRoute}/articles/bookmarks`)
         .set('Authorization', `Bearer ${userToken}`);
 
       response.should.have.status(200);
@@ -92,7 +94,7 @@ describe('Bookmark Endpoint', () => {
     });
   });
 
-  describe('user removes article from bookmark - DELETE request to /:articleId/bookmarks/', () => {
+  describe('DELETE /:articleId/bookmarks/', () => {
     it('should return 200 if article exists', async () => {
       const validBookmarkData = {
         articleId: `${bulkArticles[0].id}`,

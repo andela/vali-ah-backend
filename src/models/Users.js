@@ -198,25 +198,33 @@ export default class Users extends Model {
    * @returns {boolean} true or false
    */
   static async getUserFollowers({ data, options = {} }) {
+    let result = [];
     const { user, attributes = [] } = data;
-
     const userObject = await Users.findByPk(user);
 
-    if (!userObject) throw new NotFoundError();
+    if (!userObject) throw new NotFoundError('User does not exist');
 
-    return userObject.getFollowers({
+    const totalResult = await userObject.getFollowers({
       where: { active: true },
-      attributes: ['id'],
-      order: ['id'],
-      include: [
-        {
-          model: Users,
-          as: 'followers',
-          attributes: ['id', 'firstName', 'lastName', 'userName', ...attributes]
-        }
-      ],
-      ...options
     });
+
+    if (totalResult) {
+      result = userObject.getFollowers({
+        where: { active: true },
+        attributes: ['id'],
+        order: ['id'],
+        include: [
+          {
+            model: Users,
+            as: 'followers',
+            attributes: ['id', 'firstName', 'lastName', 'userName', ...attributes]
+          }
+        ],
+        ...options
+      });
+    }
+
+    return { result, count: totalResult.length };
   }
 
   /**
@@ -231,26 +239,34 @@ export default class Users extends Model {
    *
    * @returns {boolean} true or false
    */
-  static async getUserFollowings({ data, options = {} }) {
+  static async getUserFollowing({ data, options = {} }) {
+    let result = [];
     const { user, attributes = [] } = data;
-
     const userObject = await Users.findByPk(user);
 
-    if (!userObject) throw new NotFoundError();
+    if (!userObject) throw new NotFoundError('User does not exist');
 
-    return userObject.getFollowing({
+    const totalResult = await userObject.getFollowing({
       where: { active: true },
-      attributes: ['id'],
-      order: ['id'],
-      include: [
-        {
-          model: Users,
-          as: 'following',
-          attributes: ['id', 'firstName', 'lastName', 'userName', ...attributes]
-        }
-      ],
-      ...options
     });
+
+    if (totalResult) {
+      result = userObject.getFollowing({
+        where: { active: true },
+        attributes: ['id'],
+        order: ['id'],
+        include: [
+          {
+            model: Users,
+            as: 'following',
+            attributes: ['id', 'firstName', 'lastName', 'userName', ...attributes]
+          }
+        ],
+        ...options
+      });
+    }
+
+    return { result, count: totalResult.length };
   }
 
   /**
