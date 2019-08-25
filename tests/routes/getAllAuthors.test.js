@@ -22,7 +22,6 @@ describe('Authors Endpoint', () => {
     await Users.destroy({ where: {} });
     await Articles.destroy({ where: {} });
     await Users.bulkCreate(bulkUsers, { returning: true });
-
     await Articles.bulkCreate(bulkArticles, { returning: true });
   });
 

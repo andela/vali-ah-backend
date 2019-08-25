@@ -130,16 +130,15 @@ export default {
   },
 
   /**
-   * Handles user reset password link
+   * Handles user reset password
    *
    * @function
    * @param {Object} request - request object to the server
    * @param {Object} response - response object from the server
    *
-   * @returns {void} - empty object
+   * @returns {Object} - password reset link
    */
   resetPassword: async (request, response) => {
-    const host = request.get('host');
     const { email } = request.body;
 
     const user = await Users.getExistingUser(email);
@@ -148,7 +147,7 @@ export default {
 
     const token = await user.generateVerificationToken();
 
-    const resetLink = `${request.protocol}://${host}/password/reset/${user.id}/${token}`;
+    const resetLink = `${process.env.FRONT_END_APP_URL}/password/reset/${user.id}/${token}`;
 
     notification.emit('notification', {
       type: 'passwordRecovery',
@@ -158,7 +157,7 @@ export default {
       }]
     });
 
-    return response.status(200).json({ status: 'success', data: {}, message: 'Email sent successfully' });
+    return response.status(200).json({ status: 'success', data: { resetLink }, message: 'Email sent successfully' });
   },
 
   /**
@@ -168,7 +167,7 @@ export default {
    * @param {Object} request - The request object to the server
    * @param {Object} response - The response object from the server
    *
-   * @returns {void} - empty object
+   * @returns {void} - no data returned
    */
   updatePassword: async (request, response) => {
     const { id, token } = request.params;
@@ -183,7 +182,7 @@ export default {
     await user.update({ password });
 
     notification.emit('notification', {
-      type: 'updateSuccessful',
+      type: 'passwordUpdateSuccessful',
       payload: [{
         email: user.email,
       }]

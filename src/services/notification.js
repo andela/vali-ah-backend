@@ -314,11 +314,23 @@ class Notification extends EventEmitter {
    *
    * @param {Array} payload - An Object that contains necessary info to send the reset password link
    *
-   *
    * @returns {Object} - status of event executed
    */
   async passwordRecovery(payload) {
     return this.sendMail('passwordRecovery', payload);
+  }
+
+  /**
+   * Handles notification for password update successful
+   *
+   * @function
+   *
+   * @param {Array} payload - An Object that contains the user email
+   *
+   * @returns {Object} - status of event executed
+   */
+  async passwordUpdateSuccessful(payload) {
+    return this.sendMail('passwordUpdateSuccessful', payload);
   }
 }
 

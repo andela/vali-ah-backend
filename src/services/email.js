@@ -9,13 +9,15 @@ const debug = Debug('dev');
 const {
   SENDGRID_API_KEY,
   SENDGRID_EMAIL,
-  SENDGRID_PASSWORD_RECOVERY_TEMPLATE
+  SENDGRID_PASSWORD_RECOVERY_TEMPLATE,
+  SENDGRID_PASSWORD_UPDATE_SUCCESSFUL_TEMPLATE
 } = process.env;
 
 const templates = {
   accountActivation: process.env.SENDGRID_ACTIVATION_TEMPLATE,
   activityNotification: process.env.SENDGRID_ACTIVITY_TEMPLATE,
   passwordRecovery: SENDGRID_PASSWORD_RECOVERY_TEMPLATE,
+  passwordUpdateSuccessful: SENDGRID_PASSWORD_UPDATE_SUCCESSFUL_TEMPLATE
 };
 
 /**

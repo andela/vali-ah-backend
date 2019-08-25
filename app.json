@@ -50,6 +50,12 @@
         "SENDGRID_ACTIVITY_TEMPLATE":{
           "required": true
         },
+        "SENDGRID_PASSWORD_RECOVERY_TEMPLATE":{
+          "required": true
+        },
+        "SENDGRID_PASSWORD_UPDATE_SUCCESSFUL_TEMPLATE":{
+          "required": true
+        },
         "CLOUDINARY_CLOUD_NAME":{
           "required": true
         },
@@ -57,6 +63,9 @@
           "required": true
         },
         "CLOUDINARY_API_SECRET":{
+          "required": true
+        },
+        "FRONT_END_APP_URL": {
           "required": true
         }
       },
