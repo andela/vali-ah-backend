@@ -169,6 +169,27 @@ const extractArticles = result => result.reduce((accumulator, entry) => {
   return accumulator;
 }, []);
 
+/**
+ * converts comments array to include the net vote count
+ *
+ * @function
+ *
+ * @param {Array} comments - comment array to convert
+ *
+ * @returns {Array} - returns an array of comments with net vote count
+ */
+export const getVoteCount = comments => (comments.map((comment) => {
+  let voteCount = 0;
+  comment.CommentVotes.forEach(
+    (commentVote) => {
+      voteCount = (commentVote.dataValues.vote) ? voteCount += 1 : voteCount -= 1;
+    }
+  );
+  const { CommentVotes, ...commentData } = comment.dataValues;
+
+  return { ...commentData, voteCount };
+}));
+
 export default {
   idPresent,
   checkTags,

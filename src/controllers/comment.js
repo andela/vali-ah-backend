@@ -6,7 +6,7 @@ const { Comments, CommentVotes } = Models;
 
 export default {
   /**
-   * controller for up voting and down voting articles
+   * controller for up voting and down voting comments
    *
    * @function
    *

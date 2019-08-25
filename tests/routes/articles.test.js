@@ -44,7 +44,13 @@ import {
   subscriptions
 } from '../fixtures/subscriptions';
 
-import { myArticles, myComments, inlineComments } from '../fixtures/comments';
+import {
+  myArticles,
+  myComments,
+  commentVotes,
+  sampleComments as bulkComments,
+  inlineComments
+} from '../fixtures/comments';
 import Followers from '../../src/models/Followers';
 
 chai.use(chaiAsPromised);
@@ -61,7 +67,8 @@ const {
   Votes,
   Comments,
   InlineComments,
-  Subscriptions
+  Subscriptions,
+  CommentVotes
 } = models;
 
 const baseRoute = '/api/v1';
@@ -657,18 +664,81 @@ describe('Articles API', () => {
   });
 
   describe('GET /articles/:articleId/comments', () => {
-    let articles2;
-
     before(async () => {
-      articles2 = await Articles.bulkCreate(myArticles, { returning: true });
+      await Users.destroy({ where: {} });
+      await Articles.destroy({ where: {} });
+      await Comments.destroy({ where: {} });
+      await CommentVotes.destroy({ where: {} });
+
+      await Users.bulkCreate(bulkUsers, { returning: true });
+      await Articles.bulkCreate(bulkArticles, { returning: true });
+      await Articles.bulkCreate(myArticles, { returning: true });
+      await Comments.bulkCreate(bulkComments, { returning: true });
       await Comments.bulkCreate(myComments, { returning: true });
+      await CommentVotes.bulkCreate(commentVotes, { returning: true });
+    });
+
+    after(async () => {
+      await Users.destroy({ where: {} });
+      await Articles.destroy({ where: {} });
+      await Comments.destroy({ where: {} });
+      await CommentVotes.destroy({ where: {} });
+    });
+
+    it('should return a negative voteCount for a comment that has a net downvotes', async () => {
+      const response = await chai.request(app)
+        .get(`${baseRoute}/articles/${bulkArticles[1].id}/comments`);
+
+      const { voteCount } = response.body.data[0];
+      voteCount.should.eql(-4);
+      voteCount.should.be.a('number');
+    });
+
+    it('should return a positive voteCount for a comment that has a net upvotes', async () => {
+      const response = await chai.request(app)
+        .get(`${baseRoute}/articles/${bulkArticles[9].id}/comments`);
+
+      const { voteCount } = response.body.data[0];
+      voteCount.should.eql(6);
+      voteCount.should.be.a('number');
+    });
+
+    it('should return the correct articleId associated with a comment', async () => {
+      const response = await chai.request(app)
+        .get(`${baseRoute}/articles/${bulkArticles[9].id}/comments`);
+
+      const { articleId } = response.body.data[0];
+      articleId.should.be.eql(bulkArticles[9].id);
+    });
+
+    it('should return the correct userId associated with a comment', async () => {
+      const response = await chai.request(app)
+        .get(`${baseRoute}/articles/${bulkArticles[9].id}/comments`);
+
+      const { userId } = response.body.data[0];
+      userId.should.be.eql(bulkUsers[9].id);
+    });
+
+    it('should return the correct commentId of a comment', async () => {
+      const response = await chai.request(app)
+        .get(`${baseRoute}/articles/${bulkArticles[9].id}/comments`);
+
+      const { id } = response.body.data[0];
+      id.should.be.eql(bulkComments[9].id);
+    });
+
+    it('should return the correct repliedToId associated with a comment', async () => {
+      const response = await chai.request(app)
+        .get(`${baseRoute}/articles/${bulkArticles[9].id}/comments`);
+
+      const { repliedToId } = response.body.data[0];
+      const would = chai.should();
+      would.equal(repliedToId, null);
     });
 
     it('should return 200 when an article has no comment', async () => {
-      const response = await chai
-        .request(app)
-        .get(`${baseRoute}/articles/${articles2[0].id}/comments`)
-        .set('Authorization', `Bearer ${userToken}`);
+      const response = await chai.request(app)
+        .get(`${baseRoute}/articles/${myArticles[0].id}/comments`);
 
       response.status.should.eql(200);
       response.body.data.should.be.an('array');
@@ -677,10 +747,8 @@ describe('Articles API', () => {
     });
 
     it('should return 200 when an article has only one comment', async () => {
-      const response = await chai
-        .request(app)
-        .get(`${baseRoute}/articles/${articles2[1].id}/comments`)
-        .set('Authorization', `Bearer ${userToken}`);
+      const response = await chai.request(app)
+        .get(`${baseRoute}/articles/${myArticles[1].id}/comments`);
 
       response.status.should.eql(200);
       response.body.data.should.be.a('array');
@@ -689,10 +757,8 @@ describe('Articles API', () => {
     });
 
     it('should return 200 when an article has more than one comments', async () => {
-      const response = await chai
-        .request(app)
-        .get(`${baseRoute}/articles/${articles2[2].id}/comments`)
-        .set('Authorization', `Bearer ${userToken}`);
+      const response = await chai.request(app)
+        .get(`${baseRoute}/articles/${myArticles[2].id}/comments`);
 
       response.status.should.eql(200);
       response.body.data.should.be.a('array');
@@ -702,10 +768,8 @@ describe('Articles API', () => {
 
     it('should return 404 error if the articleId does not exist', async () => {
       const nonexistingArticleId = uuid();
-      const response = await chai
-        .request(app)
-        .get(`${baseRoute}/articles/${nonexistingArticleId}/comments`)
-        .set('Authorization', `Bearer ${userToken}`);
+      const response = await chai.request(app)
+        .get(`${baseRoute}/articles/${nonexistingArticleId}/comments`);
 
       response.status.should.eql(404);
       response.body.error.should.be.a('object');
