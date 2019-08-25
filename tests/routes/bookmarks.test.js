@@ -14,7 +14,7 @@ chai.use(chaiHttp);
 
 should();
 
-const { Users, Articles } = models;
+const { Users, Articles, Bookmarks } = models;
 const baseRoute = '/api/v1';
 
 describe('Bookmark Endpoint', () => {
@@ -22,7 +22,6 @@ describe('Bookmark Endpoint', () => {
     await Users.destroy({ where: {} });
     await Articles.destroy({ where: {} });
     await Users.bulkCreate(bulkUsers, { returning: true });
-
     await Articles.bulkCreate(bulkArticles, { returning: true });
   });
 
@@ -70,6 +69,7 @@ describe('Bookmark Endpoint', () => {
         articleId: '88c0bd9a-b83d-11e9-a2a3-2a2ae2dbcce4',
         user: `${bulkUsers[0].id}`
       };
+
       const response = await chai
         .request(app)
         .post(`${baseRoute}/articles/${validBookmarkData.articleId}/bookmarks`)
@@ -78,19 +78,6 @@ describe('Bookmark Endpoint', () => {
 
       response.should.have.status(404);
       response.body.should.have.property('error');
-    });
-  });
-
-  describe('GET /:articles/bookmarks/', () => {
-    it('should get all bookmarks for a user', async () => {
-      const response = await chai
-        .request(app)
-        .get(`${baseRoute}/articles/bookmarks`)
-        .set('Authorization', `Bearer ${userToken}`);
-
-      response.should.have.status(200);
-      response.body.should.have.property('data');
-      response.body.should.have.property('count');
     });
   });
 
@@ -116,6 +103,7 @@ describe('Bookmark Endpoint', () => {
         articleId: '88c0bd9a-b83d-11e9-a2a3-2a2ae2dbcce4',
         user: `${bulkUsers[0].id}`
       };
+
       const response = await chai
         .request(app)
         .delete(`${baseRoute}/articles/${invalidBookmarkData.articleId}/bookmarks`)
@@ -124,6 +112,35 @@ describe('Bookmark Endpoint', () => {
 
       response.should.have.status(404);
       response.body.should.have.property('error');
+    });
+  });
+
+  describe('GET /:articles/bookmarks/', () => {
+    it('should get all bookmarks for a user', async () => {
+      const response = await chai
+        .request(app)
+        .get(`${baseRoute}/articles/bookmarks`)
+        .set('Authorization', `Bearer ${userToken}`);
+
+      response.should.have.status(200);
+      response.body.should.have.property('data');
+      response.body.should.have.property('count');
+    });
+
+    it('should shpuld', async () => {
+      await Bookmarks.destroy({ where: {} });
+
+      const response = await chai
+        .request(app)
+        .get(`${baseRoute}/articles/bookmarks`)
+        .set('Authorization', `Bearer ${userToken}`);
+
+      response.should.have.status(200);
+      response.body.should.have.property('data');
+      response.body.should.have.property('count');
+      response.body.data.should.be.an('array');
+      response.body.data.should.have.length(0);
+      response.body.count.should.eql(0);
     });
   });
 });
