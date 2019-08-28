@@ -17,13 +17,14 @@ const {
   TWITTER_API_SECRET,
   FACEBOOK_APP_ID,
   FACEBOOK_APP_SECRET,
-  GOOGLE_CLIENT_ID
+  GOOGLE_CLIENT_ID,
+  REDIRECT_URL
 } = process.env;
 
 const twitterConfig = {
   consumerKey: TWITTER_API_KEY,
   consumerSecret: TWITTER_API_SECRET,
-  callbackURL: '/api/v1/auth/twitter/redirect',
+  callbackURL: `${REDIRECT_URL}`,
   includeEmail: true,
   profileFields: ['id', 'displayName', 'photos', 'email']
 };
@@ -50,7 +51,10 @@ export const facebookAuth = async ({ accessToken }) => {
   const { is_valid: isValid, app_id: appId } = verificationDetails.data;
 
   if (FACEBOOK_APP_ID !== appId) {
-    throw new ApplicationError(500, `Invalid app id: expected [${FACEBOOK_APP_ID}] but was [${appId}]`);
+    throw new ApplicationError(
+      500,
+      `Invalid app id: expected [${FACEBOOK_APP_ID}] but was [${appId}]`
+    );
   }
 
   if (!isValid) {
