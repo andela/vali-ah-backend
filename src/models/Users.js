@@ -25,6 +25,7 @@ export default class Users extends Model {
     firstName: Sequelize.STRING,
     lastName: Sequelize.STRING,
     userName: Sequelize.STRING,
+    bio: Sequelize.TEXT,
     email: Sequelize.STRING,
     notify: Sequelize.BOOLEAN,
     password: Sequelize.STRING,

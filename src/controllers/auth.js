@@ -147,7 +147,7 @@ export default {
 
     const token = await user.generateVerificationToken();
 
-    const resetLink = `${process.env.FRONT_END_APP_URL}/password/reset/${user.id}/${token}`;
+    const resetLink = `${process.env.FRONT_END_APP_URL}/password-reset/${user.id}?token=${token}`;
 
     notification.emit('notification', {
       type: 'passwordRecovery',

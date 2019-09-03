@@ -42,6 +42,19 @@ const profileSchemas = {
       .isEmail()
       .withMessage('Email is not valid')
       .customSanitizer(email => email.toLowerCase()),
+    check('bio')
+      .optional()
+      .trim()
+      .not()
+      .isEmpty({ ignore_whitespace: true })
+      .withMessage('Bio cannot be blank'),
+    check('notify')
+      .optional()
+      .trim()
+      .not()
+      .isEmpty({ ignore_whitespace: true })
+      .isBoolean()
+      .withMessage('notify cannot be blank and should be a boolean'),
     check('avatarUrl')
       .optional()
       .not()
@@ -52,19 +65,19 @@ const profileSchemas = {
     check('id')
       .trim()
       .isUUID()
-      .withMessage('Id does not exist')
+      .withMessage('Id does not exist'),
   ],
   profileViewSchema: [
     check('id')
       .trim()
       .isUUID()
-      .withMessage('Id does not exist')
+      .withMessage('Id does not exist'),
   ],
   followerSchema: [
     check('userId')
       .trim()
       .isUUID()
-      .withMessage('Id does not exist')
+      .withMessage('Id does not exist'),
   ],
   subscriptions: [
     check('categories')
@@ -73,8 +86,8 @@ const profileSchemas = {
       .withMessage('Categories cannot be empty')
       .isArray()
       .withMessage('Categories should be an array')
-      .custom(value => validateSubscriptions(value))
-  ]
+      .custom(value => validateSubscriptions(value)),
+  ],
 };
 
 export default profileSchemas;

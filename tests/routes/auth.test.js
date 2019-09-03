@@ -1,5 +1,7 @@
 import chai, { should } from 'chai';
 import chaiHttp from 'chai-http';
+import sinon from 'sinon';
+import sendgrid from '@sendgrid/mail';
 
 import app from '../../src';
 import database from '../../src/models';
@@ -27,6 +29,14 @@ let validToken;
 let blacklistedToken;
 
 const server = () => chai.request(app);
+
+before(() => {
+  sinon.stub(sendgrid, 'send').resolves();
+});
+
+after(() => {
+  if (sendgrid.send.restore) sendgrid.send.restore();
+});
 
 describe('Auth Routes', () => {
   describe('Signup Route', () => {
