@@ -35,6 +35,10 @@ export default {
           type: Sequelize.STRING,
           unique: true
         },
+        bio: {
+          allowNull: true,
+          type: Sequelize.TEXT,
+        },
         email: {
           allowNull: false,
           type: Sequelize.STRING,

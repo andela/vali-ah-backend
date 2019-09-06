@@ -20,8 +20,8 @@ const { Users, Categories, Articles } = models;
 export const idPresent = async (id, table) => {
   const Id = await table.findOne({
     where: {
-      id
-    }
+      id,
+    },
   });
   return Id;
 };
@@ -38,15 +38,22 @@ export const idPresent = async (id, table) => {
 export const checkTags = async (tag) => {
   if (tag) {
     tag.forEach((eachTag) => {
-      if (tag.length > 2) throw new ApplicationError(400, 'Tags can only be a maximum of 2');
-      if (!uuidRegularExpression.test(eachTag)) throw new ApplicationError(400, 'Tag contains an invalid value');
+      if (tag.length > 2) { throw new ApplicationError(400, 'Tags can only be a maximum of 2'); }
+      if (!uuidRegularExpression.test(eachTag)) { throw new ApplicationError(400, 'Tag contains an invalid value'); }
     });
     const availableCategory = await Categories.checkTagsExistence(tag);
 
-    const idsPresent = availableCategory.map(eachCategory => eachCategory.dataValues.id);
+    const idsPresent = availableCategory.map(
+      eachCategory => eachCategory.dataValues.id,
+    );
     const resp = tag.filter(eachTag => !idsPresent.includes(eachTag));
 
-    if (resp.length) throw new ApplicationError(400, ` The following category Ids ${resp} are not available yet`);
+    if (resp.length) {
+      throw new ApplicationError(
+        400,
+        ` The following category Ids ${resp} are not available yet`,
+      );
+    }
   }
 };
 
@@ -123,7 +130,7 @@ const filter = (title, tag, author, keyword) => {
       { model: Articles, as: 'article' },
       { model: Categories, as: 'tag' },
     ],
-    where: hasFilterQuery && { ...filterQuery }
+    where: hasFilterQuery && { ...filterQuery },
   };
 };
 
@@ -140,9 +147,8 @@ const extractArticles = result => result.reduce((accumulator, entry) => {
   const firstName = entry['author.firstName'];
   const lastName = entry['author.lastName'];
   const userName = entry['author.userName'];
-  const createdAt = entry['author.createdAt'];
-  const ArticleId = entry['article.id'];
-  const item = accumulator.find(value => value.ArticleId === entry.articleId);
+  const articleId = entry['article.id'];
+  const item = accumulator.find(value => value.articleId === entry.articleId);
 
   if (item) {
     if (item.category.includes(entry['tag.category'])) return accumulator;
@@ -152,16 +158,18 @@ const extractArticles = result => result.reduce((accumulator, entry) => {
   }
 
   const newEntry = {
-    ArticleId,
+    articleId,
     title: entry['article.title'],
     summary: entry['article.summary'],
     body: entry['article.body'],
     suspended: entry['article.suspended'],
+    slug: entry['article.slug'],
     status: entry['article.status'],
     coverImageUrl: entry['article.coverImageUrl'],
     followUpId: entry['article.followUpId'],
     createdAt: entry['article.createdAt'],
-    author: { name: `${firstName} ${lastName}`, userName, createdAt },
+    author: { name: `${firstName} ${lastName}`, userName },
+    avatarUrl: entry['author.avatarUrl'],
     category: [entry['tag.category']],
   };
   accumulator[accumulator.length] = newEntry;
@@ -178,22 +186,22 @@ const extractArticles = result => result.reduce((accumulator, entry) => {
  *
  * @returns {Array} - returns an array of comments with net vote count
  */
-export const getVoteCount = comments => (comments.map((comment) => {
+export const getVoteCount = comments => comments.map((comment) => {
   let voteCount = 0;
-  comment.CommentVotes.forEach(
-    (commentVote) => {
-      voteCount = (commentVote.dataValues.vote) ? voteCount += 1 : voteCount -= 1;
-    }
-  );
+  comment.CommentVotes.forEach((commentVote) => {
+    voteCount = commentVote.dataValues.vote
+      ? (voteCount += 1)
+      : (voteCount -= 1);
+  });
   const { CommentVotes, ...commentData } = comment.dataValues;
 
   return { ...commentData, voteCount };
-}));
+});
 
 export default {
   idPresent,
   checkTags,
   getTagName,
   filter,
-  extractArticles
+  extractArticles,
 };
