@@ -21,7 +21,6 @@ export default {
       params: { id },
       body: payload
     } = request;
-
     if (isEmptyObject(payload)) {
       throw new ApplicationError(400, 'Request body cannot be empty');
     }
@@ -29,6 +28,7 @@ export default {
     if (request.user.id !== id) {
       throw new ApplicationError(403, 'Unauthorized update');
     }
+    if (request.file) payload.avatarUrl = request.file.secure_url;
 
     const [, affectedRows] = await Users.update(
       { ...payload },
