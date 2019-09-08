@@ -51,6 +51,7 @@ export default class Comments extends Model {
   static associate(models) {
     Comments.belongsTo(models.Users, {
       foreignKey: 'userId',
+      as: 'commentAuthor',
       onDelete: 'CASCADE'
     });
     Comments.belongsTo(models.Articles, {
