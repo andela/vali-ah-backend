@@ -2,6 +2,7 @@ import express from 'express';
 import profile from '../controllers/user';
 import profileSchema from '../validations/profile';
 import middlewares from '../middlewares';
+import upload from '../services/imageUpload';
 
 const {
   getProfile,
@@ -61,6 +62,7 @@ const router = express.Router();
  */
 router.patch(
   '/profile/:id',
+  upload.single('image'),
   validator(profileUpdateSchema),
   asyncWrapper(verifyToken),
   asyncWrapper(updateProfile)

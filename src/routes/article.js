@@ -348,7 +348,7 @@ router.post(
  *       200:
  *         description: success
  */
-router.get('/:slug', asyncWrapper(verifyToken), asyncWrapper(getBySlug));
+router.get('/:slug', asyncWrapper(getBySlug));
 
 /**
  * @swagger

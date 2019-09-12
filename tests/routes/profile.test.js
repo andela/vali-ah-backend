@@ -1,8 +1,10 @@
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import chaiAsPromised from 'chai-as-promised';
+import sinon from 'sinon';
 import sinonchai from 'sinon-chai';
 
+import userController from '../../src/controllers/user';
 import Model from '../../src/models';
 import app from '../../src';
 import {
@@ -19,6 +21,7 @@ chai.use(chaiAsPromised);
 chai.use(chaiHttp);
 chai.use(sinonchai);
 
+const { updateProfile } = userController;
 const { Users, Categories } = Model;
 const profileUrl = '/api/v1/users/profile/';
 const signUrl = '/api/v1/auth/signup';
@@ -82,6 +85,30 @@ describe('Profile', () => {
       response.body.data.should.have.property('firstName');
       response.body.data.should.have.property('lastName');
       response.body.data.should.have.property('email');
+    });
+
+    it('should update user\'s profile image if image is provided', async () => {
+      const req = {
+        params: { id: 22 },
+        file: { secure_url: 'image.png' },
+        body: {
+          body: 'rrre'
+        },
+        user: { id: 22 }
+      };
+      const res = {
+        status() {},
+        json() {}
+      };
+      const affectedRows = [{ password: 'password' }];
+
+      sinon.stub(Users, 'update').callsFake(() => [1, affectedRows]);
+      sinon.stub(res, 'status').returnsThis();
+
+      await updateProfile(req, res);
+      Users.update.restore();
+
+      res.status.should.be.calledWith(200);
     });
 
     it('should not update user when it value is invalid', async () => {
