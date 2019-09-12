@@ -27,15 +27,15 @@ const {
 
 export default {
   /**
-    * controller for creating comments
-    *
-    * @function
-    *
-    * @param {Object} request - express request object
-    * @param {Object} response - express response object
-    *
-    * @returns {Object} - the response from the server
-    */
+   * controller for creating comments
+   *
+   * @function
+   *
+   * @param {Object} request - express request object
+   * @param {Object} response - express response object
+   *
+   * @returns {Object} - the response from the server
+   */
   createComment: async (request, response) => {
     const { articleId } = request.params;
     const { id: userId } = request.user;
@@ -65,12 +65,11 @@ export default {
 
     const articleObject = await Articles.getExistingArticle(articleId);
 
-    const existingBookmark = await Bookmarks.getExistingBookmark(
-      articleId,
-      userId
-    );
+    const existingBookmark = await Bookmarks.getExistingBookmark(articleId, userId);
 
-    if (existingBookmark) { throw new ApplicationError(409, 'Bookmark already added'); }
+    if (existingBookmark) {
+      throw new ApplicationError(409, 'Bookmark already added');
+    }
 
     const newBookmark = await articleObject.createBookmark({ userId });
 
@@ -93,10 +92,7 @@ export default {
     const { articleId } = request.params;
     const { id: userId } = request.user;
 
-    const existingBookmark = await Bookmarks.getExistingBookmark(
-      articleId,
-      userId
-    );
+    const existingBookmark = await Bookmarks.getExistingBookmark(articleId, userId);
 
     if (!existingBookmark) throw new NotFoundError();
 
@@ -121,7 +117,13 @@ export default {
   searchArticle: async (request, response, next) => {
     let data = [];
     const {
-      author, title, tag, keyword, includeSubscriptions, page = 1, limit = 10
+      author,
+      title,
+      tag,
+      keyword,
+      includeSubscriptions,
+      page = 1,
+      limit = 10
     } = request.query;
 
     const standardQueries = title || author || tag;
@@ -152,7 +154,7 @@ export default {
       count,
       page: +page,
       limit: +limit,
-      message: 'Articles retrieved successfully',
+      message: 'Articles retrieved successfully'
     });
   },
 
@@ -208,15 +210,15 @@ export default {
   },
 
   /**
-    * controller for getting comments
-    *
-    * @function
-    *
-    * @param {request} request - express request object
-    * @param {response} response - express response object
-    *
-    * @returns {Object} - the response from the server
-    */
+   * controller for getting comments
+   *
+   * @function
+   *
+   * @param {request} request - express request object
+   * @param {response} response - express response object
+   *
+   * @returns {Object} - the response from the server
+   */
   getComments: async (request, response) => {
     const { articleId } = request.params;
 
@@ -229,27 +231,33 @@ export default {
       include: [
         {
           model: CommentVotes
+        },
+        {
+          model: Users,
+          as: 'commentAuthor',
+          attributes: ['firstName', 'lastName', 'avatarUrl']
         }
-      ],
+      ]
     });
 
     const commentsWithVoteCount = getVoteCount(comments);
 
-    const message = comments.length ? `Comment${comments.length > 1 ? 's' : ''} retrieved successfully`
+    const message = comments.length
+      ? `Comment${comments.length > 1 ? 's' : ''} retrieved successfully`
       : 'There is no comment for this article';
 
     return response.status(200).json({ status: 'success', data: commentsWithVoteCount, message });
   },
 
   /** controller for creating articles
-    *
-    * @function
-    *
-    * @param {Object} request - express request object
-    * @param {Object} response - express response object
-    *
-    * @returns {Object} - callback that execute the controller
-    */
+   *
+   * @function
+   *
+   * @param {Object} request - express request object
+   * @param {Object} response - express response object
+   *
+   * @returns {Object} - callback that execute the controller
+   */
   createArticle: async (request, response) => {
     const { tag } = request.body;
 
@@ -257,7 +265,7 @@ export default {
       ...request.body,
       id: uuid(),
       authorId: request.user.id,
-      coverImageUrl: (request.file) ? request.file.secure_url : null,
+      coverImageUrl: request.file ? request.file.secure_url : null
     };
 
     if (!article.summary) article.summary = article.body.substring(0, 20);
@@ -265,24 +273,28 @@ export default {
 
     const articleResponse = await Articles.create(article);
 
-    const tagResponse = (tag) ? await ArticleCategories.createTags(
-      tag, articleResponse.id, request.user.id
-    ) : [];
+    const tagResponse = tag
+      ? await ArticleCategories.createTags(tag, articleResponse.id, request.user.id)
+      : [];
     const tagName = await getTagName(tagResponse);
 
-    return response.status(201).json({ status: 'success', data: { ...articleResponse.dataValues, tags: tagName }, message: 'Article successfully created' });
+    return response.status(201).json({
+      status: 'success',
+      data: { ...articleResponse.dataValues, tags: tagName },
+      message: 'Article successfully created'
+    });
   },
 
   /**
-    * controller for getting articles by slug
-    *
-    * @function
-    *
-    * @param {Object} request - express request object
-    * @param {Object} response - express response object
-    *
-    * @returns {Object} - callback that execute the controller
-    */
+   * controller for getting articles by slug
+   *
+   * @function
+   *
+   * @param {Object} request - express request object
+   * @param {Object} response - express response object
+   *
+   * @returns {Object} - callback that execute the controller
+   */
   getBySlug: async (request, response) => {
     const { slug } = request.params;
 
@@ -290,25 +302,28 @@ export default {
       where: {
         slug: { [Sequelize.Op.iLike]: slug }
       },
-      include: [{
-        model: ArticleCategories,
-        as: 'category'
-      },
-      {
-        model: Users,
-        as: 'author'
-      },
-      {
-        model: ReadStats
-      },
-      {
-        model: Votes
-      }, {
-        model: Reports
-      },
-      {
-        model: Comments
-      }],
+      include: [
+        {
+          model: ArticleCategories,
+          as: 'category'
+        },
+        {
+          model: Users,
+          as: 'author'
+        },
+        {
+          model: ReadStats
+        },
+        {
+          model: Votes
+        },
+        {
+          model: Reports
+        },
+        {
+          model: Comments
+        }
+      ]
     });
 
     if (!articleResponse) throw new ApplicationError(404, 'Article not found');
@@ -317,7 +332,7 @@ export default {
 
     let voteCount = 0;
     articleResponse.dataValues.Votes.forEach((vote) => {
-      voteCount = (vote.upVote) ? voteCount += 1 : voteCount -= 1;
+      voteCount = vote.upVote ? (voteCount += 1) : (voteCount -= 1);
     });
 
     const tagName = await getTagName(tags);
@@ -331,27 +346,25 @@ export default {
       Author: author
     };
 
-    return response.status(200).json({ status: 'success', data: articleResponse, message: 'Article successfully returned' });
+    return response
+      .status(200)
+      .json({ status: 'success', data: articleResponse, message: 'Article successfully returned' });
   },
 
   /**
-    * controller to update article by slug
-    *
-    * @function
-    *
-    * @param {Object} request - express request object
-    * @param {Object} response - express response object
-    *
-    * @returns {Object} - callback that execute the controller
-    */
+   * controller to update article by slug
+   *
+   * @function
+   *
+   * @param {Object} request - express request object
+   * @param {Object} response - express response object
+   *
+   * @returns {Object} - callback that execute the controller
+   */
   updateArticle: async (request, response) => {
     const { tag } = request.body;
     const {
-      articleId,
-      authorId,
-      slug,
-      id,
-      ...article
+      articleId, authorId, slug, id, ...article
     } = request.body;
 
     if (request.file) article.coverImageUrl = request.file.secure_url;
@@ -362,7 +375,9 @@ export default {
     if (tag) {
       await ArticleCategories.deleteTags(articleResponse.id);
       const tagResponse = await ArticleCategories.createTags(
-        tag, articleResponse.id, request.user.id
+        tag,
+        articleResponse.id,
+        request.user.id
       );
       tagName = await getTagName(tagResponse);
     } else {
@@ -371,19 +386,23 @@ export default {
       tagName = await getTagName(createdTags);
     }
 
-    return response.status(200).json({ status: 'success', data: { ...articleResponse.dataValues, tags: tagName }, message: 'Article succesfully updated' });
+    return response.status(200).json({
+      status: 'success',
+      data: { ...articleResponse.dataValues, tags: tagName },
+      message: 'Article succesfully updated'
+    });
   },
 
   /**
-    * controller for deleting articles by slug
-    *
-    * @function
-    *
-    * @param {Object} request - express request object
-    * @param {Object} response - express response object
-    *
-    * @returns {Object} - callback that execute the controller
-    */
+   * controller for deleting articles by slug
+   *
+   * @function
+   *
+   * @param {Object} request - express request object
+   * @param {Object} response - express response object
+   *
+   * @returns {Object} - callback that execute the controller
+   */
   deleteArticle: async (request, response) => {
     const { slug } = request.params;
     await Articles.deleteArticle(slug);
@@ -392,111 +411,129 @@ export default {
   },
 
   /**
-  * controller for creating inline comments for an article
-  *
-  * @function
-  *
-  * @param {Object} request - express request object
-  * @param {Object} response - express response object
-  *
-  * @return {Object} - callback that execute the controller
-  */
+   * controller for creating inline comments for an article
+   *
+   * @function
+   *
+   * @param {Object} request - express request object
+   * @param {Object} response - express response object
+   *
+   * @return {Object} - callback that execute the controller
+   */
   createInlineComment: async (request, response) => {
     const { articleId } = request.params;
     const commentData = { ...request.body, userId: request.user.id };
 
     const comment = (await Articles.createInlineComment(articleId, commentData)).toJSON();
 
-    return response.status(201).json({ status: 'success', data: comment, message: 'Inline comment added succesfully' });
+    return response
+      .status(201)
+      .json({ status: 'success', data: comment, message: 'Inline comment added succesfully' });
   },
 
   /**
-  * controller for updating inline comments for an article
-  *
-  * @function
-  *
-  * @param {Object} request - express request object
-  * @param {Object} response - express response object
-  *
-  * @return {Object} - callback that execute the controller
-  */
+   * controller for updating inline comments for an article
+   *
+   * @function
+   *
+   * @param {Object} request - express request object
+   * @param {Object} response - express response object
+   *
+   * @return {Object} - callback that execute the controller
+   */
   updateInlineComment: async (request, response) => {
     const { articleId, userId: userIdInBody, ...commentData } = request.body;
     const { comment } = request;
 
     const updatedComment = (await Articles.updateInlineComment(comment, commentData)).toJSON();
 
-    return response.status(200).json({ status: 'success', data: updatedComment, message: 'Inline comment updated succesfully' });
+    return response.status(200).json({
+      status: 'success',
+      data: updatedComment,
+      message: 'Inline comment updated succesfully'
+    });
   },
 
   /**
-    * controller for deleting inline comments for an article
-    *
-    * @function
-    *
-    * @param {Object} request - express request object
-    * @param {Object} response - express response object
-    *
-    * @return {Object} - callback that execute the controller
-    */
+   * controller for deleting inline comments for an article
+   *
+   * @function
+   *
+   * @param {Object} request - express request object
+   * @param {Object} response - express response object
+   *
+   * @return {Object} - callback that execute the controller
+   */
   deleteInlineComment: async (request, response) => {
     const { comment } = request;
 
     await comment.destroy();
 
-    return response.status(200).json({ status: 'success', data: { }, message: 'Inline comment deleted succesfully' });
+    return response
+      .status(200)
+      .json({ status: 'success', data: {}, message: 'Inline comment deleted succesfully' });
   },
 
   /**
-    * controller for getting an inline comment
-    *
-    * @function
-    *
-    * @param {Object} request - express request object
-    * @param {Object} response - express response object
-    *
-    * @return {Object} - callback that execute the controller
-    */
+   * controller for getting an inline comment
+   *
+   * @function
+   *
+   * @param {Object} request - express request object
+   * @param {Object} response - express response object
+   *
+   * @return {Object} - callback that execute the controller
+   */
   getInlineComment: async (request, response) => {
     const { commentId } = request.params;
 
-    const comment = await InlineComments.findByPk(commentId, { include: [{ model: Users, attributes: ['id', 'firstName', 'lastName', 'userName', 'avatarUrl'] }] });
+    const comment = await InlineComments.findByPk(commentId, {
+      include: [
+        { model: Users, attributes: ['id', 'firstName', 'lastName', 'userName', 'avatarUrl'] }
+      ]
+    });
 
     if (!comment) throw new NotFoundError('Comment does not exist');
 
     const commentData = comment.toJSON();
 
-    return response.status(200).json({ status: 'success', data: commentData, message: 'Inline comment retrieved succesfully' });
+    return response.status(200).json({
+      status: 'success',
+      data: commentData,
+      message: 'Inline comment retrieved succesfully'
+    });
   },
 
   /**
-    * controller for getting inline comments for an article
-    *
-    * @function
-    *
-    * @param {Object} request - express request object
-    * @param {Object} response - express response object
-    *
-    * @return {Object} - callback that execute the controller
-    */
+   * controller for getting inline comments for an article
+   *
+   * @function
+   *
+   * @param {Object} request - express request object
+   * @param {Object} response - express response object
+   *
+   * @return {Object} - callback that execute the controller
+   */
   getArticleInlineComment: async (request, response) => {
     const { articleId } = request.params;
 
     const comments = await Articles.getInlineComments(articleId);
 
-    return response.status(200).json({ status: 'success', data: comments, message: 'Inline comment retrieved succesfully' });
+    return response
+      .status(200)
+      .json({ status: 'success', data: comments, message: 'Inline comment retrieved succesfully' });
   },
 
   /**
-    * controller for fetching articles followed by user
-    *
-    * @function
-    *
-    * @param {Object} request - express request object
-    * @param {Object} response - express response object
-    *
-    * @return {Object} - callback that execute the controller
-    */
+   * controller for fetching articles followed by user
+   *
+   * @function
+   *
+   * @param {Object} request - express request object
+   * @param {Object} response - express response object
+   *
+   * @return {Object} - callback that execute the controller
+   */
   getUserFeed: async (request, response) => {
     const { id: userId } = request.user;
     const { page = 1, limit = 10 } = request.query;
@@ -507,14 +544,16 @@ export default {
         authorId: followedAuthorsId,
         status: 'published'
       },
-      include: [{
-        model: Categories,
-        as: 'categories'
-      },
-      {
-        model: Users,
-        as: 'author'
-      }],
+      include: [
+        {
+          model: Categories,
+          as: 'categories'
+        },
+        {
+          model: Users,
+          as: 'author'
+        }
+      ],
       page,
       limit
     });
@@ -550,27 +589,33 @@ export default {
     const { page = 1, limit = 10 } = request.query;
 
     const user = await Users.findByPk(userId);
-    const categoryIds = (await user.getSubscriptions({ attributes: ['categoryId'] })).map(sub => sub.categoryId);
+    const categoryIds = (await user.getSubscriptions({ attributes: ['categoryId'] })).map(
+      sub => sub.categoryId
+    );
 
     const query = {
       limit,
       page,
-      include: [{
-        model: Users,
-        as: 'author',
-        attributes: ['id', 'firstName', 'lastName', 'avatarUrl']
-
-      }, {
-        model: ArticleCategories,
-        as: 'category',
-        where: { categoryId: categoryIds },
-        attributes: [['categoryId', 'id']],
-        include: [{
-          model: Categories,
-          as: 'tag',
-          attributes: ['category']
-        }]
-      }]
+      include: [
+        {
+          model: Users,
+          as: 'author',
+          attributes: ['id', 'firstName', 'lastName', 'avatarUrl']
+        },
+        {
+          model: ArticleCategories,
+          as: 'category',
+          where: { categoryId: categoryIds },
+          attributes: [['categoryId', 'id']],
+          include: [
+            {
+              model: Categories,
+              as: 'tag',
+              attributes: ['category']
+            }
+          ]
+        }
+      ]
     };
 
     const { data, count } = await paginator(Articles, query);
@@ -615,7 +660,7 @@ export default {
       count,
       page: +page,
       limit: +limit,
-      message: 'Bookmarks fetched successfully',
+      message: 'Bookmarks fetched successfully'
     });
   }
 };
