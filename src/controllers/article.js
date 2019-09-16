@@ -650,9 +650,32 @@ export default {
    * @returns {Object} - all bookmark for a user
    */
   getAllBookmark: async (request, response) => {
-    const { id: userId, limit = 10, page = 1 } = request.user;
+    const { id: userId } = request.user;
+    const { page = 1, limit = 10 } = request.query;
 
-    const { data, count } = await paginator(Bookmarks, { where: { userId }, page, limit });
+    const query = {
+      limit,
+      page,
+      where: { userId },
+      include: [
+        {
+          model: Articles,
+          attributes: ['id', 'title', 'coverImageUrl', 'slug', 'createdAt'],
+          include: [
+            {
+              model: Users,
+              as: 'author',
+              attributes: ['id', 'firstName', 'lastName', 'avatarUrl']
+            },
+            {
+              model: ReadStats
+            },
+          ]
+        }
+      ]
+    };
+
+    const { data, count } = await paginator(Bookmarks, query);
 
     return response.status(200).json({
       status: 'success',
