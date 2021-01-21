@@ -54,7 +54,7 @@
     "request": "^2.87.0",
     "sequelize": "^5.10.2",
     "sinon-test": "^2.4.0",
-    "socket.io": "^2.2.0",
+    "socket.io": "^2.4.0",
     "swagger-ui-express": "^4.0.7",
     "uuid": "^3.3.2"
   },
